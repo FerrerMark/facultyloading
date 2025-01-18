@@ -145,9 +145,9 @@ function closeEditFacultyModal() {
 }
 //******************************* */
 
-function confirmDeleteFaculty(selectedFaculty) {
+function confirmDeleteFaculty(selectedFaculty, department) {
     if (confirm("Are you sure you want to delete this program?")) {
-        window.location.href = "/facultyloading/back/faculty.php?action=delete&id=" + selectedFaculty;
+        window.location.href = "/facultyloading/back/faculty.php?action=delete&id=" + selectedFaculty+"&department="+ department;
     }
 }
 

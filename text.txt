@@ -1,0 +1,9 @@
+INSERT INTO faculty (firstname, lastname, middlename, phone_no, address, departmentID, department_title, college, subject, role, employment_status) 
+VALUES 
+('Johnmark', 'Ferrer', 'M', '8080', 'test', 'BSIT', 'Bachelor of Science in Information Technology', 'College of Computing', 'null', 'department head', 'Full-time'),
+('Marie', 'Curie', 'V', '8080', 'test', 'BSCPE', 'Bachelor of Science in Chemical Engineering', 'College of Engineering', 'chem101', 'faculty', 'Full-time'),
+('Alden', 'Recharge', 'U', '8080', 'null', 'BSCPE', 'Bachelor of Science in Chemical Engineering', 'College of Engineering', 'null', 'department head', 'Part-time'),
+('James', 'Read', 'U', '8080', 'test', 'BSED', 'Bachelor of Science in Education', 'College of Education', 'null', 'department head', 'Full-time'),
+('Denail', 'Padila', 'M', '8080', 'test', 'BSCRIM', 'Bachelor of Science in Criminology', 'College of Criminal Justice', 'null', 'department head', 'Contract'),
+('Uzumaki', 'Naruto', 'A', '8080', 'test', 'BSIT', 'Bachelor of Science in Information Technology', 'College of Computing', 'null', 'dean', 'Full-time'),
+('Isaac', 'Newton', 'T', '8080', 'test', 'BSCPE', 'Bachelor of Science in Chemical Engineering', 'College of Engineering', 'chem101', 'faculty', 'Part-time');

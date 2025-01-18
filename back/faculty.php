@@ -4,32 +4,52 @@ include_once "../connections/connection.php";
 // Handle actions
 if (isset($_GET['action'])) {
     if ($_GET['action'] === 'add' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-        // Add new faculty
-        $firstname = $_POST['firstname'];
-        $middlename = $_POST['middlename'];
-        $lastname = $_POST['lastname'];
-        $position = $_POST['position'];
-        $college = $_POST['college'];
-        $status = $_POST['status'];
 
+        $departmentID = $_GET['department'];
+        
+        $firstname = trim($_POST['firstname']);
+        $middlename = trim($_POST['middlename']);
+        $lastname = trim($_POST['lastname']);
+        $position = trim($_POST['position']);
+        $college = trim($_POST['college']);
+        $status = trim($_POST['status']);
+        $address = trim($_POST['address']);
+        $phone_no = trim($_POST['phone_no']);
+        $department = trim($_POST['department']);
+        $department_title = trim($_POST['department_title']); // New field
+        $subject = trim($_POST['subject']);
+        $role = trim($_POST['role']);
+    
         try {
-            $sql = "INSERT INTO teachers (firstname, middlename, lastname, position, college, employment_status) 
-                    VALUES (:firstname, :middlename, :lastname, :position, :college, :status)";
+            $sql = "INSERT INTO faculty (firstname, middlename, lastname, college, employment_status, address, phone_no, departmentID, department_title, subject, role) 
+                    VALUES (:firstname, :middlename, :lastname, :college, :status, :address, :phone_no, :department, :department_title, :subject, :role)";
+            
             $stmt = $conn->prepare($sql);
+            
             $stmt->bindParam(':firstname', $firstname);
             $stmt->bindParam(':middlename', $middlename);
             $stmt->bindParam(':lastname', $lastname);
-            $stmt->bindParam(':position', $position);
             $stmt->bindParam(':college', $college);
             $stmt->bindParam(':status', $status);
+            $stmt->bindParam(':address', $address);
+            $stmt->bindParam(':phone_no', $phone_no);
+            $stmt->bindParam(':department', $department);
+            $stmt->bindParam(':department_title', $department_title);
+            $stmt->bindParam(':subject', $subject);
+            $stmt->bindParam(':role', $role);
+            
             $stmt->execute();
+    
+            header("Location: ../frame/faculty.php?department=" . urlencode($departmentID));
+            exit(); 
 
-            header("Location: ../frame/faculty.php?message=Faculty added successfully.");
-            exit;
+            
         } catch (PDOException $e) {
-            echo "Error: " . $e->getMessage();
+            error_log("Database error: " . $e->getMessage());
+            header("Location: ../frame/faculty.php?error=Failed to add faculty.");
+            exit;
         }
-    } else if($_GET['action'] === 'edit' && isset($_GET['id']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    }else if($_GET['action'] === 'edit' && isset($_GET['id']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
         // Edit faculty
         $id = $_GET['id'];
         $firstname = $_POST['firstname'];
@@ -62,14 +82,16 @@ if (isset($_GET['action'])) {
     } else if ($_GET['action'] === 'delete' && isset($_GET['id'])) {
         // Delete faculty
         $id = $_GET['id'];
+        $department = $_GET['department'];
         try {
-            $sql = "DELETE FROM teachers WHERE account_number = :id";
+            $sql = "DELETE FROM faculty WHERE faculty_id = :id";
             $stmt = $conn->prepare($sql);
             $stmt->bindParam(':id', $id, PDO::PARAM_INT);
             $stmt->execute();
 
-            header("Location: ../frame/faculty.php?message=Faculty deleted successfully.");
-            exit;
+            header("Location: ../frame/faculty.php?department=" . urlencode($department));
+            exit(); 
+
         } catch (PDOException $e) {
             echo "Error: " . $e->getMessage();
         }
@@ -78,7 +100,7 @@ if (isset($_GET['action'])) {
 
 // Fetch faculty list
 try {
-    $sql = "SELECT * FROM teachers";
+    $sql = "SELECT * FROM faculty";
     $stmt = $conn->query($sql);
     $facultyList = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (PDOException $e) {
@@ -87,16 +109,19 @@ try {
 
 $selectedFaculty = null;
 if (isset($_GET['id'])) {
-    try {
-        $id = $_GET['id'];
-        $sql = "SELECT * FROM teachers WHERE account_number = :id"; 
-        $stmt = $conn->prepare($sql);
-        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
-        $stmt->execute();
-        $selectedFaculty = $stmt->fetch(PDO::FETCH_ASSOC);
-    } catch (PDOException $e) {
-        echo "Error fetching faculty: " . $e->getMessage();
-    }
+        try {
+            
+            $id = $_GET['id'];
+            $sql = "SELECT * FROM faculty WHERE faculty_id = :id"; 
+            $stmt = $conn->prepare($sql);
+            $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+            $stmt->execute();
+
+            $selectedFaculty = $stmt->fetch(PDO::FETCH_ASSOC); 
+        
+        } catch (PDOException $e) {
+            echo "Error fetching faculty: " . $e->getMessage();
+        }
 }
 
 $conn = null;

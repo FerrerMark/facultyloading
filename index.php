@@ -37,7 +37,7 @@
                 
                 <img src="https://bootdey.com/img/Content/avatar/avatar7.png" alt="">
             </div>
-            <h3><?php echo $row['firstName']." ".$row['lastName']?></h3>
+            <h3><?php echo $row['firstname']." ".$row['lastname']?></h3>
             <h4><?php echo "<span>".$row['departmentID']."</span>"." " .$row['role']?></h4>
             <hr>
             <nav class="side_nav">
