@@ -25,6 +25,7 @@ if (isset($_POST['submit'])) {
         $_SESSION['id'] = $id;
         $_SESSION['role'] = $role;
 
+
         header("Location: /facultyloading/index.php");
 
         // if ($role === 'department head') {

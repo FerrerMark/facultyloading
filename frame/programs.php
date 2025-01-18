@@ -157,7 +157,8 @@
             <div class="modal-content">
                 <span class="close-btn" onclick="closeModal()">&times;</span>
                 <h2>Add NNew Program</h2>
-                <form action="/facultyloading/back/actions.php?action=add" method="POST">
+                <form action="/facultyloading/back/actions.php?action=add&department=<?php echo $_SESSION['departmentID']?>" method="POST">
+                
                     <label for="programCode">Program Code:</label>
                     <input type="text" id="programCode" name="programCode" required>
                     
@@ -207,43 +208,46 @@
         </div>
 
         <table>
-    <thead>
-        <tr>
-            <th>program code</th>
-            <th>program</th>
-            <th>college</th>
-            <th>Action</th>
-        </tr>
-    </thead>
-    <tbody>
-        <?php foreach ($programs as $row) { ?>
-            <tr>
-                <td><?php echo $row['program_code']; ?></td>
-                <td><?php echo $row['program_name']; ?></td>
-                <td><?php echo $row['college']; ?></td>
-                <td>
-                    <div class="action-buttons">
+            <thead>
+                <tr>
+                    <th>program code</th>
+                    <th>program</th>
+                    <th>college</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
 
-                        <button class="delete-btn" onclick="confirmDelete('<?php echo $row['program_code']; ?>')">🗑</button>
+                <?php foreach ($programs as $row) { ?>
+                    <tr>
+                        <td><?php echo $row['program_code']; ?></td>
+                        <td><?php echo $row['program_name']; ?></td>
+                        <td><?php echo $row['college']; ?></td>
+                        <td>
+                            <div class="action-buttons">
+                                <?php if ($_GET['department'] === $row['program_code']) { ?>
+                                    <!-- Show buttons only if the user's department matches -->
+                                    <button class="delete-btn" onclick="confirmDelete('<?php echo $row['program_code']; ?>')">🗑</button>
 
+                                    <button class="edit-btn" onclick="openEditProgramModal('<?php echo htmlspecialchars($row['program_code'], ENT_QUOTES); ?>', '<?php echo htmlspecialchars($row['program_name'], ENT_QUOTES); ?>', '<?php echo htmlspecialchars($row['college'], ENT_QUOTES); ?>')">✎</button>
+                                <?php } else { ?>
+                                    <!-- Show disabled buttons for unauthorized users -->
+                                    <button class="delete-btn" disabled style="opacity: 0.5; cursor: not-allowed;">🗑</button>
+                                    <button class="edit-btn" disabled style="opacity: 0.5; cursor: not-allowed;">✎</button>
+                                <?php } ?>
 
-                        <button class="edit-btn" onclick="openEditProgramModal('<?php echo htmlspecialchars($row['program_code'], ENT_QUOTES); ?>', '<?php echo htmlspecialchars($row['program_name'], ENT_QUOTES); ?>', '<?php echo htmlspecialchars($row['college'], ENT_QUOTES); ?>')">✎</button>
-
-
-                        <a href="class.php?program_code=<?php echo urlencode($row['program_code']); ?>">
-                        <button class="programs-btn">Class</button>
-                        </a>
-
-                        <a href="courses.php?program_code=<?php echo urlencode($row['program_code']); ?>">
-                            <button class="programs-btn">Courses</button>
-                        </a>
-                    </div>
-                </td>
-            </tr>
-        <?php } ?>
-    </tbody>
-
-</table>
+                                <!-- These buttons are always accessible -->
+                                <a href="class.php?program_code=<?php echo urlencode($row['program_code']); ?>">
+                                    <button class="programs-btn">Class</button>
+                                </a>
+                                <a href="courses.php?program_code=<?php echo urlencode($row['program_code']); ?>">
+                                    <button class="programs-btn">Courses</button>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                <?php } ?>
+            </tbody>
         </table>
     </div>
     <script src="../scripts.js"></script>

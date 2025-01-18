@@ -25,7 +25,7 @@
         <div class="header-icons">
             <span class="icon-park-solid--dark-mode"></span>
             <i class="fa-solid fa-bell"></i>
-            <a href="/sms/faculty/profile.php">
+            <a onclick="loadFrame('profile','<?php echo $role?>','<?php ?>')">
                 <i class="fa-solid fa-user"></i>
             </a>
         </div>
@@ -47,17 +47,21 @@
                     <a href="#" onclick="documents()" class="nav-item"><i class="fa-solid fa-file"></i>&nbsp;Documents</a>  
                 <?php } ?> 
                 
-                <a href="#" onclick="loadFrame('programs')" class="nav-item"><span class="nrk--media-programguide-active"></span></i>&nbsp;programs</a>
+                <a href="#" onclick="loadFrame('programs','<?php echo $role;?>','<?php echo $departmentId;?>')"class="nav-item"><span class="nrk--media-programguide-active"></span></i>&nbsp;programs</a>
+
                 <a href="#" onclick="todo()"  class="nav-item"><span class="lucide--list-todo"></span>&nbsp;ToDo list</a>
                 <a href="#" onclick="loadFrame('crads')"  class="nav-item"><span class="uis--schedule"></span>&nbsp;Student Research Schedule</a>
                         
                     <!--head-->
                     <?php if($role == "department head"){ ?>
                         <a href="#" onclick="loadFrame('faculty','<?php echo $role;?>','<?php echo $departmentId;?>')"  class="nav-item"><span class="mdi--teacher"></span>&nbsp;faculty</a>
+
                         <a href="#" onclick="loadFrame('rooms')"  class="nav-item"><span class="guidance--conference-room"></span>&nbsp;room</a>
+
                         <a href="#" onclick="loadFrame('schedules')"  class="nav-item"><span class="mingcute--schedule-line"></span>&nbsp;schedule management</a>
                         
                         <a href="#" onclick="distribute()"  class="nav-item"><span class="fluent-mdl2--assign"></span>&nbsp;distribute schedule</a>
+
                         <a href="#" onclick="check_schedule()"  class="nav-item"><span class="tdesign--fact-check"></span>&nbsp;check schedule</a>
                     <?php } ?>
                

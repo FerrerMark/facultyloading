@@ -223,7 +223,7 @@
                 <h2>Add New Faculty</h2>
             </div>
             <div class="modal-body">
-                <form id="newFacultyForm" action="../back/faculty.php?action=add" method="post" enctype="multipart/form-data">
+                <form id="newFacultyForm" action="../back/faculty.php?action=add&department=<?php echo $_GET['department']?>" method="post" enctype="multipart/form-data">
 
                     <label for="firstname">First Name:</label>
                     <input type="text" id="firstname" name="firstname" required placeholder="Enter first name">
@@ -234,14 +234,14 @@
                     <label for="lastname">Last Name:</label>
                     <input type="text" id="lastname" name="lastname" required placeholder="Enter last name">
 
-                    <label for="college">College:</label>
+                    <!-- <label for="college">College:</label>
                     <select id="college" name="college" required>
                         <option value="">Select College</option>
                         <option value="College of Computing">College of Computing</option>
                         <option value="College of Engineering">College of Engineering</option>
                         <option value="College of Education">College of Education</option>
                         <option value="College of Criminal Justice">College of Criminal Justice</option>
-                    </select>
+                    </select> -->
 
                     <label for="status">Employment Status:</label>
                     <select id="status" name="status" required>
@@ -256,12 +256,6 @@
 
                     <label for="phone_no">Phone Number:</label>
                     <input type="text" id="phone_no" name="phone_no" required placeholder="Enter phone number">
-
-                    <label for="department">Department:</label>
-                    <input type="text" id="department" name="department" required placeholder="Enter department name">
-
-                    <label for="department_title">Department Title:</label>
-                    <input type="text" id="department_title" name="department_title" required placeholder="Enter full department title">
 
                     <label for="subject">Subject:</label>
                     <input type="text" id="subject" name="subject" required placeholder="Enter subject taught">
@@ -330,9 +324,6 @@
                     <label for="phone_no">Phone Number:</label>
                     <input type="text" id="phone_no" name="phone_no" required placeholder="Enter phone number">
 
-                    <label for="department">Department:</label>
-                    <input type="text" id="department" name="department" required placeholder="Enter department name">
-
                     <label for="department_title">Department Title:</label>
                     <input type="text" id="department_title" name="department_title" required placeholder="Enter full department title">
 
@@ -352,10 +343,6 @@
             </div>
         </div>
     </div>
-
-
-
-
 
     <div class="main-content">
         <div class="header">
@@ -389,21 +376,13 @@
             <?php foreach ($facultyList as $faculty): ?>
                     <tr>
                         <td><?php echo htmlspecialchars($faculty['firstname']); ?></td>
-                    
                         <td><?php echo htmlspecialchars($faculty['lastname']); ?></td>
-                    
                         <td><?php echo htmlspecialchars($faculty['middlename']); ?></td>
-                    
                         <td><?php echo htmlspecialchars($faculty['college']); ?></td>
-                    
                         <td><?php echo htmlspecialchars($faculty['departmentID']); ?></td>
-                    
                         <td><?php echo htmlspecialchars($faculty['employment_status']); ?></td>
-                    
                         <td><?php echo htmlspecialchars($faculty['subject']); ?></td>
-                    
                         <td><?php echo htmlspecialchars($faculty['role']); ?></td>
-                    
                         <td>
                             <a href="faculty.php?id=<?php echo $faculty['faculty_id']; ?>&department=<?php echo $faculty['departmentID']?>&action=edit">
                                 <button class="edit-btn">✏ Edit</button>

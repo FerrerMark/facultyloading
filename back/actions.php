@@ -34,14 +34,13 @@ if (isset($_GET['action'])) {
     
             $stmt->execute();
     
-            header("Location: ../frame/programs.php?message=Program successfully updated");
+            header("Location: ../frame/programs.php?message=Program successfully updated&role=department%20head&department=$programCode");
+            
             exit;
         } catch (PDOException $e) {
             echo "Error updating program: " . $e->getMessage();
         }
     } elseif ($action === 'add' && isset($_POST['programCode'])) {
-
-        
 
         try {
 
@@ -57,8 +56,9 @@ if (isset($_GET['action'])) {
             $stmt->bindParam(':college', $college, PDO::PARAM_STR);
     
             $stmt->execute();
-    
-            header("Location: ../frame/programs.php?message=Program successfully added");
+
+            $departmentID = $_SESSION['departmentID'];
+            header("Location: ../frame/programs.php?message=Program successfully updated&role=department%20head&department=". urldecode($departmentID));
             exit;
         } catch (PDOException $e) {
             echo "Error adding program: " . $e->getMessage();
