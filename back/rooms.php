@@ -2,7 +2,10 @@
 
     include_once "../connections/connection.php";
 
-if($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $role = "department head";
+
+if($_SERVER['REQUEST_METHOD'] === 'POST' || $role === 'department head') {
+    
     if(isset($_GET['action'])){
 
         $action = $_GET['action'];
@@ -34,8 +37,10 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt->bindParam(':room_no', $room_no, PDO::PARAM_STR);
             $stmt->execute();
 
-            header("location: ../frame/rooms.php");
+            header("location: ../frame/rooms.php?role=department head");    
             exit;
+
+            echo "triggered";
 
         }else if ($action === "edit") {
             
@@ -79,6 +84,8 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit;
         }
     }
+}else{
+    echo "nothing";
 }
 
     $stmt = $conn->prepare("SELECT * FROM rooms");

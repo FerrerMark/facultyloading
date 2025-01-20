@@ -164,7 +164,7 @@ function closeAddRoomModal() {
 // delete confirmation for room
 function deleteRoomComfirm(building, room){
     if(confirm("are you sure you want to delete this room?")){
-        window.location.href = "/facultyloading/back/rooms.php?building="+building+"&room="+room+"&action=delete";
+        window.location.href = "/facultyloading/back/rooms.php?building="+building+"&room="+room+"&action=delete&role=department head";
     }
 }
 

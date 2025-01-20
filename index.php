@@ -56,7 +56,7 @@
                     <?php if($role == "department head"){ ?>
                         <a href="#" onclick="loadFrame('faculty','<?php echo $role;?>','<?php echo $departmentId;?>')"  class="nav-item"><span class="mdi--teacher"></span>&nbsp;faculty</a>
 
-                        <a href="#" onclick="loadFrame('rooms')"  class="nav-item"><span class="guidance--conference-room"></span>&nbsp;room</a>
+                        <a href="#" onclick="loadFrame('rooms','<?php echo $role;?>','<?php echo $departmentId;?>')"  class="nav-item"><span class="guidance--conference-room"></span>&nbsp;room</a>
 
                         <a href="#" onclick="loadFrame('schedules')"  class="nav-item"><span class="mingcute--schedule-line"></span>&nbsp;schedule management</a>
 

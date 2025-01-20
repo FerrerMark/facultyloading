@@ -1,9 +1,15 @@
 <?php
 
+    include_once("../back/manual_scheduling.php");
 
-include_once "../back/manual_scheduling.php";
+    $building = $_GET['building'] ?? null;
+    $room_no = $_GET['room_no'] ?? null;
+
+    if (!$building || !$room_no) {
+        die("Error: No room selected. Please go back and select a room.");
+    }
+
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -35,8 +41,12 @@ include_once "../back/manual_scheduling.php";
     </style>
 </head>
 <body>
-    <h2>Manual Scheduling</h2>
-    <form method="POST">
+    <h2>Manual Scheduling for Room: <?php echo htmlspecialchars($room_no); ?> (<?php echo htmlspecialchars($building); ?>)</h2>
+
+    <form action="../back/manual_scheduling.php?room_no=<?php echo $_GET['room_no']; ?>&building=<?php echo $_GET['building']; ?>" method="POST">
+        <input type="hidden" name="building" value="<?php echo htmlspecialchars($building); ?>">
+        <input type="hidden" name="room" value="<?php echo htmlspecialchars($room_no); ?>">
+
         <label>Teacher:</label>
         <input type="text" name="teacher" required><br>
 
@@ -47,53 +57,76 @@ include_once "../back/manual_scheduling.php";
         <input type="text" name="course" required><br>
 
         <label>Room:</label>
-        <input type="text" name="room" required><br>
+        <input type="text" value="<?php echo htmlspecialchars($room_no); ?>" disabled><br>
 
         <label>Remarks:</label>
         <input type="text" name="remarks"><br>
 
         <h3>Select Schedule:</h3>
-        <table border="1">
-            <tr>
-                <th>Time Slot</th>
-                <?php foreach ($days_of_week as $day_num => $day_name) { ?>
-                    <th><?php echo $day_name; ?></th>
-                <?php } ?>
-            </tr>
-            <?php foreach ($time_slots as $slot_num => $slot_label) { ?>
+            <table border="1">
                 <tr>
-                    <td><?php echo $slot_label; ?></td>
+                    <th>Time Slot</th>
                     <?php foreach ($days_of_week as $day_num => $day_name) { ?>
-                        <td>
-                            <?php
-                            $checkbox_name = $slot_num . '-' . $day_num;
-                            echo renderCheckbox($checkbox_name, isset($schedule_data[$checkbox_name]));
-                            ?>
-                        </td>
+                        <th><?php echo $day_name; ?></th>
                     <?php } ?>
                 </tr>
-            <?php } ?>
-        </table>
+                <?php foreach ($time_slots as $slot_num => $slot_label) { ?>
+                    <tr>
+                        <td><?php echo $slot_label; ?></td>
+                        <?php foreach ($days_of_week as $day_num => $day_name) { ?>
+                            <td style="text-align: center;">
+                                <?php
+                                // Generate unique key for this time slot and day
+                                $schedule_key = $slot_num . '-' . $day_num;
+
+                                // Check if this slot is already scheduled for the selected room
+                                $existing_schedule = null;
+                                foreach ($schedules as $schedule) {
+                                    if ($schedule['room'] == $room_no && 
+                                        $schedule['time_slot'] == $slot_num && $schedule['day_of_week'] == $day_num) {
+                                        $existing_schedule = $schedule;
+                                        break;
+                                    }
+                                }
+
+                                if ($existing_schedule) {
+                                    // Display faculty name and disable checkbox
+                                    echo '<div style="color: red; font-weight: bold;">' . htmlspecialchars($existing_schedule['teacher']) . '</div>';
+                                    echo '<input type="checkbox" name="schedule_data[' . htmlspecialchars($schedule_key) . ']" disabled>';
+                                } else {
+                                    // Show checkbox if slot is available
+                                    echo '<input type="checkbox" name="schedule_data[' . htmlspecialchars($schedule_key) . ']">';
+                                }
+                                ?>
+                            </td>
+                        <?php } ?>
+                    </tr>
+                <?php } ?>
+            </table>
+
 
         <button type="submit">Save Schedule</button>
     </form>
 
-    <h3>Existing Schedules</h3>
+    <h3>Existing Schedules for Room <?php echo htmlspecialchars($room_no); ?></h3>
     <table border="1">
         <tr>
             <th>Teacher</th>
             <th>Subject</th>
             <th>Course</th>
-            <th>Room</th>
             <th>Time Slot</th>
             <th>Day</th>
         </tr>
-        <?php foreach ($schedules as $schedule) { ?>
+        <?php 
+        $filtered_schedules = array_filter($schedules, function($schedule) use ($room_no, $building) {
+            return $schedule['room'] == $room_no;
+        });
+
+        foreach ($filtered_schedules as $schedule) { ?>
             <tr>
                 <td><?php echo htmlspecialchars($schedule['teacher']); ?></td>
                 <td><?php echo htmlspecialchars($schedule['subject']); ?></td>
                 <td><?php echo htmlspecialchars($schedule['course']); ?></td>
-                <td><?php echo htmlspecialchars($schedule['room']); ?></td>
                 <td><?php echo $time_slots[$schedule['time_slot']] ?? "Unknown"; ?></td>
                 <td><?php echo $days_of_week[$schedule['day_of_week']] ?? "Unknown"; ?></td>
             </tr>
