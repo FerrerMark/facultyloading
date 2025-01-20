@@ -10,6 +10,7 @@ $role = $_SESSION['role'];
 
 // Handle actions
 $department = $_GET['department'];
+
 if(!empty($department) && $role !== 'faculty') {
     if (isset($_GET['action'])) {
         if ($_GET['action'] === 'add' && $_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -20,18 +21,38 @@ if(!empty($department) && $role !== 'faculty') {
             $middlename = trim($_POST['middlename']);
             $lastname = trim($_POST['lastname']);
             $position = trim($_POST['position']);
-            $college = trim($_POST['college']);
+            $college = "null";
             $status = trim($_POST['status']);
             $address = trim($_POST['address']);
             $phone_no = trim($_POST['phone_no']);
             $department = $department;
-            $department_title = trim($_POST['department_title']);
+            $department_title = "null";
             $subject = trim($_POST['subject']);
             $role = trim($_POST['role']);
         
             try {
-                $sql = "INSERT INTO faculty (firstname, middlename, lastname, college, employment_status, address, phone_no, departmentID, department_title, subject, role) 
-                        VALUES (:firstname, :middlename, :lastname, :college, :status, :address, :phone_no, :department, :department_title, :subject, :role)";
+                $sql = "INSERT INTO faculty (firstname, 
+                                            middlename, 
+                                            lastname, 
+                                            college, 
+                                            employment_status, 
+                                            address, 
+                                            phone_no, 
+                                            departmentID, 
+                                            department_title, 
+                                            subject, 
+                                            role) 
+                        VALUES (:firstname,
+                                            :middlename,
+                                            :lastname,
+                                            :college, 
+                                            :status,
+                                            :address,
+                                            :phone_no, 
+                                            :department,
+                                            :department_title,
+                                            :subject,
+                                            :role)";
                 
                 $stmt = $conn->prepare($sql);
                 
@@ -64,25 +85,35 @@ if(!empty($department) && $role !== 'faculty') {
             $firstname = $_POST['firstname'];
             $middlename = $_POST['middlename'];
             $lastname = $_POST['lastname'];
-            $position = $_POST['position'];
-            $college = $_POST['college'];
-            $status = $_POST['status'];
-
+            $employment_status = $_POST['status'];
+            $address = $_POST['address'];
+            $phone_no = $_POST['phone_no'];
+            $subject = $_POST['subject'];
+            $role = $_POST['role'];
             try {
-                $sql = "UPDATE teachers SET firstname = :firstname, middlename = :middlename, lastname = :lastname, 
-                        position = :position, college = :college, employment_status = :status WHERE account_number = :id";
-                $stmt = $conn->prepare($sql);
-                $stmt->bindParam(':firstname', $firstname);
-                $stmt->bindParam(':middlename', $middlename);
-                $stmt->bindParam(':lastname', $lastname);
-                $stmt->bindParam(':position', $position);
-                $stmt->bindParam(':college', $college);
-                $stmt->bindParam(':status', $status);
-                $stmt->bindParam(':id', $id, PDO::PARAM_INT);
-                $stmt->execute();
+                $sql = "UPDATE faculty SET 
+                            firstname = :firstname, 
+                            middlename = :middlename, 
+                            lastname = :lastname, 
+                            employment_status = :status,
+                            address = :address, 
+                            phone_no = :phone_no, 
+                            subject = :subject,
+                            role = :role 
+                        WHERE faculty_id = :id";
+                            $stmt = $conn->prepare($sql);
+                            $stmt->bindParam(':firstname', $firstname);
+                            $stmt->bindParam(':middlename', $middlename);
+                            $stmt->bindParam(':lastname', $lastname);
+                            $stmt->bindParam(':status', $employment_status);
+                            $stmt->bindParam(':address', $address);
+                            $stmt->bindParam(':phone_no', $phone_no);
+                            $stmt->bindParam(':subject', $subject);
+                            $stmt->bindParam(':role', $role);
+                            $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+                            $stmt->execute();
 
-                header("Location: ../frame/faculty.php?message=Faculty updated successfully.");
-                echo "success";
+                header("Location: ../frame/faculty.php?department=$department&role=$role");
                 exit;
             } catch (PDOException $e) {
                 echo "Error: " . $e->getMessage();
@@ -139,7 +170,8 @@ if(!empty($department) && $role !== 'faculty') {
 }
 
 }else{
-    header("Location: ../back/logout.php");
+    // header("Location: ../back/logout.php");
+    echo "home";
     exit();
 }
 

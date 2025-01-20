@@ -59,10 +59,14 @@
                         <a href="#" onclick="loadFrame('rooms')"  class="nav-item"><span class="guidance--conference-room"></span>&nbsp;room</a>
 
                         <a href="#" onclick="loadFrame('schedules')"  class="nav-item"><span class="mingcute--schedule-line"></span>&nbsp;schedule management</a>
-                        
+
+                        <a href="#" onclick="loadFrame('manual_scheduling','<?php echo $role;?>','<?php echo $departmentId;?>')" onclick="check_schedule()"  class="nav-item"><span class="mingcute--schedule-line"></span>&nbsp;Manual Scheduling</a>
+
                         <a href="#" onclick="distribute()"  class="nav-item"><span class="fluent-mdl2--assign"></span>&nbsp;distribute schedule</a>
 
-                        <a href="#" onclick="check_schedule()"  class="nav-item"><span class="tdesign--fact-check"></span>&nbsp;check schedule</a>
+                        <a href="#" onclick="loadFrame('manual_scheduling','<?php echo $role;?>','<?php echo $departmentId;?>')"class="nav-item"><span class="tdesign--fact-check"></span>&nbsp;check schedule</a>
+
+                        
                     <?php } ?>
                
 
