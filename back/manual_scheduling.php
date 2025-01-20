@@ -24,39 +24,31 @@ $days_of_week = [
 // Initialize variables to prevent undefined errors
 $schedule_data = [];
 
+$stmt = $pdo->query("SELECT * FROM schedules");
+$schedules = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+// Store checked schedules in an array for easy reference
+foreach ($schedules as $schedule) {
+    // Create a key based on time slot and day of the week to track scheduled time slots
+    $schedule_data[$schedule['time_slot'] . '-' . $schedule['day_of_week']] = true;
+}
+
+// Now, handle form submission (check for duplicates and insert new records)
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Sanitize inputs to prevent SQL Injection
     $teacher = htmlspecialchars($_POST['teacher'] ?? '');
     $subject = htmlspecialchars($_POST['subject'] ?? '');
     $course = htmlspecialchars($_POST['course'] ?? '');
     $room = htmlspecialchars($_POST['room'] ?? '');
     $remarks = htmlspecialchars($_POST['remarks'] ?? '');
-    $schedule_data = $_POST['schedule_data'] ?? [];
+    $schedule_data_from_form = $_POST['schedule_data'] ?? []; // schedule data from the form
 
-    // Loop through selected schedule slots and insert them if not duplicate
-    foreach ($schedule_data as $key => $value) {
+    // Loop through selected schedule slots from the form submission
+    foreach ($schedule_data_from_form as $key => $value) {
         list($time_slot, $day_of_week) = explode('-', $key);
 
-        // Check if the record already exists
-        $checkStmt = $pdo->prepare("
-            SELECT COUNT(*) FROM schedules 
-            WHERE teacher = :teacher 
-              AND subject = :subject 
-              AND course = :course 
-              AND room = :room 
-              AND time_slot = :time_slot 
-              AND day_of_week = :day_of_week
-        ");
-        $checkStmt->execute([
-            ':teacher' => $teacher,
-            ':subject' => $subject,
-            ':course' => $course,
-            ':room' => $room,
-            ':time_slot' => $time_slot,
-            ':day_of_week' => $day_of_week
-        ]);
-
-        if ($checkStmt->fetchColumn() == 0) { // Only insert if the schedule is new
+        // Check if the record already exists in the database to prevent duplicates
+        if (!isset($schedule_data[$key])) { // Only insert if the schedule isn't already taken
+            // Prepare and execute the insert query
             $stmt = $pdo->prepare("
                 INSERT INTO schedules (teacher, subject, course, room, remarks, time_slot, day_of_week, is_checked) 
                 VALUES (:teacher, :subject, :course, :room, :remarks, :time_slot, :day_of_week, 1)
@@ -73,26 +65,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
-    // Redirect after submission to prevent duplicate inserts from refresh
-    header("Location: manual_scheduling.php?role=department%20head&department=BSIT");
+    // Redirect to prevent resubmission after form submission
+    header("Location: manual_scheduling.php?success=true");
     exit();
 }
-
-///*
-// Retrieve schedules from the database
-$stmt = $pdo->query("SELECT * FROM schedules");
-$schedules = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-// Store checked schedules in an array for easy reference
-foreach ($schedules as $schedule) {
-    $schedule_data[$schedule['time_slot'] . '-' . $schedule['day_of_week']] = true;
-}
-// */
-
-// Function to render a checkbox
-// function renderCheckbox($name, $checked = false) {
-//     return '<input type="checkbox" name="schedule_data[' . htmlspecialchars($name) . ']"' . ($checked ? ' checked' : '') . '>';
-// }
 
 function renderCheckbox($name, $checked = false) {
     if ($checked) {
