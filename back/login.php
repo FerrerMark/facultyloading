@@ -20,7 +20,7 @@ if (isset($_POST['submit'])) {
     $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if ($stmt->rowCount() > 0) {
-        $id = $row['faculty_id'];
+        $id = $row['faculty_id'];   
         $role = $row['role']; 
         $_SESSION['id'] = $id;
         $_SESSION['role'] = $role;

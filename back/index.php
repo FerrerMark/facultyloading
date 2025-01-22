@@ -17,18 +17,5 @@
     $role = $row['role'];
     $departmentId = $row['departmentID'];
 
-    
-
-    // $depsql = "SELECT * FROM `department` WHERE `DepartmentID` = ?";
-    // $depstmt = $pdo->prepare($depsql);
-    // $depstmt->execute([$id]);
-    // $deprow = $depstmt->fetch();
-
-    // $depsql = "SELECT department.* FROM department 
-    //        INNER JOIN faculty ON faculty.DepartmentID = department.DepartmentID 
-    //        WHERE faculty.FacultyID = :id";
-    //     $depstmt = $pdo->prepare($depsql);
-    //     $depstmt->execute([':id' => $id]);
-    //     $deprow = $depstmt->fetch();
 
 ?>

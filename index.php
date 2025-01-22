@@ -66,6 +66,8 @@
 
                         <a href="#" onclick="loadFrame('manual_scheduling','<?php echo $role;?>','<?php echo $departmentId;?>')"class="nav-item"><span class="tdesign--fact-check"></span>&nbsp;check schedule</a>
 
+                        <a href="#" onclick="loadFrame('auto_scheduling','<?php echo $role;?>','<?php echo $departmentId;?>')"class="nav-item"><span class="ic--outline-hdr-auto"></span>&nbsp;auto schedule</a>
+
                         
                     <?php } ?>
                

@@ -170,8 +170,7 @@ if(!empty($department) && $role !== 'faculty') {
 }
 
 }else{
-    // header("Location: ../back/logout.php");
-    echo "home";
+    header("Location: ../back/logout.php");
     exit();
 }
 

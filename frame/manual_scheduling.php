@@ -47,8 +47,13 @@
         <input type="hidden" name="building" value="<?php echo htmlspecialchars($building); ?>">
         <input type="hidden" name="room" value="<?php echo htmlspecialchars($room_no); ?>">
 
-        <label>Teacher:</label>
-        <input type="text" name="teacher" required><br>
+        <label for="faculty">Select Faculty:</label>
+            <select name="teacher" id="faculty" required>
+                <option value="">Select a faculty</option>
+                <?php foreach ($facultyList as $faculty): ?>
+                    <option value="<?php echo $faculty['faculty_id']; ?>"><?php echo $faculty['firstname'] . ' ' . $faculty['middlename'].' ' . $faculty['lastname']; ?></option>
+                <?php endforeach; ?>
+            </select><br>
 
         <label>Subject:</label>
         <input type="text" name="subject" required><br>
@@ -76,25 +81,21 @@
                         <?php foreach ($days_of_week as $day_num => $day_name) { ?>
                             <td style="text-align: center;">
                                 <?php
-                                // Generate unique key for this time slot and day
                                 $schedule_key = $slot_num . '-' . $day_num;
 
-                                // Check if this slot is already scheduled for the selected room
                                 $existing_schedule = null;
                                 foreach ($schedules as $schedule) {
                                     if ($schedule['room'] == $room_no && 
                                         $schedule['time_slot'] == $slot_num && $schedule['day_of_week'] == $day_num) {
                                         $existing_schedule = $schedule;
                                         break;
-                                    }
+                                    }   
                                 }
 
                                 if ($existing_schedule) {
-                                    // Display faculty name and disable checkbox
                                     echo '<div style="color: red; font-weight: bold;">' . htmlspecialchars($existing_schedule['teacher']) . '</div>';
-                                    echo '<input type="checkbox" name="schedule_data[' . htmlspecialchars($schedule_key) . ']" disabled>';
+                                    echo '<input type="checkbox" name="schedule_data[' . htmlspecialchars($schedule_key) . ']" Hidden>';
                                 } else {
-                                    // Show checkbox if slot is available
                                     echo '<input type="checkbox" name="schedule_data[' . htmlspecialchars($schedule_key) . ']">';
                                 }
                                 ?>
@@ -117,7 +118,7 @@
             <th>Time Slot</th>
             <th>Day</th>
         </tr>
-        <?php 
+        <?php
         $filtered_schedules = array_filter($schedules, function($schedule) use ($room_no, $building) {
             return $schedule['room'] == $room_no;
         });

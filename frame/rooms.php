@@ -303,7 +303,7 @@ include_once "../back/rooms.php";
 
                                 <button class="btn btn-delete" onclick="deleteRoomComfirm('<?php echo $room['building'];?>','<?php echo $room['room_no']; ?>')">🗑</button>
 
-                                <a href="manual_scheduling.php?building=<?php echo urlencode($room['building']); ?>&room_no=<?php echo urlencode($room['room_no']); ?>"><button class="btn btn-schedule">Schedules</button></a>
+                                <a href="manual_scheduling.php?building=<?php echo urlencode($room['building']); ?>&room_no=<?php echo urlencode($room['room_no']); ?>&department=<?php echo $_GET['department']; ?>"><button class="btn btn-schedule">Schedules</button></a>
 
                             </div>
                         </td>
