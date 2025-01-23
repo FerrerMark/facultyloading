@@ -3,81 +3,88 @@ include_once "../connections/connection.php";
 
 session_start();
 $role = $_SESSION['role'];
-// if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'department head') {
-//     header("Location: ../login.php"); // Redirect to login if not logged in
-//     exit();
-// }
 
-// Handle actions
-$department = $_GET['department'];
+$id = $_SESSION['id'];
+$stmt = $pdo->prepare("SELECT department FROM users where faculty_id = :department");
+$stmt->bindParam(':department', $id);
+$stmt->execute();
 
-if(!empty($department) && $role !== 'faculty') {
+$department = $stmt->fetchColumn();
+
+if(!empty($department) && $role != 'faculty') {
     if (isset($_GET['action'])) {
-        if ($_GET['action'] === 'add' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-
-            $departmentID = $_GET['department'];
+        if (isset($_GET['action']) && $_GET['action'] === 'add' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+            // Sanitize and validate inputs
+            $firstname = trim($_POST['firstname'] ?? '');
+            $middlename = trim($_POST['middlename'] ?? '');
+            $lastname = trim($_POST['lastname'] ?? '');
+            $status = trim($_POST['status'] ?? '');
+            $address = trim($_POST['address'] ?? '');
+            $phone_no = trim($_POST['phone_no'] ?? '');
+            $departmentID = trim($_POST['department']);
+            $subject = trim($_POST['subject'] ?? '');
+            $role = trim($_POST['role'] ?? '');
+            $master_specialization = trim($_POST['master_specialization'] ?? '');
             
-            $firstname = trim($_POST['firstname']);
-            $middlename = trim($_POST['middlename']);
-            $lastname = trim($_POST['lastname']);
-            $position = trim($_POST['position']);
-            $college = "null";
-            $status = trim($_POST['status']);
-            $address = trim($_POST['address']);
-            $phone_no = trim($_POST['phone_no']);
-            $department = $department;
-            $department_title = "null";
-            $subject = trim($_POST['subject']);
-            $role = trim($_POST['role']);
+            // Handle the college field - set it to NULL if not provided
+            $college = !empty($_POST['college']) ? $_POST['college'] : NULL;
+        
+            // Set nullable values properly
+            $department_title = NULL;
         
             try {
-                $sql = "INSERT INTO faculty (firstname, 
-                                            middlename, 
-                                            lastname, 
-                                            college, 
-                                            employment_status, 
-                                            address, 
-                                            phone_no, 
-                                            departmentID, 
-                                            department_title, 
-                                            subject, 
-                                            role) 
-                        VALUES (:firstname,
-                                            :middlename,
-                                            :lastname,
-                                            :college, 
-                                            :status,
-                                            :address,
-                                            :phone_no, 
-                                            :department,
-                                            :department_title,
-                                            :subject,
-                                            :role)";
-                
+                // SQL Insert Query
+                $sql = "INSERT INTO faculty (
+                            firstname, 
+                            middlename, 
+                            lastname, 
+                            employment_status, 
+                            address, 
+                            phone_no, 
+                            departmentID, 
+                            subject, 
+                            role,
+                            master_specialization,
+                            college
+                        ) VALUES (
+                            :firstname,
+                            :middlename,
+                            :lastname,
+                            :status,
+                            :address,
+                            :phone_no, 
+                            :departmentID,
+                            :subject,
+                            :role,
+                            :master_specialization,
+                            :college
+                        )";
+        
+                // Prepare and execute the statement
                 $stmt = $conn->prepare($sql);
-                
                 $stmt->bindParam(':firstname', $firstname);
                 $stmt->bindParam(':middlename', $middlename);
                 $stmt->bindParam(':lastname', $lastname);
-                $stmt->bindParam(':college', $college);
                 $stmt->bindParam(':status', $status);
                 $stmt->bindParam(':address', $address);
                 $stmt->bindParam(':phone_no', $phone_no);
-                $stmt->bindParam(':department', $department);
-                $stmt->bindParam(':department_title', $department_title);
+                $stmt->bindParam(':departmentID', $departmentID);
                 $stmt->bindParam(':subject', $subject);
                 $stmt->bindParam(':role', $role);
-                
-                $stmt->execute();
+                $stmt->bindParam(':master_specialization', $master_specialization);
+                $stmt->bindParam(':college', $college, PDO::PARAM_STR); // Ensures college can be NULL
         
-                header("Location: ../frame/faculty.php?department=" . urlencode($departmentID));
-                exit(); 
-
-                
+                if ($stmt->execute()) {
+                    header("Location: ../frame/faculty.php?department=" . urlencode($departmentID) . "&success=Faculty added successfully");
+                    exit();
+                } else {
+                    throw new Exception("Failed to execute SQL query.");
+                }
             } catch (PDOException $e) {
                 error_log("Database error: " . $e->getMessage());
-                header("Location: ../frame/faculty.php?error=Failed to add faculty.");
-                exit;
+                die("Error: " . $e->getMessage()); // Show error for debugging
+            } catch (Exception $e) {
+                die("Error: " . $e->getMessage());
             }
         }else if($_GET['action'] === 'edit' && isset($_GET['id']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
             // Edit faculty
@@ -90,6 +97,7 @@ if(!empty($department) && $role !== 'faculty') {
             $phone_no = $_POST['phone_no'];
             $subject = $_POST['subject'];
             $role = $_POST['role'];
+            $master_specialization = $_POST['master_specialization'];
             try {
                 $sql = "UPDATE faculty SET 
                             firstname = :firstname, 
@@ -99,7 +107,8 @@ if(!empty($department) && $role !== 'faculty') {
                             address = :address, 
                             phone_no = :phone_no, 
                             subject = :subject,
-                            role = :role 
+                            role = :role,
+                            master_specialization = :master_specialization
                         WHERE faculty_id = :id";
                             $stmt = $conn->prepare($sql);
                             $stmt->bindParam(':firstname', $firstname);
@@ -111,6 +120,7 @@ if(!empty($department) && $role !== 'faculty') {
                             $stmt->bindParam(':subject', $subject);
                             $stmt->bindParam(':role', $role);
                             $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+                            $stmt->bindParam(':master_specialization', $master_specialization);
                             $stmt->execute();
 
                 header("Location: ../frame/faculty.php?department=$department&role=$role");
@@ -138,8 +148,6 @@ if(!empty($department) && $role !== 'faculty') {
         }
     }
 
-    // Fetch faculty list
-    $department = $_GET['department'];
     if(!empty($department) && isset($department)) {
         try {
             $sql = "SELECT * FROM faculty where departmentID = '$department'";
@@ -169,11 +177,12 @@ if(!empty($department) && $role !== 'faculty') {
     $conn = null;
 }
 
-}else{
-    header("Location: ../back/logout.php");
+else{
+    echo "hahaha";
+    if($department == null){
+        echo "no department";
+    }
     exit();
 }
 
-
-
-?>
+}

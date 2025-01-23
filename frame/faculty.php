@@ -105,20 +105,29 @@
             gap: 5px;
         }
 
-        .btn {
+        button {
             padding: 4px 8px;
             border: none;
             border-radius: 4px;
             cursor: pointer;
-            color: white;
         }
 
-        .btn-delete {
+        .delete-btn {
             background-color: #dc3545;
         }
 
-        .btn-loading {
+        .edit-btn {
+            background-color:#7dd700;
+        }
+
+        .schedule-btn {
             background-color: #00f2c3;
+            color:black;
+        }
+
+        .add-btn{
+            background-color: #00f2c3;
+            color: black;   
         }
 
         .position-badge {
@@ -212,6 +221,11 @@
             background-color: #00d6ab;
         }
     </style>
+
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.3/xlsx.full.min.js"></script>
+    <script src="../fetchfaculty.js"></script>
+
 </head>
 <body>
 
@@ -233,6 +247,87 @@
 
                     <label for="lastname">Last Name:</label>
                     <input type="text" id="lastname" name="lastname" required placeholder="Enter last name">
+
+                    <!-- <label for="college">College:</label>
+                    <select id="college" name="college" required>
+                        <option value="">Select College</option>
+                        <option value="College of Computing">College of Computing</option>
+                        <option value="College of Engineering">College of Engineering</option>
+                        <option value="College of Education">College of Education</option>
+                        <option value="College of Criminal Justice">College of Criminal Justice</option>
+                    </select> -->
+
+                    <label for="status">Employment Status:</label>
+                    <select id="status" name="status" required>
+                        <option value="">Select Employment Status</option>
+                        <option value="Full-time">Full-time</option>
+                        <option value="Part-time">Part-time</option>
+                        <option value="Contract">Contract</option>
+                    </select>
+
+                    <label for="master_specialization">Master's Specialization:</label>
+                    <select name="master_specialization" id="master_specialization">
+                        <option value="general_education">General Education</option>
+                        <option value="computer_science">Computer Science</option>
+                    </select>
+
+                    <label for="address">Address:</label>
+                    <textarea id="address" name="address" placeholder="Enter address"></textarea>
+
+                    <label for="phone_no">Phone Number:</label>
+                    <input type="text" id="phone_no" name="phone_no" required placeholder="Enter phone number">
+
+                    <label for="subject">Subject:</label>
+                    <input type="text" id="subject" name="subject" required placeholder="Enter subject taught">
+
+                    <label for="role">Role:</label>
+                    <select id="role" name="role" required>
+                        <option value="">Select Role</option>
+                        <option value="Faculty">Faculty</option>
+                        <option value="Department Head">Department Head</option>
+                        <option value="Dean">Dean</option>
+                    </select>
+
+                    <input type="hidden" name="department" value="<?php echo $_GET['department']; ?>">
+
+                    <input type="hidden" name="college" value="">
+
+
+                    <button type="submit">Submit</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+
+    <!-- Edit Faculty Modal -->
+    <div id="editFacultyModal" class="modal" style="display: <?php echo isset($selectedFaculty) ? 'block' : 'none'; ?>;">
+        <div class="modal-content">
+            <span class="close" onclick="window.location.href='faculty.php?department=<?php echo $_GET['department']?>'">&times;</span>
+            <div class="modal-header">
+                <h2>Edit Faculty Attachment</h2>
+            </div>
+            <div class="modal-body">
+
+                <h4><?php echo $selectedFaculty['firstname'] . ' ' . $selectedFaculty['lastname']; ?></h4>
+
+                <form id="newFacultyForm" action="../back/faculty.php?action=edit&id=<?php echo $selectedFaculty['faculty_id']?>" method="post" enctype="multipart/form-data">
+
+                    <label for="firstname">First Name:</label>
+                    <input type="text" id="firstname" name="firstname" required placeholder="Enter first name" value="<?php  echo $selectedFaculty['firstname']?>">
+
+                    <label for="middlename">Middle Name:</label>
+                    <input type="text" id="middlename" name="middlename" placeholder="Enter middle name">
+
+                    <label for="lastname">Last Name:</label>
+                    <input type="text" id="lastname" name="lastname" required placeholder="Enter last name">
+
+                    <label for="master_specialization">Master's Specialization:</label>
+                    <select name="master_specialization" id="master_specialization">
+                        <option value="general_education">General Education</option>
+                        <option value="computer_science">computer_science</option>
+                    </select>
 
                     <!-- <label for="college">College:</label>
                     <select id="college" name="college" required>
@@ -274,82 +369,12 @@
         </div>
     </div>
 
-
-
-    <!-- Edit Faculty Modal -->
-    <div id="editFacultyModal" class="modal" style="display: <?php echo isset($selectedFaculty) ? 'block' : 'none'; ?>;">
-        <div class="modal-content">
-            <span class="close" onclick="window.location.href='faculty.php?department=<?php echo $_GET['department']?>'">&times;</span>
-            <div class="modal-header">
-                <h2>Edit Faculty Attachment</h2>
-            </div>
-            <div class="modal-body">
-
-                <h4><?php echo $selectedFaculty['firstname'] . ' ' . $selectedFaculty['lastname']; ?></h4>
-
-                <form id="newFacultyForm" action="../back/faculty.php?action=edit&id=<?php echo $selectedFaculty['faculty_id']?>" method="post" enctype="multipart/form-data">
-
-                    <label for="firstname">First Name:</label>
-                    <input type="text" id="firstname" name="firstname" required placeholder="Enter first name" value="<?php  echo $selectedFaculty['firstname']?>">
-
-                    <label for="middlename">Middle Name:</label>
-                    <input type="text" id="middlename" name="middlename" placeholder="Enter middle name">
-
-                    <label for="lastname">Last Name:</label>
-                    <input type="text" id="lastname" name="lastname" required placeholder="Enter last name">
-
-                    <label for="position">Position:</label>
-                    <input type="text" id="position" name="position" required placeholder="Enter position">
-
-                    <label for="college">College:</label>
-                    <select id="college" name="college" required>
-                        <option value="">Select College</option>
-                        <option value="College of Computing">College of Computing</option>
-                        <option value="College of Engineering">College of Engineering</option>
-                        <option value="College of Education">College of Education</option>
-                        <option value="College of Criminal Justice">College of Criminal Justice</option>
-                    </select>
-
-                    <label for="status">Employment Status:</label>
-                    <select id="status" name="status" required>
-                        <option value="">Select Employment Status</option>
-                        <option value="Full-time">Full-time</option>
-                        <option value="Part-time">Part-time</option>
-                        <option value="Contract">Contract</option>
-                    </select>
-
-                    <label for="address">Address:</label>
-                    <textarea id="address" name="address" placeholder="Enter address"></textarea>
-
-                    <label for="phone_no">Phone Number:</label>
-                    <input type="text" id="phone_no" name="phone_no" required placeholder="Enter phone number">
-
-                    <label for="department_title">Department Title:</label>
-                    <input type="text" id="department_title" name="department_title" required placeholder="Enter full department title">
-
-                    <label for="subject">Subject:</label>
-                    <input type="text" id="subject" name="subject" required placeholder="Enter subject taught">
-
-                    <label for="role">Role:</label>
-                    <select id="role" name="role" required>
-                        <option value="">Select Role</option>
-                        <option value="Faculty">Faculty</option>
-                        <option value="Department Head">Department Head</option>
-                        <option value="Dean">Dean</option>
-                    </select>
-
-                    <button type="submit">Submit</button>
-                </form>
-            </div>
-        </div>
-    </div>
-
     <div class="main-content">
         <div class="header">
             <h1><?php echo $_GET['department']?>&nbsp;Faculty</h1>  
         </div>
 
-        <button onclick="openAddNewModal()">Add New</button>
+        <button class="add-btn" onclick="openAddNewModal()">Add New</button>
 
         <div class="toolbar">
             <div class="toolbar-buttons">
@@ -358,51 +383,36 @@
             <input type="text" placeholder="Search:" class="search-box">
         </div>
 
-        <table>
+        <table id="faculty-table">
             <thead>
                 <tr>
+                    <th>Faculty ID</th>
                     <th>First Name</th>
-                    <th>Last Name</th>
                     <th>Middle Name</th>
-                    <th>college</th>
-                    <th>Department</th>
+                    <th>Last Name</th>
+                    <th>College</th>
                     <th>Employment Status</th>
+                    <th>Address</th>
+                    <th>Phone No</th>
+                    <th>Department ID</th>
+                    <th>Department Title</th>
                     <th>Subject</th>
                     <th>Role</th>
-                    <th>action</th>
+                    <th>Specialization</th>
                 </tr>
             </thead>
-            <tbody>
-            <?php foreach ($facultyList as $faculty): ?>
-                    <tr>
-                        <td><?php echo htmlspecialchars($faculty['firstname']); ?></td>
-                        <td><?php echo htmlspecialchars($faculty['lastname']); ?></td>
-                        <td><?php echo htmlspecialchars($faculty['middlename']); ?></td>
-                        <td><?php echo htmlspecialchars($faculty['college']); ?></td>
-                        <td><?php echo htmlspecialchars($faculty['departmentID']); ?></td>
-                        <td><?php echo htmlspecialchars($faculty['employment_status']); ?></td>
-                        <td><?php echo htmlspecialchars($faculty['subject']); ?></td>
-                        <td><?php echo htmlspecialchars($faculty['role']); ?></td>
-                        <td>
-                            <a href="faculty.php?id=<?php echo $faculty['faculty_id']; ?>&department=<?php echo $faculty['departmentID']?>&action=edit">
-                                <button class="edit-btn">✏ Edit</button>
-                            </a>
-
-                            <button class="delete-btn" onclick="confirmDeleteFaculty('<?php echo $faculty['faculty_id']; ?>','<?php echo $_GET['department']?>')">
-                                🗑 Delete
-                            </button>
-
-                            <button class="schedule-btn" onclick="viewFacultySchedule('<?php echo $faculty['faculty_id']; ?>')">
-                                📅 View Schedule
-                            </button>
-                        </td>
-                    </tr>
-                <?php endforeach; ?>
+            <tbody id="faculty-table-body">
+                <!-- Data rows will be added here dynamically by JavaScript -->
             </tbody>
-    </table>
+        </table>
 
+
+
+    <button onclick="downloadExcel()">Download Faculty List</button>
 
     </div>
     <script src="../scripts.js"></script>
+
+
 </body>
 </html>

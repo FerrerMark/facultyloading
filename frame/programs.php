@@ -157,7 +157,7 @@
             <div class="modal-content">
                 <span class="close-btn" onclick="closeModal()">&times;</span>
                 <h2>Add NNew Program</h2>
-                <form action="/facultyloading/back/actions.php?action=add&department=<?php echo $_SESSION['departmentID']?>" method="POST">
+                <form action="/facultyloading/back/actions.php?action=add&department=<?php echo $_GET['department']?>" method="POST">
                 
                     <label for="programCode">Program Code:</label>
                     <input type="text" id="programCode" name="programCode" required>

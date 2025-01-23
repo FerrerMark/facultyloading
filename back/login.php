@@ -5,7 +5,7 @@ include_once("./connections/connection.php");
 if (isset($_SESSION['id'])) {
     if ($_SESSION['role'] === 'department head') {
         header("Location: ../facultyloading/index.php");
-    } elseif ($_SESSION['role'] === 'faculty') {
+    } elseif ($_SESSION['role'] === 'instructor') {
         header("Location: ../faculty/index.php");
     }
 }
@@ -22,9 +22,14 @@ if (isset($_POST['submit'])) {
     if ($stmt->rowCount() > 0) {
         $id = $row['faculty_id'];   
         $role = $row['role']; 
+
+        echo $department = $row['department'];
+
         $_SESSION['id'] = $id;
         $_SESSION['role'] = $role;
+        $_SESSION['department'] = $department;
 
+        // $print = $_SESSION['department'];
         header("Location: /facultyloading/index.php");
 
         // if ($role === 'department head') {

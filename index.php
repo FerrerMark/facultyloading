@@ -42,7 +42,7 @@
             <hr>
             <nav class="side_nav">
 
-                <?php if($row['role'] == "faculty"){ ?>
+                <?php if($row['role'] == "instructor"){ ?>
                     <a href="#" onclick="schedule()" class="nav-item"><i class="fa-solid fa-calendar-days"></i>&nbsp;Schedule</a>
                     <a href="#" onclick="documents()" class="nav-item"><i class="fa-solid fa-file"></i>&nbsp;Documents</a>  
                 <?php } ?> 
@@ -58,17 +58,16 @@
 
                         <a href="#" onclick="loadFrame('rooms','<?php echo $role;?>','<?php echo $departmentId;?>')"  class="nav-item"><span class="guidance--conference-room"></span>&nbsp;room</a>
 
+                        <a href="#" onclick="loadFrame('sections','<?php echo $role;?>','<?php echo $departmentId;?>')"class="nav-item"><span class="ic--outline-hdr-auto"></span>&nbsp;sections</a>
+
                         <a href="#" onclick="loadFrame('schedules')"  class="nav-item"><span class="mingcute--schedule-line"></span>&nbsp;schedule management</a>
 
                         <a href="#" onclick="loadFrame('manual_scheduling','<?php echo $role;?>','<?php echo $departmentId;?>')" onclick="check_schedule()"  class="nav-item"><span class="mingcute--schedule-line"></span>&nbsp;Manual Scheduling</a>
 
                         <a href="#" onclick="distribute()"  class="nav-item"><span class="fluent-mdl2--assign"></span>&nbsp;distribute schedule</a>
 
-                        <a href="#" onclick="loadFrame('manual_scheduling','<?php echo $role;?>','<?php echo $departmentId;?>')"class="nav-item"><span class="tdesign--fact-check"></span>&nbsp;check schedule</a>
+                        <a href="#" onclick="loadFrame('auto_generated_schedule','<?php echo $role;?>','<?php echo $departmentId;?>')"class="nav-item"><span class="ic--outline-hdr-auto"></span>&nbsp;auto schedule</a>
 
-                        <a href="#" onclick="loadFrame('auto_scheduling','<?php echo $role;?>','<?php echo $departmentId;?>')"class="nav-item"><span class="ic--outline-hdr-auto"></span>&nbsp;auto schedule</a>
-
-                        
                     <?php } ?>
                
 
@@ -81,7 +80,7 @@
         </aside>
         <div style="width:100%; ">
 
-        <?php if($row['role'] == "faculty"){ ?>
+        <?php if($row['role'] == "instructor"){ ?>
             <iframe id="frame" src="http://localhost/sms/faculty/frame/facultydashboard.php" width="100%" height="100%" title="nav">
             </iframe>
         <?php } ?>

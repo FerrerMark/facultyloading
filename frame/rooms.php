@@ -2,6 +2,7 @@
 
 include_once "../back/rooms.php";
 
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -205,8 +206,8 @@ include_once "../back/rooms.php";
 </head>
 <body>
 
-    <!-- Add Room Modal -->
-    <div id="openAddRoomModal" class="modal"  style="display: none;
+<!-- Add Room Modal -->
+<div id="openAddRoomModal" class="modal" style="display: none;
             position: fixed;
             z-index: 1000;
             left: 0;
@@ -214,10 +215,10 @@ include_once "../back/rooms.php";
             width: 100%;
             height: 100%;
             background-color: rgba(0, 0, 0, 0.5);">
-        <div class="modal-content">
-            <span class="close" onclick="closeAddRoomModal()">&times;</span>
-            <h2>Add Room</h2>
-            <form method="POST" action="../back/rooms.php?action=add">
+    <div class="modal-content">
+        <span class="close" onclick="closeAddRoomModal()">&times;</span>
+        <h2>Add Room</h2>
+        <form method="POST" action="../back/rooms.php?action=add&department=<?php echo $_GET['department']?>">
             <label for="building">Select Campus:</label>
             <select name="building" id="building" required>
                 <option value="" disabled selected>Select a campus</option>
@@ -226,16 +227,39 @@ include_once "../back/rooms.php";
                 <option value="San Agustin">San Agustin</option>
                 <option value="Main Campus">Main Campus</option>
             </select>
-                <input type="text" name="room_no" placeholder="Room No" required>
-                <input type="text" name="room_type" placeholder="Room Type" required>
-                <button type="submit" name="add_room">Add</button>
-            </form>
-        </div>
+
+            <label for="section">Select Section:</label>
+            <select name="section" id="section" required>
+                <option value="" disabled selected>Select a section</option>
+                <?php
+                // Fetch sections from the database
+                include_once "../connections/connection.php"; // Ensure the connection is included
+                try {
+                    $stmt = $conn->prepare("SELECT * FROM sections");
+                    $stmt->execute();
+                    $sections = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                    foreach ($sections as $section) {
+                        echo '<option value="' . htmlspecialchars($section['year_section']) . '">' . htmlspecialchars($section['year_section']) . ' (Year Level: ' . htmlspecialchars($section['year_level']) . ')</option>';
+                    }
+                } catch (PDOException $e) {
+                    echo '<option value="">Error fetching sections</option>';
+                }
+                ?>
+            </select>
+
+            <input type="text" name="room_no" placeholder="Room No" required>
+            <input type="text" name="room_type" placeholder="Room Type" required>
+            <input type="text" name="capacity" placeholder="Room Capacity" required>
+
+            <button type="submit" name="add_room">Add</button>
+        </form>
     </div>
+</div>
+
+
 
     <!-- Edit Room Modal -->
-    <div id="openEditRoomModal" class="modal" 
-        style="display: <?php echo isset($selectedRoomAndBuilding) ? 'block' : 'none'; ?>;
+    <div id="openEditRoomModal" class="modal" style="display: <?php echo isset($selectedRoomAndBuilding) ? 'block' : 'none'; ?>;
                 position: fixed;
                 z-index: 1000;
                 left: 0;
@@ -246,7 +270,8 @@ include_once "../back/rooms.php";
         <div class="modal-content">
             <span class="close" onclick="closeEditRoomModal()">&times;</span>
             <h2>Edit Room</h2>
-            <form method="POST" action="../back/rooms.php?action=edit&room=<?php echo $selectedRoomAndBuilding['room_no']; ?>&building=<?php echo $selectedRoomAndBuilding['building']; ?>&room_type=<?php echo $selectedRoomAndBuilding['room_type']; ?>">
+            <form method="POST" action="../back/rooms.php?action=edit&room=<?php echo $selectedRoomAndBuilding['room_no']; ?>&building=<?php echo $selectedRoomAndBuilding['building']; ?>&room_type=<?php echo $selectedRoomAndBuilding['room_type']; ?>&department=<?php echo $_GET['department']?>&building=<?php echo $_GET['building']?>">
+                
                 <label for="building">Select Campus:</label>
                 <select name="building" id="building" required>
                     <option value="<?php echo $selectedRoomAndBuilding['building']; ?>" selected><?php echo $selectedRoomAndBuilding['building']; ?></option>
@@ -255,12 +280,18 @@ include_once "../back/rooms.php";
                     <option value="San Agustin">San Agustin</option>
                     <option value="Main Campus">Main Campus</option>
                 </select>
+
+                <label for="section">Section:</label>
+                <input type="text" name="section" value="<?php echo $selectedRoomAndBuilding['section']; ?>" placeholder="Section" required>
+
                 <input type="text" id="room" name="room_no" placeholder="Room No" value="<?php echo $selectedRoomAndBuilding['room_no']; ?>" required>
                 <input type="text" id="type" name="room_type" placeholder="Room Type" value="<?php echo $selectedRoomAndBuilding['room_type']; ?>" required>
+
                 <button type="submit" name="edit_room">Save Changes</button>
             </form>
         </div>
     </div>
+
 
     <div class="container">
         <div class="header">
@@ -270,14 +301,7 @@ include_once "../back/rooms.php";
         <button onclick="openAddRoomModal()">Add New</button>
 
         <div class="toolbar">
-            <div class="toolbar-buttons">
-                <button>Copy</button>
-                <button>CSV</button>
-                <button>Excel</button>
-                <button>PDF</button>
-                <button>Print</button>
-                <button>Column visibility ▼</button>
-            </div>
+            <h3>ROOMS</h3>
             <input type="text" placeholder="Search:" class="search-box">
         </div>
 
@@ -285,7 +309,8 @@ include_once "../back/rooms.php";
             <thead>
                 <tr>
                     <th>Building</th>
-                    <th>Room_no</th>
+                    <th>Section</th> <!-- Add section column -->
+                    <th>Room No</th>
                     <th>Room Type</th>
                     <th>Action</th>
                 </tr>
@@ -294,23 +319,26 @@ include_once "../back/rooms.php";
                 <?php foreach ($rooms as $room) { ?>
                     <tr>
                         <td><?php echo $room['building']; ?></td>
+                        <td><?php echo $room['section']; ?></td> <!-- Display section -->
                         <td><?php echo $room['room_no']; ?></td>
                         <td><?php echo $room['room_type']; ?></td>
                         <td>
                             <div class="action-buttons">
-                                <a href="rooms.php?building=<?php echo urlencode($room['building']); ?>&room_no=<?php echo urlencode($room['room_no']); ?>&action=select">
-                                <button>✎</button></a>
 
-                                <button class="btn btn-delete" onclick="deleteRoomComfirm('<?php echo $room['building'];?>','<?php echo $room['room_no']; ?>')">🗑</button>
+                                <a href="rooms.php?building=<?php echo urlencode($room['building']); ?>&room_no=<?php echo urlencode($room['room_no']); ?>&action=select&department=<?php echo $_GET['department']?>">
+                                    <button>✎</button>
+                                </a>
 
-                                <a href="manual_scheduling.php?building=<?php echo urlencode($room['building']); ?>&room_no=<?php echo urlencode($room['room_no']); ?>&department=<?php echo $_GET['department']; ?>"><button class="btn btn-schedule">Schedules</button></a>
+                                <button class="btn btn-delete" onclick="deleteRoomComfirm('<?php echo $room['building'];?>', '<?php echo $room['room_no']; ?>')">🗑</button>
 
+                                <a href="manual_scheduling.php?building=<?php echo urlencode($room['building']); ?>&room_no=<?php echo urlencode($room['room_no']); ?>&department=<?php echo $_GET['department']; ?>&section=<?php echo $room['section']; ?>">
+                                    <button class="btn btn-schedule">Schedules</button>
+                                </a>
                             </div>
                         </td>
                     </tr>
                 <?php } ?>
             </tbody>
-
         </table>
 
         <div style="display: flex; justify-content: space-between; align-items: center;">

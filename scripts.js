@@ -175,5 +175,7 @@ function openEditRoomModal() {
 }
 
 function closeEditRoomModal() {
+
     document.getElementById('openEditRoomModal').style.display = 'none';
+
 }

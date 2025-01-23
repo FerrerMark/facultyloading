@@ -41,28 +41,25 @@
     </style>
 </head>
 <body>
-    <h2>Manual Scheduling for Room: <?php echo htmlspecialchars($room_no); ?> (<?php echo htmlspecialchars($building); ?>)</h2>
+    <h2>Manual Scheduling for Section: <?php echo htmlspecialchars($section_id); ?> (Department: <?php echo htmlspecialchars($department); ?>)</h2>
 
-    <form action="../back/manual_scheduling.php?room_no=<?php echo $_GET['room_no']; ?>&building=<?php echo $_GET['building']; ?>" method="POST">
-        <input type="hidden" name="building" value="<?php echo htmlspecialchars($building); ?>">
-        <input type="hidden" name="room" value="<?php echo htmlspecialchars($room_no); ?>">
+    <form action="../back/manual_scheduling.php?section=<?php echo $_GET['section']; ?>&department=<?php echo $_GET['department']; ?>&room_no=<?php echo $_GET['room_no']; ?>&building=<?php echo $_GET['building']?>" method="POST">
+        <input type="hidden" name="section" value="<?php echo htmlspecialchars($section_id); ?>">
 
-        <label for="faculty">Select Faculty:</label>
+        <input type="hidden" name="department" value="<?php echo htmlspecialchars($department); ?>" >
+
+        <label for="faculty">Select Faculty:</label>    
             <select name="teacher" id="faculty" required>
                 <option value="">Select a faculty</option>
                 <?php foreach ($facultyList as $faculty): ?>
-                    <option value="<?php echo $faculty['faculty_id']; ?>"><?php echo $faculty['firstname'] . ' ' . $faculty['middlename'].' ' . $faculty['lastname']; ?></option>
+                    <option value="<?php echo htmlspecialchars($faculty['firstname'] . ' ' . ($faculty['middlename'] ?? '') . ' ' . $faculty['lastname']); ?>">
+                        <?php echo htmlspecialchars($faculty['firstname'] . ' ' . ($faculty['middlename'] ?? '') . ' ' . $faculty['lastname']); ?>
+                    </option>
                 <?php endforeach; ?>
             </select><br>
 
-        <label>Subject:</label>
-        <input type="text" name="subject" required><br>
-
         <label>Course:</label>
         <input type="text" name="course" required><br>
-
-        <label>Room:</label>
-        <input type="text" value="<?php echo htmlspecialchars($room_no); ?>" disabled><br>
 
         <label>Remarks:</label>
         <input type="text" name="remarks"><br>
@@ -85,7 +82,7 @@
 
                                 $existing_schedule = null;
                                 foreach ($schedules as $schedule) {
-                                    if ($schedule['room'] == $room_no && 
+                                    if ($schedule['section'] == $section_id && 
                                         $schedule['time_slot'] == $slot_num && $schedule['day_of_week'] == $day_num) {
                                         $existing_schedule = $schedule;
                                         break;
@@ -105,11 +102,10 @@
                 <?php } ?>
             </table>
 
-
         <button type="submit">Save Schedule</button>
     </form>
 
-    <h3>Existing Schedules for Room <?php echo htmlspecialchars($room_no); ?></h3>
+    <h3>Existing Schedules for Section <?php echo htmlspecialchars($section_id); ?></h3>
     <table border="1">
         <tr>
             <th>Teacher</th>
@@ -119,8 +115,8 @@
             <th>Day</th>
         </tr>
         <?php
-        $filtered_schedules = array_filter($schedules, function($schedule) use ($room_no, $building) {
-            return $schedule['room'] == $room_no;
+        $filtered_schedules = array_filter($schedules, function($schedule) use ($section_id) {
+            return $schedule['section'] == $section_id;
         });
 
         foreach ($filtered_schedules as $schedule) { ?>
