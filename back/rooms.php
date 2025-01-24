@@ -18,16 +18,23 @@ if($_SERVER['REQUEST_METHOD'] === 'POST' || $role === 'department head') {
             $room_type = $_POST['room_type'];
             $capacity = $_POST['capacity'];
             $section = $_POST['section']; // Capture section
-        
+
+            $stmt = $conn->prepare("SELECT year_level FROM sections WHERE year_section = :section");
+            $stmt->bindParam(':section', $section, PDO::PARAM_STR);
+            $stmt->execute();
+            $year_level = $stmt->fetchColumn();
+
+
             // Insert the room data, including the section
-            $stmt = $conn->prepare("INSERT INTO rooms (building, room_no, room_type, capacity, section) VALUES (:building, :room_no, :room_type, :capacity, :section)");
+            $stmt = $conn->prepare("INSERT INTO rooms (building, room_no, room_type, capacity, section, year_level) VALUES (:building, :room_no, :room_type, :capacity, :section, :year_level)");
             $stmt->bindParam(':building', $building, PDO::PARAM_STR);
             $stmt->bindParam(':room_no', $room_no, PDO::PARAM_STR);
             $stmt->bindParam(':room_type', $room_type, PDO::PARAM_STR);
             $stmt->bindParam(':capacity', $capacity, PDO::PARAM_STR);
             $stmt->bindParam(':section', $section, PDO::PARAM_STR); // Bind section
+            $stmt->bindParam(':year_level', $year_level, PDO::PARAM_STR); // Bind year level
             $stmt->execute();
-        
+
             header("location: ../frame/rooms.php?department=$dep");
             exit;
         }else if($action === "delete"){

@@ -90,7 +90,7 @@
                                 }
 
                                 if ($existing_schedule) {
-                                    echo '<div style="color: red; font-weight: bold;">' . htmlspecialchars($existing_schedule['teacher']) . '</div>';
+                                    echo '<div style="color: red; font-weight: bold;">' . htmlspecialchars($existing_schedule['teacher'] . ' - ' . $existing_schedule['course']) . '</div>';
                                     echo '<input type="checkbox" name="schedule_data[' . htmlspecialchars($schedule_key) . ']" Hidden>';
                                 } else {
                                     echo '<input type="checkbox" name="schedule_data[' . htmlspecialchars($schedule_key) . ']">';
@@ -109,7 +109,6 @@
     <table border="1">
         <tr>
             <th>Teacher</th>
-            <th>Subject</th>
             <th>Course</th>
             <th>Time Slot</th>
             <th>Day</th>
@@ -122,7 +121,7 @@
         foreach ($filtered_schedules as $schedule) { ?>
             <tr>
                 <td><?php echo htmlspecialchars($schedule['teacher']); ?></td>
-                <td><?php echo htmlspecialchars($schedule['subject']); ?></td>
+                <td><?php echo htmlspecialchars($schedule['room']); ?></td>
                 <td><?php echo htmlspecialchars($schedule['course']); ?></td>
                 <td><?php echo $time_slots[$schedule['time_slot']] ?? "Unknown"; ?></td>
                 <td><?php echo $days_of_week[$schedule['day_of_week']] ?? "Unknown"; ?></td>

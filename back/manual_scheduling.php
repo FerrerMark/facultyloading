@@ -53,13 +53,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $schedule_data_from_form = $_POST['schedule_data'] ?? [];
     $department = $_POST['department'] ?? '';
 
+
+    $section_id = $_GET['section'];
+    $stmt = $pdo->prepare("SELECT year_level FROM sections WHERE year_section = :section");
+    $stmt->execute([':section' => $section_id]);
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+    $year_level = $result['year_level'];
+
+
+
     foreach ($schedule_data_from_form as $key => $value) {
         list($time_slot, $day_of_week) = explode('-', $key);
 
         if (!isset($schedule_data[$key])) {
             $stmt = $pdo->prepare("
-                INSERT INTO schedules (teacher, course, section, time_slot, day_of_week, is_checked, program_code) 
-                VALUES (:teacher, :course, :section_id, :time_slot, :day_of_week, 1, :program_code)
+                INSERT INTO schedules (teacher, course, section, time_slot, day_of_week, is_checked, program_code, year_level, room) 
+                VALUES (:teacher, :course, :section_id, :time_slot, :day_of_week, 1, :program_code, :year_level, :room)
             ");
             $stmt->execute([
                 ':teacher' => $teacher,
@@ -67,7 +76,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 ':section_id' => $section_id,
                 ':time_slot' => $time_slot,
                 ':day_of_week' => $day_of_week,
-                ':program_code' => $department
+                ':program_code' => $department,
+                ':year_level' => $year_level,
+                ':room' => $room_no
             ]);
         }
     }
