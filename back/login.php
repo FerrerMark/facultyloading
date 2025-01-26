@@ -3,9 +3,9 @@ session_start();
 include_once("./connections/connection.php");
 
 if (isset($_SESSION['id'])) {
-    if ($_SESSION['role'] === 'department head') {
+    if ($_SESSION['role'] === 'Department Head') {
         header("Location: ../facultyloading/index.php");
-    } elseif ($_SESSION['role'] === 'instructor') {
+    } elseif ($_SESSION['role'] === 'Instructor') {
         header("Location: ../faculty/index.php");
     }
 }

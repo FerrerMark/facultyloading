@@ -1,0 +1,4 @@
+SELECT faculty.firstname AS faculty, courses.subject_code, schedules.day_of_week, schedules.time_slot 
+                    FROM schedules 
+                    JOIN faculty ON schedules.faculty_id = faculty.faculty_id
+                    JOIN courses ON schedules.schedule_id = courses.course_id

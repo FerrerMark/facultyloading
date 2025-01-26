@@ -239,6 +239,9 @@
             <div class="modal-body">
                 <form id="newFacultyForm" action="../back/faculty.php?action=add&department=<?php echo $_GET['department']?>" method="post" enctype="multipart/form-data">
 
+                    <lable for="department"></lable>
+                    <input type="hidden" id="department" name="department" value="<?php echo $_GET['department']?>" >
+
                     <label for="firstname">First Name:</label>
                     <input type="text" id="firstname" name="firstname" required placeholder="Enter first name">
 
@@ -247,15 +250,6 @@
 
                     <label for="lastname">Last Name:</label>
                     <input type="text" id="lastname" name="lastname" required placeholder="Enter last name">
-
-                    <!-- <label for="college">College:</label>
-                    <select id="college" name="college" required>
-                        <option value="">Select College</option>
-                        <option value="College of Computing">College of Computing</option>
-                        <option value="College of Engineering">College of Engineering</option>
-                        <option value="College of Education">College of Education</option>
-                        <option value="College of Criminal Justice">College of Criminal Justice</option>
-                    </select> -->
 
                     <label for="status">Employment Status:</label>
                     <select id="status" name="status" required>
@@ -277,24 +271,19 @@
                     <label for="phone_no">Phone Number:</label>
                     <input type="text" id="phone_no" name="phone_no" required placeholder="Enter phone number">
 
-                    <label for="subject">Subject:</label>
-                    <input type="text" id="subject" name="subject" required placeholder="Enter subject taught">
-
                     <label for="role">Role:</label>
                     <select id="role" name="role" required>
                         <option value="">Select Role</option>
-                        <option value="Faculty">Faculty</option>
-                        <option value="Department Head">Department Head</option>
                         <option value="Dean">Dean</option>
+                        <option value="Department Head">Department Head</option>
+                        <option value="Instructor">Instructor</option>
                     </select>
 
                     <input type="hidden" name="department" value="<?php echo $_GET['department']; ?>">
 
-                    <input type="hidden" name="college" value="">
-
-
                     <button type="submit">Submit</button>
                 </form>
+
             </div>
         </div>
     </div>
@@ -312,59 +301,52 @@
 
                 <h4><?php echo $selectedFaculty['firstname'] . ' ' . $selectedFaculty['lastname']; ?></h4>
 
-                <form id="newFacultyForm" action="../back/faculty.php?action=edit&id=<?php echo $selectedFaculty['faculty_id']?>" method="post" enctype="multipart/form-data">
+                <form id="newFacultyForm" action="../back/faculty.php?action=edit&id=<?php echo $selectedFaculty['faculty_id']; ?>" method="post" enctype="multipart/form-data">
 
                     <label for="firstname">First Name:</label>
-                    <input type="text" id="firstname" name="firstname" required placeholder="Enter first name" value="<?php  echo $selectedFaculty['firstname']?>">
+                    <input type="text" id="firstname" name="firstname" required placeholder="Enter first name" 
+                        value="<?php echo htmlspecialchars($selectedFaculty['firstname']); ?>">
 
                     <label for="middlename">Middle Name:</label>
-                    <input type="text" id="middlename" name="middlename" placeholder="Enter middle name">
+                    <input type="text" id="middlename" name="middlename" placeholder="Enter middle name" 
+                        value="<?php echo htmlspecialchars($selectedFaculty['middlename']); ?>">
 
                     <label for="lastname">Last Name:</label>
-                    <input type="text" id="lastname" name="lastname" required placeholder="Enter last name">
+                    <input type="text" id="lastname" name="lastname" required placeholder="Enter last name"
+                        value="<?php echo htmlspecialchars($selectedFaculty['lastname']); ?>">
 
                     <label for="master_specialization">Master's Specialization:</label>
                     <select name="master_specialization" id="master_specialization">
-                        <option value="general_education">General Education</option>
-                        <option value="computer_science">computer_science</option>
+                        <option value="general_education" <?php echo ($selectedFaculty['master_specialization'] == 'general_education') ? 'selected' : ''; ?>>General Education</option>
+                        <option value="computer_science" <?php echo ($selectedFaculty['master_specialization'] == 'computer_science') ? 'selected' : ''; ?>>Computer Science</option>
                     </select>
-
-                    <!-- <label for="college">College:</label>
-                    <select id="college" name="college" required>
-                        <option value="">Select College</option>
-                        <option value="College of Computing">College of Computing</option>
-                        <option value="College of Engineering">College of Engineering</option>
-                        <option value="College of Education">College of Education</option>
-                        <option value="College of Criminal Justice">College of Criminal Justice</option>
-                    </select> -->
 
                     <label for="status">Employment Status:</label>
                     <select id="status" name="status" required>
                         <option value="">Select Employment Status</option>
-                        <option value="Full-time">Full-time</option>
-                        <option value="Part-time">Part-time</option>
-                        <option value="Contract">Contract</option>
+                        <option value="Full-time" <?php echo ($selectedFaculty['employment_status'] == 'Full-time') ? 'selected' : ''; ?>>Full-time</option>
+                        <option value="Part-time" <?php echo ($selectedFaculty['employment_status'] == 'Part-time') ? 'selected' : ''; ?>>Part-time</option>
+                        <option value="Contract" <?php echo ($selectedFaculty['employment_status'] == 'Contract') ? 'selected' : ''; ?>>Contract</option>
                     </select>
 
                     <label for="address">Address:</label>
-                    <textarea id="address" name="address" placeholder="Enter address"></textarea>
+                    <textarea id="address" name="address" placeholder="Enter address"><?php echo htmlspecialchars($selectedFaculty['address']); ?></textarea>
 
                     <label for="phone_no">Phone Number:</label>
-                    <input type="text" id="phone_no" name="phone_no" required placeholder="Enter phone number">
-
-                    <label for="subject">Subject:</label>
-                    <input type="text" id="subject" name="subject" required placeholder="Enter subject taught">
+                    <input type="text" id="phone_no" name="phone_no" required placeholder="Enter phone number"
+                        value="<?php echo htmlspecialchars($selectedFaculty['phone_no']); ?>">
 
                     <label for="role">Role:</label>
                     <select id="role" name="role" required>
                         <option value="">Select Role</option>
-                        <option value="Faculty">Faculty</option>
-                        <option value="Department Head">Department Head</option>
-                        <option value="Dean">Dean</option>
+                        <option value="Instructor" <?php echo ($selectedFaculty['role'] == 'Instructor') ? 'selected' : ''; ?>>Instructor</option>
+                        <option value="Department Head" <?php echo ($selectedFaculty['role'] == 'Department Head') ? 'selected' : ''; ?>>Department Head</option>
+                        <option value="Dean" <?php echo ($selectedFaculty['role'] == 'Dean') ? 'selected' : ''; ?>>Dean</option>
                     </select>
 
                     <button type="submit">Submit</button>
                 </form>
+
             </div>
         </div>
     </div>
@@ -383,28 +365,48 @@
             <input type="text" placeholder="Search:" class="search-box">
         </div>
 
-        <table id="faculty-table">
+        <table border="1">
             <thead>
                 <tr>
                     <th>Faculty ID</th>
                     <th>First Name</th>
                     <th>Middle Name</th>
                     <th>Last Name</th>
-                    <th>College</th>
-                    <th>Employment Status</th>
-                    <th>Address</th>
-                    <th>Phone No</th>
-                    <th>Department ID</th>
-                    <th>Department Title</th>
-                    <th>Subject</th>
+                    <th>Status</th>
                     <th>Role</th>
-                    <th>Specialization</th>
+                    <th>Action</th>
                 </tr>
             </thead>
-            <tbody id="faculty-table-body">
-                <!-- Data rows will be added here dynamically by JavaScript -->
+            <tbody>
+                <?php
+                // Loop through faculty list and display each record in a table row
+                if (!empty($facultyList)) {
+                    foreach ($facultyList as $faculty) {
+                        echo "<tr>";
+                        echo "<td>" . htmlspecialchars($faculty['faculty_id']) . "</td>";
+                        echo "<td>" . htmlspecialchars($faculty['firstname']) . "</td>";
+                        echo "<td>" . htmlspecialchars($faculty['middlename']) . "</td>";
+                        echo "<td>" . htmlspecialchars($faculty['lastname']) . "</td>";
+                        echo "<td>" . htmlspecialchars($faculty['employment_status']) . "</td>";
+                        echo "<td>" . htmlspecialchars($faculty['role']) . "</td>";
+                        echo "<td>
+                        
+                                <a href='edit.php?id=" . urlencode($faculty['faculty_id']) . "&department=" . urlencode($faculty['departmentID']) . "&role=" . urlencode($faculty['role']) . "&action=edit'><button class='edit-btn'>Edit</button></a> 
+                        
+                                <a href='?action=delete&id=" . urlencode($faculty['faculty_id']) . "'><button class='delete-btn'>Delete</button></a>
+
+                                <a href='?action=delete&id=" . urlencode($faculty['faculty_id']) . "'><button class='schedule-btn'>View Schedule</button></a>
+
+                            </td>";
+                        echo "</tr>";
+                    }
+                } else {
+                    echo "<tr><td colspan='8'>No faculty members found.</td></tr>";
+                }
+                ?>
             </tbody>
         </table>
+
 
 
 

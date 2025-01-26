@@ -361,7 +361,7 @@ include_once "../back/courses.php";
         <table>
             <thead>
                 <tr>
-                    <th>Subject Code</th>
+                    <th>Course Code</th>
                     <th>Course Title</th>
                     <th>Program</th>
                     <th>Year Level</th>
@@ -386,7 +386,6 @@ include_once "../back/courses.php";
                         <td>
                             <div class="action-icons">
                                 
-
                                 <a href="courses.php?delete_course_code=<?php echo urlencode($course['subject_code']); ?>&program_code=<?php echo urlencode($programCode); ?>" class="action-icon delete-icon">🗑</a>
 
                                 

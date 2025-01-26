@@ -2,15 +2,15 @@
 
 include_once "../connections/connection.php";
 
-$section_id = $_GET['section'];  
+$section_id = $_GET['section_id'];  
 $department = $_GET['department'];
-$room_no = $_GET['room_no'];
-$building = $_GET['building'] ?? null;
+// $room_no = $_GET['room_no'];
+// $building = $_GET['building'] ?? null;
 $time_slots = [
     1 => "6:00 AM - 7:00 AM",
     2 => "7:00 AM - 8:00 AM",
     3 => "8:00 AM - 9:00 AM",
-    4 => "10:00 AM - 10:00 AM",
+    4 => "9:00 AM - 10:00 AM", 
     5 => "10:00 AM - 11:00 AM",
     6 => "11:00 AM - 12:00 PM",
     7 => "12:00 PM - 1:00 PM",
@@ -37,38 +37,49 @@ $days_of_week = [
     //     die("Invalid request: No section selected.");
     // }
 
-// Fetch schedules for the selected section
-$stmt = $pdo->prepare("SELECT * FROM schedules WHERE section = :section_id");
+$sql = "SELECT s.*, CONCAT(f.firstname, ' ', f.lastname) as facultyName
+FROM schedules s 
+JOIN faculty f 
+ON s.faculty_id = f.faculty_id 
+WHERE s.section_id = :section_id";
+
+$stmt = $pdo->prepare($sql);
 $stmt->execute([':section_id' => $section_id]);
 $schedules = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+
+
 
 $schedule_data = [];
 foreach ($schedules as $schedule) {
     $schedule_data[$schedule['time_slot'] . '-' . $schedule['day_of_week']] = true;
 }
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_GET['action'] === 'add') {   
     $teacher = htmlspecialchars($_POST['teacher'] ?? '');
     $course = htmlspecialchars($_POST['course'] ?? '');
     $schedule_data_from_form = $_POST['schedule_data'] ?? [];
     $department = $_POST['department'] ?? '';
 
 
-    $section_id = $_GET['section'];
-    $stmt = $pdo->prepare("SELECT year_level FROM sections WHERE year_section = :section");
+    $section_id = $_GET['section_id'];
+    $stmt = $pdo->prepare("SELECT * FROM sections WHERE section_id = :section");
     $stmt->execute([':section' => $section_id]);
     $result = $stmt->fetch(PDO::FETCH_ASSOC);
     $year_level = $result['year_level'];
+    $semester = $result['semester'];
 
 
 
     foreach ($schedule_data_from_form as $key => $value) {
         list($time_slot, $day_of_week) = explode('-', $key);
+        $time_slot =  $time_slot;
+        
 
         if (!isset($schedule_data[$key])) {
             $stmt = $pdo->prepare("
-                INSERT INTO schedules (teacher, course, section, time_slot, day_of_week, is_checked, program_code, year_level, room) 
-                VALUES (:teacher, :course, :section_id, :time_slot, :day_of_week, 1, :program_code, :year_level, :room)
+                INSERT INTO schedules (faculty_id, subject_code, section_id, time_slot, day_of_week, is_checked, department, year_level, semester) 
+                VALUES (:teacher, :course, :section_id, :time_slot, :day_of_week, 1, :program_code, :year_level, :semester)
             ");
             $stmt->execute([
                 ':teacher' => $teacher,
@@ -78,12 +89,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 ':day_of_week' => $day_of_week,
                 ':program_code' => $department,
                 ':year_level' => $year_level,
-                ':room' => $room_no
+                ':semester' => $semester
+                // ':room_id' => $room_no
             ]);
         }
     }
 
-    header("Location: ../frame/manual_scheduling.php?building=$building&department=$department&section=$section_id&success=true&section=$section_id&room_no=$room_no"); 
+    header("Location: ../frame/manual_scheduling.php?department=$department&section=$section_id&success=true&section_id=$section_id"); 
 
     exit();
 }
@@ -98,13 +110,25 @@ try {
     die("Query failed: " . $e->getMessage());
 }
 
-try {
-    $stmt = $conn->prepare("SELECT * FROM faculty WHERE departmentID = :departmentID");
-    $stmt->bindParam(':departmentID', $department, PDO::PARAM_STR);
+if($_SERVER['REQUEST_METHOD'] === 'POST' && $_GET['action'] === 'delete') {
+
+    $schedule_id = $_POST['schedule_id'];
+    $stmt = $conn->prepare("DELETE FROM schedules WHERE schedule_id = :schedule_id");
+    $stmt->bindParam(':schedule_id', $schedule_id);
     $stmt->execute();
-    $facultyList = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    header("Location: ../frame/manual_scheduling.php?department=$department&section=$section_id&success=true&section_id=$section_id"); 
+
+}
+
+try{
+    $selectStmt = $conn->prepare("SELECT * FROM courses WHERE program_code = :program_code");
+    $selectStmt->bindParam(':program_code', $department, PDO::PARAM_STR);
+    $selectStmt->execute();
+    $courseList = $selectStmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (PDOException $e) {
     die("Query failed: " . $e->getMessage());
 }
+
 
 ?>

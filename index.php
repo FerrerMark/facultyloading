@@ -42,9 +42,13 @@
             <hr>
             <nav class="side_nav">
 
-                <?php if($row['role'] == "instructor"){ ?>
+                <?php if($row['role'] == "Instructor"){ ?>
                     <a href="#" onclick="schedule()" class="nav-item"><i class="fa-solid fa-calendar-days"></i>&nbsp;Schedule</a>
                     <a href="#" onclick="documents()" class="nav-item"><i class="fa-solid fa-file"></i>&nbsp;Documents</a>  
+
+                    <a href="#" onclick="loadFrame('available','<?php echo $role;?>','<?php echo $departmentId;?>')" class="nav-item"><i class="fa-solid fa-calendar-days"></i>&nbsp;my available</a>
+                    <a href="#" onclick="documents()" class="nav-item"><i class="fa-solid fa-file"></i>&nbsp;available</a>
+
                 <?php } ?> 
                 
                 <a href="#" onclick="loadFrame('programs','<?php echo $role;?>','<?php echo $departmentId;?>')"class="nav-item"><span class="nrk--media-programguide-active"></span></i>&nbsp;programs</a>
@@ -53,7 +57,7 @@
                 <a href="#" onclick="loadFrame('crads')"  class="nav-item"><span class="uis--schedule"></span>&nbsp;Student Research Schedule</a>
                         
                     <!--head-->
-                    <?php if($role == "department head"){ ?>
+                    <?php if($role == "Department Head"){ ?>
                         <a href="#" onclick="loadFrame('faculty','<?php echo $role;?>','<?php echo $departmentId;?>')"  class="nav-item"><span class="mdi--teacher"></span>&nbsp;faculty</a>
 
                         <a href="#" onclick="loadFrame('rooms','<?php echo $role;?>','<?php echo $departmentId;?>')"  class="nav-item"><span class="guidance--conference-room"></span>&nbsp;room</a>
@@ -80,11 +84,11 @@
         </aside>
         <div style="width:100%; ">
 
-        <?php if($row['role'] == "instructor"){ ?>
+        <?php if($row['role'] == "Instructor"){ ?>
             <iframe id="frame" src="http://localhost/sms/faculty/frame/facultydashboard.php" width="100%" height="100%" title="nav">
             </iframe>
         <?php } ?>
-        <?php if($row['role'] == "department head"){ ?>
+        <?php if($row['role'] == "Department Head"){ ?>
             <iframe id="frame" src="http://localhost/sms/faculty/frame/headdashboard.php" width="100%" height="100%" title="nav">
             </iframe>
         <?php } ?>  

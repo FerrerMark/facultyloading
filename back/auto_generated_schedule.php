@@ -1,91 +1,110 @@
 <?php
-require 'vendor/autoload.php'; // Include PhpSpreadsheet
+// Enable error reporting for debugging
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 
-use PhpOffice\PhpSpreadsheet\IOFactory;
+include_once "../connections/connection.php";
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_FILES['faculty_file'])) {
-    $file = $_FILES['faculty_file']['tmp_name'];
-    $schedules = []; // To hold the final schedule
-    $conflicts = []; // To hold conflicts
+// Check if database connection is successful
+if (!$conn) {
+    die("❌ Database connection failed: " . $conn->errorInfo()[2]);
+}
 
-    // Load the uploaded XLSX file
-    $spreadsheet = IOFactory::load($file);
-    $sheet = $spreadsheet->getActiveSheet();
-    $rows = $sheet->toArray();
+echo "✅ Database connected successfully!<br>";
 
-    // Process the data
-    foreach ($rows as $index => $row) {
-        if ($index === 0) continue; // Skip header row
+// Fetch all instructors and their maximum load
+$instructors = [];
+$sql = "SELECT faculty_id, firstname, max_weekly_hours FROM faculty";
+$stmt = $conn->prepare($sql);
+$stmt->execute(); 
 
-        // Assuming the columns are in the order specified
-        $facultyID = $row[0];
-        $firstName = $row[1];
-        $middleName = $row[2];
-        $lastName = $row[3];
-        $college = $row[4];
-        $employmentStatus = $row[5];
-        $address = $row[6];
-        $phoneNo = $row[7];
-        $departmentID = $row[8];
-        $departmentTitle = $row[9];
-        $subject = $row[10];
-        $role = $row[11];
-        $specialization = $row[12];
+while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {  
+    $instructors[$row['faculty_id']] = [
+        'name' => $row['firstname'],
+        'max_load' => $row['max_weekly_hours'],  
+        'assigned' => 0  
+    ];
+}
 
-        // Check for conflicts (this is a placeholder logic)
-        if (!isset($schedules[$facultyID])) {
-            $schedules[$facultyID] = [];
-        }
+echo "✅ Instructors fetched successfully!<br>";
 
-        // Example time slot (this should be replaced with actual scheduling logic)
-        $requestedTime = "9:00 AM - 10:00 AM"; // Placeholder for requested time
-        if (in_array($requestedTime, array_column($schedules[$facultyID], 'time'))) {
-            // Find the next available time slot (simple example)
-            $nextAvailableTime = findNextAvailableTime($requestedTime, $schedules[$facultyID]);
-            if ($nextAvailableTime) {
-                $schedules[$facultyID][] = [
-                    'name' => "$firstName $lastName",
-                    'subject' => $subject,
-                    'time' => $nextAvailableTime,
-                    'room' => 'Room 101' // Placeholder for room
-                ];
-            } else {
-                $conflicts[] = "Conflict for $firstName $lastName: $subject at $requestedTime";
+// Fetch all courses and their corresponding section_id
+$sql = "SELECT c.course_id, c.subject_code, c.course_title, s.section_id 
+        FROM courses c
+        JOIN sections s ON c.program_code = s.program_code";
+$stmt = $conn->prepare($sql);
+$stmt->execute();
+$courses = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+echo "✅ Courses with sections fetched successfully!<br>";
+
+// Fetch available rooms
+$sql = "SELECT room_id FROM rooms";
+$stmt = $conn->prepare($sql);
+$stmt->execute();
+$rooms = $stmt->fetchAll(PDO::FETCH_COLUMN);
+
+if (empty($rooms)) {
+    die("❌ No rooms available. Cannot proceed with scheduling.");
+}
+
+echo "✅ Rooms fetched successfully!<br>";
+
+// Available time slots (Monday-Friday, 8 AM - 5 PM)
+$time_slots = [
+    "Monday 8-10", "Monday 10-12", "Monday 1-3", "Monday 3-5",
+    "Tuesday 8-10", "Tuesday 10-12", "Tuesday 1-3", "Tuesday 3-5",
+    "Wednesday 8-10", "Wednesday 10-12", "Wednesday 1-3", "Wednesday 3-5",
+    "Thursday 8-10", "Thursday 10-12", "Thursday 1-3", "Thursday 3-5",
+    "Friday 8-10", "Friday 10-12", "Friday 1-3", "Friday 3-5"
+];
+
+$assigned_slots = []; 
+
+foreach ($courses as $course) {  
+    echo "📌 Processing course: " . $course['subject_code'] . " (" . $course['course_title'] . ")<br>";
+
+    if (empty($course['section_id'])) {
+        echo "⚠️ Skipping " . $course['subject_code'] . " (No section assigned)<br>";
+        continue;
+    }
+
+    foreach ($instructors as $id => &$instructor) {  
+        if ($instructor['assigned'] < $instructor['max_load']) {  
+            foreach ($time_slots as $slot) {  
+                if (!isset($assigned_slots[$id][$slot])) {  
+                    try {
+                        // Assign the first available room
+                        $room_id = $rooms[array_rand($rooms)];
+
+                        // Assign instructor to course with section_id and room_id
+                        $sql = "INSERT INTO schedules (faculty_id, subject_code, section_id, room_id, day_of_week, time_slot) 
+                                VALUES (:faculty_id, :subject_code, :section_id, :room_id, :day, :time_slot)";
+                        $stmt = $conn->prepare($sql);
+                        $stmt->execute([
+                            'faculty_id' => $id,
+                            'subject_code' => $course['subject_code'],
+                            'section_id' => $course['section_id'],
+                            'room_id' => $room_id, // Now correctly included
+                            'day' => explode(" ", $slot)[0], 
+                            'time_slot' => $slot
+                        ]);
+
+                        echo "✅ Assigned " . $instructor['name'] . " to " . $course['subject_code'] . 
+                             " (Section " . $course['section_id'] . ", Room " . $room_id . ") at " . $slot . "<br>";
+
+                        // Mark slot as used
+                        $assigned_slots[$id][$slot] = true;
+                        $instructor['assigned']++;
+                        break 2; // Move to next course
+                    } catch (PDOException $e) {
+                        die("❌ SQL Error: " . $e->getMessage());
+                    }
+                }
             }
-        } else {
-            $schedules[$facultyID][] = [
-                'name' => "$firstName $lastName",
-                'subject' => $subject,
-                'time' => $requestedTime,
-                'room' => 'Room 101' // Placeholder for room
-            ];
         }
-    }
-
-    // Function to find the next available time slot
-    function findNextAvailableTime($requestedTime, $scheduledTimes) {
-        // Logic to find the next available time slot
-        // This is a placeholder; implement your own logic based on your scheduling needs
-        return null; // Return the next available time or null if none found
-    }
-
-    // Output the generated schedule
-    foreach ($schedules as $faculty => $schedule) {
-        echo "<h2>Schedule for $faculty</h2>";
-        echo "<table><tr><th>Name</th><th>Subject</th><th>Time</th><th>Room</th></tr>";
-        foreach ($schedule as $entry) {
-            echo "<tr><td>{$entry['name']}</td><td>{$entry['subject']}</td><td>{$entry['time']}</td><td>{$entry['room']}</td></tr>";
-        }
-        echo "</table>";
-    }
-
-    // Display conflicts if any
-    if (!empty($conflicts)) {
-        echo "<h3>Conflicts:</h3><ul>";
-        foreach ($conflicts as $conflict) {
-            echo "<li>$conflict</li>";
-        }
-        echo "</ul>";
     }
 }
+
+echo "<br>✅ Scheduling completed successfully!";
 ?>

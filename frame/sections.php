@@ -21,7 +21,7 @@ try {
     $stmt = $pdo->prepare("
         SELECT * FROM sections
         WHERE program_code = :department
-        ORDER BY id DESC
+        ORDER BY section_id ASC
         LIMIT :limit OFFSET :offset
     ");
     $stmt->bindParam(':department', $dep);
@@ -79,6 +79,7 @@ try {
             border: none;
             border-radius: 4px;
             cursor: pointer;
+            margin: 5px 0px 0px;
         }
         button:hover {
             background-color: #0056b3;
@@ -111,15 +112,29 @@ try {
     <form action="../back/sections.php?role=<?php echo $role?>&department=<?php echo $dep?>&action=add_section" method="POST">
 
         <input type="hidden" name="action" value="add_section">
-        <p>add sections for<h3><?php echo $dep?></h3></p> <br>
+        <h3><?php echo $dep?></h3> <br>
 
         <input type="hidden" id="program_code" name="program_code" placeholder="Enter Program Code" value="<?php echo $dep?>">
 
         <label for="year_section">Year/Section:</label>
-        <input type="text" id="year_section" name="year_section" required placeholder="e.g., 3-1">
+        <input type="text" id="year_section" name="section_name" required placeholder="e.g., 01">
+
+        <label for="semester">Semester:</label>
+        <select id="semester" name="semestrial" required>
+            <option value="">Select Semester</option>
+            <option value="First">First</option>
+            <option value="Second">Second</option>
+        </select>
+
 
         <label for="year_level">Year Level:</label>
-        <input type="number" id="year_level" name="year_level" required placeholder="Enter Year Level">
+        <select id="year_level" name="year_level" required>
+            <option value="">Select Year Level</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+        </select>
 
         <button type="submit">Add Section</button>
     </form>
@@ -132,18 +147,33 @@ try {
             <th>Program Code</th>
             <th>Year/Section</th>
             <th>Year Level</th>
+            <th>Semestrial</th>
+            <th>Action</th>
         </tr>
         <?php if (!empty($sections)) : ?>
             <?php foreach ($sections as $section) : ?>
                 <tr>
                     <td><?php echo htmlspecialchars($section['program_code']); ?></td>
-                    <td><?php echo htmlspecialchars($section['year_section']); ?></td>
+                    <td><?php echo htmlspecialchars($section['section_name']); ?></td>
                     <td><?php echo htmlspecialchars($section['year_level']); ?></td>
+                    <td><?php echo htmlspecialchars($section['semester']); ?></td>
+                    <td>
+                        <button onclick="window.location.href='manual_scheduling.php?section_id=<?php echo urlencode($section['section_id']); ?>&department=<?php echo urlencode($section['program_code']); ?>'">View Schedule</button>
+                    <form method="post" action="../back/sections.php?action=delete&role=<?php echo $role?>&department=<?php echo $dep?>">
+
+                        <input type="hidden" name="section_id" value="<?php echo urlencode($section['section_id']); ?>">
+
+                        <button onclick="window.location.href='sections.php?department=<?php echo urlencode($section['program_code']); ?>&role=<?php echo  $_GET['role']?>'">Delete</button>
+
+                    </form>
+
+                    </td>
+
                 </tr>
             <?php endforeach; ?>
         <?php else : ?>
             <tr>
-                <td colspan="3" style="text-align:center;">No sections added yet.</td>
+                <td colspan="4" style="text-align:center;">No sections added yet.</td>
             </tr>
         <?php endif; ?>
     </table>

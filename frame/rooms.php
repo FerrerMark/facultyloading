@@ -218,7 +218,7 @@ include_once "../back/rooms.php";
     <div class="modal-content">
         <span class="close" onclick="closeAddRoomModal()">&times;</span>
         <h2>Add Room</h2>
-        <form method="POST" action="../back/rooms.php?action=add&department=<?php echo $_GET['department']?>">
+        <form method="POST" action="../back/rooms.php?action=add&department=<?php echo $_GET['department'] ?>">
             <label for="building">Select Campus:</label>
             <select name="building" id="building" required>
                 <option value="" disabled selected>Select a campus</option>
@@ -228,31 +228,13 @@ include_once "../back/rooms.php";
                 <option value="Main Campus">Main Campus</option>
             </select>
 
-            <label for="section">Select Section:</label>
-            <select name="section" id="section" required>
-                <option value="" disabled selected>Select a section</option>
-                <?php
-                // Fetch sections from the database
-                include_once "../connections/connection.php"; // Ensure the connection is included
-                try {
-                    $stmt = $conn->prepare("SELECT * FROM sections");
-                    $stmt->execute();
-                    $sections = $stmt->fetchAll(PDO::FETCH_ASSOC);
-                    foreach ($sections as $section) {
-                        echo '<option value="' . htmlspecialchars($section['year_section']) . '">' . htmlspecialchars($section['year_section']) . ' (Year Level: ' . htmlspecialchars($section['year_level']) . ')</option>';
-                    }
-                } catch (PDOException $e) {
-                    echo '<option value="">Error fetching sections</option>';
-                }
-                ?>
-            </select>
-
             <input type="text" name="room_no" placeholder="Room No" required>
             <input type="text" name="room_type" placeholder="Room Type" required>
-            <input type="text" name="capacity" placeholder="Room Capacity" required>
+            <input type="number" name="capacity" placeholder="Room Capacity" required min="1">
 
-            <button type="submit" name="add_room">Add</button>
+            <button type="submit" name="add_room">Add Room</button>
         </form>
+
     </div>
 </div>
 
@@ -270,25 +252,31 @@ include_once "../back/rooms.php";
         <div class="modal-content">
             <span class="close" onclick="closeEditRoomModal()">&times;</span>
             <h2>Edit Room</h2>
-            <form method="POST" action="../back/rooms.php?action=edit&room=<?php echo $selectedRoomAndBuilding['room_no']; ?>&building=<?php echo $selectedRoomAndBuilding['building']; ?>&room_type=<?php echo $selectedRoomAndBuilding['room_type']; ?>&department=<?php echo $_GET['department']?>&building=<?php echo $_GET['building']?>">
-                
+            <form method="POST" action="../back/rooms.php?action=edit&room=<?php echo urlencode($selectedRoomAndBuilding['room_no']); ?>&building=<?php echo urlencode($selectedRoomAndBuilding['building']); ?>&department=<?php echo urlencode($_GET['department']); ?>">
+
                 <label for="building">Select Campus:</label>
                 <select name="building" id="building" required>
-                    <option value="<?php echo $selectedRoomAndBuilding['building']; ?>" selected><?php echo $selectedRoomAndBuilding['building']; ?></option>
+                    <option value="<?php echo htmlspecialchars($selectedRoomAndBuilding['building']); ?>" selected>
+                        <?php echo htmlspecialchars($selectedRoomAndBuilding['building']); ?>
+                    </option>
                     <option value="MV Campus">MV Campus</option>
                     <option value="Bulacan Campus">Bulacan Campus</option>
                     <option value="San Agustin">San Agustin</option>
                     <option value="Main Campus">Main Campus</option>
                 </select>
 
-                <label for="section">Section:</label>
-                <input type="text" name="section" value="<?php echo $selectedRoomAndBuilding['section']; ?>" placeholder="Section" required>
+                <label for="room_no">Room No:</label>
+                <input type="text" id="room_no" name="room_no" placeholder="Room No" value="<?php echo htmlspecialchars($selectedRoomAndBuilding['room_no']); ?>" required>
 
-                <input type="text" id="room" name="room_no" placeholder="Room No" value="<?php echo $selectedRoomAndBuilding['room_no']; ?>" required>
-                <input type="text" id="type" name="room_type" placeholder="Room Type" value="<?php echo $selectedRoomAndBuilding['room_type']; ?>" required>
+                <label for="room_type">Room Type:</label>
+                <input type="text" id="room_type" name="room_type" placeholder="Room Type" value="<?php echo htmlspecialchars($selectedRoomAndBuilding['room_type']); ?>" required>
+
+                <label for="capacity">Room Capacity:</label>
+                <input type="number" id="capacity" name="capacity" placeholder="Capacity" value="<?php echo htmlspecialchars($selectedRoomAndBuilding['capacity']); ?>" required>
 
                 <button type="submit" name="edit_room">Save Changes</button>
             </form>
+
         </div>
     </div>
 
@@ -309,9 +297,9 @@ include_once "../back/rooms.php";
             <thead>
                 <tr>
                     <th>Building</th>
-                    <th>Section</th> <!-- Add section column -->
-                    <th>Room No</th>
+                    <th>Room No</th> <!-- Add section column -->
                     <th>Room Type</th>
+                    <th>Capacity</th>
                     <th>Action</th>
                 </tr>
             </thead>
@@ -319,9 +307,9 @@ include_once "../back/rooms.php";
                 <?php foreach ($rooms as $room) { ?>
                     <tr>
                         <td><?php echo $room['building']; ?></td>
-                        <td><?php echo $room['section']; ?></td> <!-- Display section -->
                         <td><?php echo $room['room_no']; ?></td>
                         <td><?php echo $room['room_type']; ?></td>
+                        <td><?php echo $room['capacity']; ?></td>
                         <td>
                             <div class="action-buttons">
 
@@ -331,7 +319,7 @@ include_once "../back/rooms.php";
 
                                 <button class="btn btn-delete" onclick="deleteRoomComfirm('<?php echo $room['building'];?>', '<?php echo $room['room_no']; ?>')">🗑</button>
 
-                                <a href="manual_scheduling.php?building=<?php echo urlencode($room['building']); ?>&room_no=<?php echo urlencode($room['room_no']); ?>&department=<?php echo $_GET['department']; ?>&section=<?php echo $room['section']; ?>">
+                                <a href="manual_scheduling.php?building=<?php echo urlencode($room['building']); ?>&room_no=<?php echo urlencode($room['room_no']); ?>&department=<?php echo $_GET['department'];?>">
                                     <button class="btn btn-schedule">Schedules</button>
                                 </a>
                             </div>
