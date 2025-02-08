@@ -231,6 +231,30 @@ include_once "../back/courses.php";
             padding: 5px;
         }
 
+        .disabled-btn {
+            opacity: 0.5;
+            cursor: not-allowed;
+            position: relative;
+            pointer-events: none; /* Prevent clicking */
+        }
+
+        .disabled-btn:hover::after {
+            content: "Only for Dean of this department";
+            position: absolute;
+            background: #333;
+            color: #fff;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            white-space: nowrap;
+            top: -30px; /* Position above the button */
+            left: 50%;
+            transform: translateX(-50%);
+            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.3);
+        }
+
+
+
     </style>
 </head>
 <body>
@@ -242,7 +266,7 @@ include_once "../back/courses.php";
     <div class="modal-content">
         <span class="close" onclick="closeEditCourseModal()">&times;</span>
         <h2>Edit Course</h2>
-        <form action="courses.php" method="POST">
+        <form action="courses.php?role=<?php echo $_GET['role']; ?>&department=<?php echo $_GET['department']; ?>&action=edit" method="POST">
             <input type="hidden" id="edit_course_id" name="course_id">
             <input type="hidden" name="program_code" value="<?php echo htmlspecialchars($programCode); ?>">
 
@@ -282,7 +306,7 @@ include_once "../back/courses.php";
         <div class="modal-content">
             <span class="close-btn" onclick="closeAddCourseModal()">&times;</span>
             <h2>Add New Course</h2>
-                <form action="courses.php" method="POST">
+                <form action="courses.php?role=<?php echo $_GET['role']; ?>&program_code=<?php echo $_GET['department']; ?>&action=add" method="POST">  
                     <input type="hidden" name="program_code" value="<?php echo htmlspecialchars($programCode); ?>">
                     
                     <label for="subject_code">Subject Code:</label>
@@ -330,7 +354,11 @@ include_once "../back/courses.php";
         </div>
 
         <div class="action-buttons">
-            <button class="btn btn-primary" onclick="openAddCourseModal()">Add New Course</button>
+            <?php if ($_GET['role'] == 'Dean' && $_GET['department'] === $_GET['program_code']) { ?>
+                <button class="btn btn-primary" onclick="openAddCourseModal()">Add New Course</button>
+            <?php } else { ?>
+                <button class="btn btn-primary disabled-btn">Add New Course</button>
+            <?php } ?>
         </div>
 
         <div class="filters">
@@ -385,18 +413,23 @@ include_once "../back/courses.php";
                         <td><?php echo htmlspecialchars($course['slots']); ?></td>
                         <td>
                             <div class="action-icons">
-                                
-                                <a href="courses.php?delete_course_code=<?php echo urlencode($course['subject_code']); ?>&program_code=<?php echo urlencode($programCode); ?>" class="action-icon delete-icon">🗑</a>
+                                <?php if ($_GET['role'] == 'Dean' && $_GET['department'] === $course['program_code']) { ?>
+                                    <!-- Delete Button -->
+                                    <a href="courses.php?delete_course_code=<?php echo urlencode($course['subject_code']); ?>&program_code=<?php echo urlencode($programCode); ?>&role=<?php echo $_GET['role']; ?>" class="action-icon delete-icon">🗑</a>
 
-                                
+                                    <!-- Edit Button -->
+                                    <span class="action-icon edit-icon" onclick="openEditCourseModal('<?php echo htmlspecialchars(json_encode($course)); ?>')">✎</span>
+                                <?php } else { ?>
+                                    <!-- Disabled Delete Button with Tooltip -->
+                                    <span class="action-icon delete-icon disabled-btn">🗑</span>
 
-
-                                <span class="action-icon edit-icon" onclick="openEditCourseModal('<?php echo htmlspecialchars(json_encode($course)); ?>')">✎</span>
-
-
-                                
+                                    <!-- Disabled Edit Button with Tooltip -->
+                                    <span class="action-icon edit-icon disabled-btn">✎</span>
+                                <?php } ?>
                             </div>
                         </td>
+
+
                     </tr>
                 <?php endforeach; ?>
             </tbody>

@@ -36,9 +36,7 @@ function displayFacultyData(facultyData) {
                 <button class="delete-btn" onclick="confirmDeleteFaculty('${faculty.faculty_id}','${faculty.departmentID}')">
                     Delete
                 </button>
-                <button class="schedule-btn" onclick="viewFacultySchedule('${faculty.faculty_id}')">
-                    View Schedule
-                </button>
+                <a href='../frame/info.php?id=${faculty.faculty_id}'><button class='schedule-btn'>View Profile</button></a>
             </td>
         `;
         tableBody.appendChild(row);

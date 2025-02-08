@@ -149,6 +149,36 @@
             cursor: pointer;
         }
 
+        /*disable button*/
+        .disabled-btn {
+            opacity: 0.5;
+            cursor: not-allowed;
+            position: relative;
+            border: none;
+            background: #ddd; /* Light grey background to indicate disabled state */
+            color: #888;
+        }
+
+        .disabled-btn:hover::after {
+            content: "Only for Dean";
+            position: absolute;
+            background: #333;
+            color: #fff;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            white-space: nowrap;
+            top: -30px; /* Position above the button */
+            left: 50%;
+            transform: translateX(-50%);
+            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.3);
+        }
+
+        .disabled-btn:hover {
+            opacity: 0.7; /* Slightly increase opacity when hovered */
+        }
+
+
     </style>    
 </head>
 <body>
@@ -157,7 +187,7 @@
             <div class="modal-content">
                 <span class="close-btn" onclick="closeModal()">&times;</span>
                 <h2>Add NNew Program</h2>
-                <form action="/facultyloading/back/actions.php?action=add&department=<?php echo $_GET['department']?>" method="POST">
+                <form action="/facultyloading/back/actions.php?action=add&department=<?php echo $_GET['department']?>&role=<?php echo $_GET['role']?>" method="POST">
                 
                     <label for="programCode">Program Code:</label>
                     <input type="text" id="programCode" name="programCode" required>
@@ -195,9 +225,9 @@
 
     <div class="container">
         <h1>Programs</h1>
-        
-        <button class="add-new">Add New</button>
-
+        <?php if ($_GET['role'] == 'Dean'){?>
+            <button class="add-new">Add New</button>
+        <?php }?>
         <div class="actions-bar">
             <div>
                 <h6>lists of programs</h6>
@@ -225,22 +255,21 @@
                         <td><?php echo $row['college']; ?></td>
                         <td>
                             <div class="action-buttons">
-                                <?php if ($_GET['department'] === $row['program_code']) { ?>
-                                    <!-- Show buttons only if the user's department matches -->
+                                <?php if ($_GET['role'] == 'Dean' && $_GET['department'] === $row['program_code']) { ?>
+                                    
                                     <button class="delete-btn" onclick="confirmDelete('<?php echo $row['program_code']; ?>')">🗑</button>
 
                                     <button class="edit-btn" onclick="openEditProgramModal('<?php echo htmlspecialchars($row['program_code'], ENT_QUOTES); ?>', '<?php echo htmlspecialchars($row['program_name'], ENT_QUOTES); ?>', '<?php echo htmlspecialchars($row['college'], ENT_QUOTES); ?>')">✎</button>
                                 <?php } else { ?>
-                                    <!-- Show disabled buttons for unauthorized users -->
-                                    <button class="delete-btn" disabled style="opacity: 0.5; cursor: not-allowed;">🗑</button>
-                                    <button class="edit-btn" disabled style="opacity: 0.5; cursor: not-allowed;">✎</button>
+                                    <button class="delete-btn disabled-btn">🗑</button>
+                                    <button class="edit-btn disabled-btn">✎</button>
                                 <?php } ?>
 
-                                <!-- These buttons are always accessible -->
-                                <a href="class.php?program_code=<?php echo urlencode($row['program_code']); ?>">
+                                <a href="sections.php?department=<?php echo urlencode($row['program_code']); ?>&role=<?php echo urlencode($_GET['role']); ?>">
                                     <button class="programs-btn">Class</button>
                                 </a>
-                                <a href="courses.php?program_code=<?php echo urlencode($row['program_code']); ?>">
+
+                                    <a href="courses.php?program_code=<?php echo urlencode($row['program_code']); ?>&role=<?php echo urlencode($_GET['role']); ?>&department=<?php echo urlencode($_GET['department']); ?>">
                                     <button class="programs-btn">Courses</button>
                                 </a>
                             </div>

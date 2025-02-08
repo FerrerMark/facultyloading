@@ -289,7 +289,6 @@
     </div>
 
 
-
     <!-- Edit Faculty Modal -->
     <div id="editFacultyModal" class="modal" style="display: <?php echo isset($selectedFaculty) ? 'block' : 'none'; ?>;">
         <div class="modal-content">
@@ -365,19 +364,26 @@
             <input type="text" placeholder="Search:" class="search-box">
         </div>
 
-        <table border="1">
+        <table border="1" id="faculty-table">
             <thead>
                 <tr>
                     <th>Faculty ID</th>
                     <th>First Name</th>
                     <th>Middle Name</th>
                     <th>Last Name</th>
+                    <th>College</th>
                     <th>Status</th>
+                    <th>Address</th>
+                    <th>Phone Number</th>
+                    <th>Department ID</th>
+                    <th>Department Title</th>
+                    <th>Subject</th>
                     <th>Role</th>
-                    <th>Action</th>
+                    <th>Master Specialization</th>
+ 
                 </tr>
             </thead>
-            <tbody>
+            <tbody id="faculty-table-body">
                 <?php
                 // Loop through faculty list and display each record in a table row
                 if (!empty($facultyList)) {
@@ -389,13 +395,16 @@
                         echo "<td>" . htmlspecialchars($faculty['lastname']) . "</td>";
                         echo "<td>" . htmlspecialchars($faculty['employment_status']) . "</td>";
                         echo "<td>" . htmlspecialchars($faculty['role']) . "</td>";
+                        
                         echo "<td>
                         
-                                <a href='edit.php?id=" . urlencode($faculty['faculty_id']) . "&department=" . urlencode($faculty['departmentID']) . "&role=" . urlencode($faculty['role']) . "&action=edit'><button class='edit-btn'>Edit</button></a> 
+                                <a href='faculty.php?id=" . urlencode($faculty['faculty_id']) . "&department=" . urlencode($faculty['departmentID']) . "&role=" . urlencode($faculty['role']) . "&action=edit'><button class='edit-btn'>Edit</button></a> 
                         
                                 <a href='?action=delete&id=" . urlencode($faculty['faculty_id']) . "'><button class='delete-btn'>Delete</button></a>
 
-                                <a href='?action=delete&id=" . urlencode($faculty['faculty_id']) . "'><button class='schedule-btn'>View Schedule</button></a>
+                                <a href='../frame/viewfacultysched.php?id=" . urlencode($faculty['faculty_id']) . "&department=".($faculty['departmentID']) ."'><button class='schedule-btn'>View Schedule</button></a>
+
+                                <a href='../frame/info.php?id=" . urlencode($faculty['faculty_id']) . "'><button class='schedule-btn'>View Profile</button></a>
 
                             </td>";
                         echo "</tr>";

@@ -1,11 +1,12 @@
 <?php
 include_once "../connections/connection.php"; 
 
+$role = $_GET['role'];
 
 if (isset($_GET['action'])) {
     $action = $_GET['action'];
 
-    if ($action === 'delete' && isset($_GET['program_code'])) {
+    if ($action === 'delete' && isset($_GET['program_code']) && $role === 'Dean') {
         $programCode = $_GET['program_code'];
 
         try {
@@ -17,7 +18,7 @@ if (isset($_GET['action'])) {
         } catch (PDOException $e) {
             echo "Error deleting program: " . $e->getMessage();
         }
-    } elseif ($action === 'edit' && isset($_POST['program_code'])) {
+    } elseif ($action === 'edit' && isset($_POST['program_code']) && $role === 'Dean') {
 
         // handleEditProgram($conn, $programCode, $programName, $college);
         try {
@@ -40,7 +41,7 @@ if (isset($_GET['action'])) {
         } catch (PDOException $e) {
             echo "Error updating program: " . $e->getMessage();
         }
-    } elseif ($action === 'add' && isset($_POST['programCode'])) {
+    } elseif ($action === 'add' && isset($_POST['programCode']) && $role === 'Dean') {
 
         try {
 
@@ -58,7 +59,8 @@ if (isset($_GET['action'])) {
             $stmt->execute();
 
             $departmentID = $_SESSION['departmentID'];
-            header("Location: ../frame/programs.php?message=Program successfully updated&role=department%20head&department=". urldecode($departmentID));
+            header("Location: ../frame/programs.php?message=Program successfully updated&role=Dean&department=". urldecode($departmentID));
+
             exit;
         } catch (PDOException $e) {
             echo "Error adding program: " . $e->getMessage();

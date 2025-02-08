@@ -29,6 +29,9 @@ if (isset($_POST['submit'])) {
         $_SESSION['role'] = $role;
         $_SESSION['department'] = $department;
 
+        // echo $_SESSION['id'];
+
+
         // $print = $_SESSION['department'];
         header("Location: /facultyloading/index.php");
 

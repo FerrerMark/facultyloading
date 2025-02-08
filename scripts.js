@@ -4,6 +4,19 @@ function loadFrame(page,role,department) {
     document.getElementById("frame").src = basePath + page + ".php?role="+role+"&department="+department;
 
 }
+
+document.addEventListener("DOMContentLoaded", function() {
+    const navLinks = document.querySelectorAll(".nav-item");
+
+    navLinks.forEach(link => {
+        link.addEventListener("click", function() {
+            navLinks.forEach(nav => nav.classList.remove("active"));
+            this.classList.add("active");
+        });
+    });
+});
+
+
 // modal for adding program
 var modal = document.getElementById("addProgramModal");
 var btn = document.querySelector(".add-new");
@@ -178,5 +191,28 @@ function openEditRoomModal() {
 function closeEditRoomModal() {
 
     document.getElementById('openEditRoomModal').style.display = 'none';
+
+}
+
+//notification
+function toggleNotification(){
+    
+    const notificationPopup = document.getElementById('notificationPopup');
+    notificationPopup.style.display = notificationPopup.style.display === 'none' ? 'block' : 'none';
+
+    const notifications = [
+        { id: 1, title: "New message from John", message: "Hey, how are you?", time: "2 minutes ago", unread: true },
+        { id: 2, title: "Meeting reminder", message: "Team meeting at 3 PM", time: "1 hour ago", unread: true },
+        { id: 3, title: "System update", message: "The system will be down for maintenance tonight", time: "Yesterday", unread: false },
+    ];
+
+        notificationList.innerHTML = notifications.map(notification => `
+            <div class="notification-item ${notification.unread ? 'unread' : ''}">
+                <div class="title">${notification.title}</div>
+                <div class="message">${notification.message}</div>
+                <div class="time">${notification.time}</div>
+            </div>
+        `).join('');
+
 
 }

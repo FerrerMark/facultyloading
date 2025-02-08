@@ -14,21 +14,22 @@ $department = $stmt->fetchColumn();
 if(!empty($department) && $role != 'instructor') {
     if (isset($_GET['action'])) {
         if (isset($_GET['action']) && $_GET['action'] === 'add' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-        
-            // Sanitize and validate inputs
+    
             $firstname = trim($_POST['firstname'] ?? '');
             $middlename = trim($_POST['middlename'] ?? '');
             $lastname = trim($_POST['lastname'] ?? '');
             $status = trim($_POST['status'] ?? '');
             $address = trim($_POST['address'] ?? '');
             $phone_no = trim($_POST['phone_no'] ?? '');
-            $departmentID = trim($_POST['department']);
+            $departmentID = trim($_POST['department'] ?? '');
             $role = trim($_POST['role'] ?? '');
             $master_specialization = trim($_POST['master_specialization'] ?? '');
             $college = !empty($_POST['college']) ? $_POST['college'] : NULL;
         
-            try {
-                // SQL Insert Query (Removed `subject` since it doesn't exist)
+            // Set max_weekly_hours based on employment status
+            $max_weekly_hours = ($status === 'Full-time') ? 18 : (($status === 'Part-time') ? 12 : NULL);
+        
+            try {   
                 $sql = "INSERT INTO faculty (
                             firstname, 
                             middlename, 
@@ -39,7 +40,8 @@ if(!empty($department) && $role != 'instructor') {
                             departmentID, 
                             role,
                             master_specialization,
-                            college
+                            college,
+                            max_weekly_hours
                         ) VALUES (
                             :firstname,
                             :middlename,
@@ -50,10 +52,10 @@ if(!empty($department) && $role != 'instructor') {
                             :departmentID,
                             :role,
                             :master_specialization,
-                            :college
+                            :college,
+                            :max_weekly_hours
                         )";
         
-                // Prepare and execute the statement
                 $stmt = $conn->prepare($sql);
                 $stmt->bindParam(':firstname', $firstname);
                 $stmt->bindParam(':middlename', $middlename);
@@ -65,9 +67,9 @@ if(!empty($department) && $role != 'instructor') {
                 $stmt->bindParam(':role', $role);
                 $stmt->bindParam(':master_specialization', $master_specialization);
                 $stmt->bindParam(':college', $college, PDO::PARAM_STR); 
-
+                $stmt->bindParam(':max_weekly_hours', $max_weekly_hours, PDO::PARAM_INT);
+        
                 if ($stmt->execute()) {
-                    
                     header("Location: ../frame/faculty.php?department=" . urlencode($departmentID) . "&success=Faculty added successfully");
                     exit();
                 } else {
@@ -82,7 +84,7 @@ if(!empty($department) && $role != 'instructor') {
                 exit();
             }
         }else if($_GET['action'] === 'edit' && isset($_GET['id']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
-            // Edit faculty
+            
             $id = $_GET['id'];
             $firstname = $_POST['firstname'];
             $middlename = $_POST['middlename'];
@@ -117,34 +119,28 @@ if(!empty($department) && $role != 'instructor') {
                 $stmt->bindParam(':id', $id, PDO::PARAM_INT);
                 $stmt->execute();
         
-                // Redirect with department ID if available
                 header("Location: ../frame/faculty.php?success=Faculty updated successfully");
                 exit;
             } catch (PDOException $e) {
                 echo "Error: " . $e->getMessage();
             }
         }else if ($_GET['action'] === 'delete' && isset($_GET['id'])) {
-            // Sanitize ID and Department
             $id = intval($_GET['id']);
             $department = htmlspecialchars($_GET['department']);
         
-            // Confirmation before deletion
             if (isset($_POST['confirm_delete']) && $_POST['confirm_delete'] === 'yes') {
                 try {
-                    // SQL Query to delete faculty
                     $sql = "DELETE FROM faculty WHERE faculty_id = :id";
                     $stmt = $conn->prepare($sql);
                     $stmt->bindParam(':id', $id, PDO::PARAM_INT);
                     $stmt->execute();
         
-                    // Redirect after successful deletion
                     header("Location: ../frame/faculty.php?department=" . urlencode($department) . "&success=Faculty deleted successfully");
                     exit(); 
                 } catch (PDOException $e) {
                     echo "Error: " . $e->getMessage();
                 }
             } else {
-                // Show a confirmation page before deletion
                 echo "<form method='POST'>
                         <p>Are you sure you want to delete this faculty?</p>
                         <button type='submit' name='confirm_delete' value='yes'>Yes, Delete</button>
@@ -183,11 +179,11 @@ if(!empty($department) && $role != 'instructor') {
 
     $conn = null;
     }else{
-    echo "hahaha";
-    if($department == null){
-        echo "no department";
+        echo "hahaha";
+        if($department == null){
+            echo "no department";
+        }
+        exit();
     }
-    exit();
-}
 
 }
