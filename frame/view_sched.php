@@ -7,21 +7,25 @@ $faculty_id = $_SESSION['id'];
 
 try {
     $stmt = $conn->prepare("
-        SELECT f.*, 
-               CONCAT(f.firstname, ' ', f.lastname) AS teacher, 
-               section.section_name, 
-               sched.day_of_week, 
-               sched.time_slot, 
-               sched.subject_code, 
-               sched.year_level, 
-               sched.semester, 
-               sched.room_id,
-               section.program_code
-        FROM faculty f
-        LEFT JOIN schedules sched ON f.faculty_id = sched.faculty_id
-        LEFT JOIN sections section ON section.section_id = sched.section_id
-        WHERE f.faculty_id = :faculty_id
+    SELECT f.*, 
+           CONCAT(f.firstname, ' ', f.lastname) AS teacher, 
+           section.section_name, 
+           sched.day_of_week, 
+           sched.start_time,  -- Added Start Time
+           sched.end_time,    -- Added End Time
+           sched.subject_code, 
+           sched.year_level, 
+           sched.semester, 
+           sched.room_id,
+           section.program_code,
+           section.year_level,
+           section.semester 
+    FROM faculty f
+    LEFT JOIN schedules sched ON f.faculty_id = sched.faculty_id
+    LEFT JOIN sections section ON section.section_id = sched.section_id
+    WHERE f.faculty_id = :faculty_id
     ");
+
 
     $stmt->bindParam(':faculty_id', $faculty_id);
     $stmt->execute();
@@ -40,7 +44,6 @@ try {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Faculty Schedule</title>
-    <!-- Bootstrap for Styling -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
@@ -76,11 +79,9 @@ try {
 </head>
 <body>
 
-<!-- <div class="container"> -->
     <h2>Faculty Schedule</h2>
 
     <?php if (!empty($schedules)): ?>
-        <!-- Display Faculty Information -->
         <?php if (!empty($schedules) || isset($schedules[0])): ?>
             <div class="faculty-info">
                 <h4 class="text-center">
@@ -98,14 +99,14 @@ try {
         <?php endif; ?>
 
 
-        <!-- Schedule Table -->
         <table class="table table-bordered table-striped">
             <thead class="table-primary">
                 <tr>
                     <th>Section</th>
-                    <th>Program Code</th> <!-- New Column -->
+                    <th>Program Code</th>
                     <th>Day</th>
-                    <th>Time Slot</th>
+                    <th>Start Time</th> 
+                    <th>End Time</th> 
                     <th>Subject Code</th>
                     <th>Year Level</th>
                     <th>Semester</th>
@@ -116,9 +117,10 @@ try {
                 <?php foreach ($schedules as $schedule): ?>
                     <tr>
                         <td><?php echo htmlspecialchars($schedule['section_name'] ?? 'N/A'); ?></td>
-                        <td><?php echo htmlspecialchars($schedule['program_code'] ?? 'N/A'); ?></td> 
+                        <td><?php echo htmlspecialchars($schedule['program_code'] ?? 'N/A'); ?></td>
                         <td><?php echo htmlspecialchars($schedule['day_of_week'] ?? 'N/A'); ?></td>
-                        <td><?php echo htmlspecialchars($schedule['time_slot'] ?? 'N/A'); ?></td>
+                        <td><?php echo date("h:i A", strtotime($schedule['start_time'] ?? '00:00:00')); ?></td>
+                        <td><?php echo date("h:i A", strtotime($schedule['end_time'] ?? '00:00:00')); ?></td> 
                         <td><?php echo htmlspecialchars($schedule['subject_code'] ?? 'N/A'); ?></td>
                         <td><?php echo htmlspecialchars($schedule['year_level'] ?? 'N/A'); ?></td>
                         <td><?php echo htmlspecialchars($schedule['semester'] ?? 'N/A'); ?></td>
@@ -128,12 +130,12 @@ try {
             </tbody>
         </table>
 
+
     <?php else: ?>
         <p class="text-center text-danger">No schedule found for this faculty member.</p>
     <?php endif; ?>
 
 
-<!-- </div> -->
 
 </body>
 </html>

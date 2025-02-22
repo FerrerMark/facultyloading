@@ -94,34 +94,7 @@ function formatTime($time) {
         th, td { border: 1px solid black; padding: 10px; text-align: center; }
         th { background-color: #f4f4f4; }
         select, button { padding: 5px; }
-        td { min-width: 120px; height: 40px; position: relative; }
-        .delete-btn, .add-btn {
-            position: absolute;
-            top: 5px;
-            right: 5px;
-            cursor: pointer;
-            font-weight: bold;
-            font-size: 26px;
-            border: none;
-            background: none;
-            padding: 0;
-            display: none; /* Hidden by default */
-        }
-        .delete-btn {
-            color: red;
-        }
-        .add-btn {
-            color: White;
-        }
-        .delete-btn:hover {
-            color: darkred;
-        }
-        .add-btn:hover {
-            color: darkgreen;
-        }
-        td:hover .delete-btn, td:hover .add-btn {
-            display: block; /* Show on hover */
-        }
+        td { min-width: 120px; height: 40px; }
     </style>
 </head>
 <body>
@@ -185,15 +158,9 @@ function formatTime($time) {
                             $teacher_display = !empty($teacher_name) ? $teacher_name : "<small style='color: gray;'>No Faculty</small>";
                             $room_display = !empty($schedule['room_no']) ? $schedule['room_no'] : "<small style='color: gray;'>No Room</small>";
 
-                            // Conditional button based on whether there's a faculty
-                            $action_button = !empty($teacher_name) ? 
-                                "<button class='delete-btn' onclick='deleteFaculty({$schedule['schedule_id']})'>×</button>" :
-                                "<button class='add-btn' onclick='addFaculty({$schedule['schedule_id']})'>+</button>";
-
                             $new_content = "<strong style='color: black;'>{$schedule['subject_code']}</strong><br>" .
                                            "<small>Teacher: $teacher_display</small><br>" .
-                                           "<small>Room: $room_display</small>" .
-                                           $action_button;
+                                           "<small>Room: $room_display</small>";
 
                             if (!empty($teacher_name)) {
                                 $cell_style = "style='background-color: #90ee90a8;'"; 
@@ -229,65 +196,6 @@ function formatTime($time) {
 <?php else: ?>
     <p>Please select a section to view the schedule.</p>
 <?php endif; ?>
-
-<script>
-function deleteFaculty(scheduleId) {
-    if (confirm('Are you sure you want to remove the faculty from this schedule?')) {
-        // Here you would typically make an AJAX call to a PHP script to handle the deletion
-        console.log('Deleting faculty for schedule ID: ' + scheduleId);
-        
-        // Example AJAX call (uncomment and modify according to your setup):
-        /*
-        fetch('delete_faculty.php', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ schedule_id: scheduleId })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                location.reload();
-            } else {
-                alert('Error deleting faculty: ' + data.message);
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('An error occurred while deleting the faculty');
-        });
-        */
-    }
-}
-
-function addFaculty(scheduleId) {
-    if (confirm('Do you want to assign a faculty to this schedule?')) {
-        // Here you would typically redirect to a form or open a modal to select faculty
-        console.log('Adding faculty for schedule ID: ' + scheduleId);
-        
-        // Example AJAX call or redirect (uncomment and modify according to your setup):
-        /*
-        // Option 1: Redirect to a faculty assignment page
-        window.location.href = 'assign_faculty.php?schedule_id=' + scheduleId;
-        
-        // Option 2: AJAX call to get faculty list
-        fetch('get_available_faculty.php', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ schedule_id: scheduleId })
-        })
-        .then(response => response.json())
-        .then(data => {
-            // Handle faculty selection logic here
-            console.log('Available faculty:', data);
-        });
-        */
-    }
-}
-</script>
 
 </body>
 </html>

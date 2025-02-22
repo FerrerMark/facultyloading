@@ -18,6 +18,7 @@
             color: #333;
             margin: 0;
             padding: 20px;
+            background: #fff;
         }
         .container {
             max-width: 800px;
@@ -96,7 +97,7 @@
     </style>
 </head>
 <body>
-    <div class="container">
+    <!-- <div class="container"> -->
         <h1>Faculty Profile</h1>
         <div class="profile-header">
             
@@ -119,6 +120,6 @@
             <div class="info-value"><?php echo $row['address'] ?></div>
             
         </div>
-    </div>
+    <!-- </div> -->
 </body>
 </html>

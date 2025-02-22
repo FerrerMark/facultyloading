@@ -2,6 +2,8 @@
 session_start();
 include_once "../connections/connection.php";
 
+include_once "../registrar/sync_fetch_courses.php";
+
 $programCode = $_GET['program_code'] ?? $_POST['program_code'] ?? null;
 
 if (!$programCode) {
@@ -52,7 +54,6 @@ try {
         $stmt->bindParam(':slots', $slots, PDO::PARAM_INT);
         $stmt->execute();
 
-        //Redirect back to the courses page with a success message
         header("Location: courses.php?program_code=" . urlencode($programCode) . "&role=" . urlencode($role) . "&success=Course deleted successfully&department=" . urlencode($programCode) . "&role=Dean");
         exit;
     }

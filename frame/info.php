@@ -20,7 +20,11 @@ include_once("../connections/connection.php");
             SELECT section.section_name, 
                    CONCAT(f.firstname, ' ', f.lastname) AS teacher, 
                    sched.*, f.*, 
-                   section.program_code 
+                   section.program_code,
+                   section.year_level,
+                   sched.end_time,
+                sched.start_time,
+                section.semester
             FROM faculty f
             LEFT JOIN schedules sched ON f.faculty_id = sched.faculty_id
             LEFT JOIN sections section ON section.section_id = sched.section_id
@@ -45,18 +49,21 @@ include_once("../connections/connection.php");
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Faculty Profile</title>
     <style>
+       
+
         body {
             font-family: Arial, sans-serif;
             background-color: #f4f4f4;
-            margin: 0;
-            padding: 20px;
+            margin: 17px;
+            padding: 0px;
         }
 
+        
         .container {
-            max-width: 800px;
+            width: 100%;
             margin: auto;
             background: white;
-            padding: 20px;
+            padding: inherit;
             border-radius: 8px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
@@ -64,6 +71,7 @@ include_once("../connections/connection.php");
         h2 {
             text-align: center;
             color: #333;
+            padding: 19px 0;
         }
 
         .profile-card {
@@ -121,9 +129,8 @@ include_once("../connections/connection.php");
         <p>No faculty records found.</p>
     <?php endif; ?>
 
-
-    <!-- Schedule Table -->
     <style>
+
         .table-info {
             border-collapse: collapse;
             width: 100%;
@@ -152,7 +159,8 @@ include_once("../connections/connection.php");
             <tr>
                 <th>Section</th>
                 <th>Day</th>
-                <th>Time Slot</th>
+                <th>Start Time</th>
+                <th>End Time</th>
                 <th>Subject Code</th>
                 <th>Program</th>
                 <th>Year Level</th>
@@ -166,7 +174,8 @@ include_once("../connections/connection.php");
                     <tr>
                         <td><?php echo htmlspecialchars($schedule['section_name'] ?? 'N/A'); ?></td>
                         <td><?php echo htmlspecialchars($schedule['day_of_week'] ?? 'N/A'); ?></td>
-                        <td><?php echo htmlspecialchars($schedule['time_slot'] ?? 'N/A'); ?></td>
+                        <td><?php echo htmlspecialchars($schedule['start_time'] ?? 'N/A'); ?></td>
+                        <td><?php echo htmlspecialchars($schedule['end_time'] ?? 'N/A'); ?></td>
                         <td><?php echo htmlspecialchars($schedule['subject_code'] ?? 'N/A'); ?></td>
                         <td><?php echo htmlspecialchars($schedule['program_code'] ?? 'N/A'); ?></td>
                         <td><?php echo htmlspecialchars($schedule['year_level'] ?? 'N/A'); ?></td>

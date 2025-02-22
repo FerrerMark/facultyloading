@@ -1,9 +1,7 @@
 <?php
-
-    
-    include_once("../back/faculty.php");
-
+include_once("../back/faculty.php");
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -21,149 +19,220 @@
         body {
             display: flex;
             min-height: 100vh;
+            background-color: #f4f6f9;
+            color: #333;
         }
 
         .main-content {
             flex: 1;
-            padding: 20px;
-            background-color: #f5f5f5;
+            padding: 30px;
         }
 
         .header {
-            margin-bottom: 20px;
+            margin-bottom: 25px;
         }
 
         .header h1 {
-            font-size: 24px;
+            font-size: 28px;
+            font-weight: 600;
             color: #2c3e50;
         }
 
         .add-new {
-            background-color: #00f2c3;
+            background-color: #00c4b4;
             color: white;
             border: none;
-            padding: 8px 16px;
-            border-radius: 4px;
+            padding: 10px 20px;
+            border-radius: 6px;
             cursor: pointer;
-            margin-bottom: 20px;
+            font-weight: 500;
+            transition: background-color 0.3s ease;
+        }
+
+        .add-new:hover {
+            background-color: #00a99d;
         }
 
         .toolbar {
-            background-color: #6c757d;
-            padding: 10px;
-            border-radius: 4px;
-            margin-bottom: 20px;
+            background-color: #34495e;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 25px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
-        .toolbar-buttons {
+        .toolbar-buttons h6 {
+            color: white;
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        .search-container {
             display: flex;
+            align-items: center;
             gap: 10px;
         }
 
-        .toolbar button {
-            background: transparent;
-            color: white;
-            border: none;
-            padding: 5px 10px;
-            cursor: pointer;
+        .search-box {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            width: 220px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
         }
 
-        .search-box {
-            padding: 6px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            width: 200px;
+        .search-box:focus {
+            outline: none;
+            border-color: #00c4b4;
+        }
+
+        .search-btn {
+            background-color: #00c4b4;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background-color 0.3s ease;
+        }
+
+        .search-btn:hover {
+            background-color: #00a99d;
         }
 
         table {
             width: 100%;
             background: white;
             border-collapse: collapse;
-            margin-bottom: 20px;
+            border-radius: 6px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
         th, td {
-            padding: 12px;
+            padding: 15px;
             text-align: left;
-            border-bottom: 1px solid #dee2e6;
+            border-bottom: 1px solid #e5e7eb;
         }
 
         th {
             background-color: #f8f9fa;
-            font-weight: bold;
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 14px;
+            text-transform: uppercase;
+        }
+
+        td {
+            font-size: 14px;
+            color: #555;
         }
 
         tr:nth-child(even) {
-            background-color: #f9f9f9;
+            background-color: #fafafa;
+        }
+
+        tr:hover {
+            background-color: #f1f3f5;
         }
 
         .action-buttons {
             display: flex;
-            gap: 5px;
+            flex-direction: column;
+            gap: 8px;
         }
 
         button {
-            padding: 4px 8px;
+            padding: 8px 12px;
             border: none;
             border-radius: 4px;
             cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            transition: background-color 0.3s ease;
+            width: 100%;
+            color: black;
         }
 
         .delete-btn {
-            background-color: #dc3545;
+            background-color: #e74c3c;
+        }
+
+        .delete-btn:hover {
+            background-color: #c0392b;
         }
 
         .edit-btn {
-            background-color:#7dd700;
+            background-color: #7dd700;
+        }
+
+        .edit-btn:hover {
+            background-color: #6ab900;
         }
 
         .schedule-btn {
-            background-color: #00f2c3;
-            color:black;
+            background-color: #00c4b4;
         }
 
-        .add-btn{
-            background-color: #00f2c3;
-            color: black;   
+        .schedule-btn:hover {
+            background-color: #00a99d;
+        }
+
+        .add-btn, .btn {
+            background-color: #00c4b4;
         }
 
         .position-badge {
             background-color: #f1c40f;
             color: #2c3e50;
-            padding: 2px 6px;
+            padding: 4px 8px;
             border-radius: 4px;
-            font-size: 0.9em;
-        }
-
-        .status-badge {
-            color: #2c3e50;
+            font-size: 12px;
             font-weight: 500;
         }
 
-        /* Styles for the modal */
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .status-badge.full-time {
+            background-color: #dfe6e9;
+            color: #2c3e50;
+        }
+
+        .status-badge.part-time {
+            background-color: #ffeaa7;
+            color: #2c3e50;
+        }
+
         .modal {
             display: none;
             position: fixed;
-            z-index: 1;
+            z-index: 1000;
             left: 0;
             top: 0;
             width: 100%;
             height: 100%;
             overflow: auto;
-            background-color: rgba(0,0,0,0.4);
+            background-color: rgba(0,0,0,0.5);
         }
 
         .modal-content {
-            background-color: #fefefe;
-            margin: 15% auto;
-            padding: 20px;
-            border: 1px solid #888;
-            width: 80%;
-            max-width: 500px;
+            background-color: white;
+            margin: 10% auto;
+            padding: 25px;
             border-radius: 8px;
+            width: 90%;
+            max-width: 550px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
 
         .close {
@@ -172,13 +241,12 @@
             font-size: 28px;
             font-weight: bold;
             cursor: pointer;
+            transition: color 0.3s ease;
         }
 
         .close:hover,
         .close:focus {
-            color: #000;
-            text-decoration: none;
-            cursor: pointer;
+            color: #333;
         }
 
         .modal-header {
@@ -187,70 +255,132 @@
 
         .modal-header h2 {
             color: #2c3e50;
+            font-size: 22px;
+            font-weight: 600;
         }
 
         .modal-body form {
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 20px;
         }
 
         .modal-body label {
-            font-weight: bold;
+            font-weight: 500;
             color: #2c3e50;
+            font-size: 14px;
         }
 
         .modal-body input[type="text"],
-        .modal-body input[type="file"] {
+        .modal-body textarea,
+        .modal-body select {
             width: 100%;
-            padding: 8px;
+            padding: 10px;
             border: 1px solid #ddd;
-            border-radius: 4px;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        .modal-body input[type="text"]:focus,
+        .modal-body textarea:focus,
+        .modal-body select:focus {
+            outline: none;
+            border-color: #00c4b4;
+        }
+
+        .modal-body textarea {
+            min-height: 80px;
+            resize: vertical;
         }
 
         .modal-body input[type="submit"] {
-            background-color: #00f2c3;
+            background-color: #00c4b4;
             color: white;
-            border: none;
-            padding: 10px;
-            border-radius: 4px;
-            cursor: pointer;
+            padding: 12px;
+            border-radius: 6px;
+            font-weight: 500;
+            transition: background-color 0.3s ease;
         }
 
         .modal-body input[type="submit"]:hover {
-            background-color: #00d6ab;
+            background-color: #00a99d;
+        }
+
+        #pagination {
+            margin-top: 25px;
+            text-align: center;
+        }
+
+        #pagination button {
+            background-color: #00c4b4;
+            color: white;
+            padding: 8px 14px;
+            border-radius: 6px;
+            margin: 0 5px;
+            font-weight: 500;
+            transition: background-color 0.3s ease;
+        }
+
+        #pagination button:hover:not(:disabled) {
+            background-color: #00a99d;
+        }
+
+        #pagination button:disabled {
+            background-color: #dfe6e9;
+            cursor: not-allowed;
+        }
+
+        #pagination button.active {
+            background-color: #34495e;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 15px;
+            }
+            .toolbar {
+                flex-direction: column;
+                gap: 10px;
+            }
+            .search-box {
+                width: 100%;
+            }
+            table {
+                font-size: 12px;
+            }
+            th, td {
+                padding: 10px;
+            }
+            .action-buttons {
+                flex-direction: row;
+                flex-wrap: wrap;
+            }
+            button {
+                width: auto;
+            }
         }
     </style>
-
-    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.3/xlsx.full.min.js"></script>
     <script src="../fetchfaculty.js"></script>
-
 </head>
 <body>
-
     <!-- Add New Faculty Modal -->
     <div id="newFacultyModal" class="modal">
         <div class="modal-content">
-            <span class="close" onclick="closeAddNewModal()">&times;</span>
+            <span class="close" onclick="closeAddNewModal()">×</span>
             <div class="modal-header">
                 <h2>Add New Faculty</h2>
             </div>
             <div class="modal-body">
                 <form id="newFacultyForm" action="../back/faculty.php?action=add&department=<?php echo $_GET['department']?>" method="post" enctype="multipart/form-data">
-
-                    <lable for="department"></lable>
-                    <input type="hidden" id="department" name="department" value="<?php echo $_GET['department']?>" >
-
+                    <input type="hidden" id="department" name="department" value="<?php echo $_GET['department']?>">
                     <label for="firstname">First Name:</label>
                     <input type="text" id="firstname" name="firstname" required placeholder="Enter first name">
-
                     <label for="middlename">Middle Name:</label>
                     <input type="text" id="middlename" name="middlename" placeholder="Enter middle name">
-
                     <label for="lastname">Last Name:</label>
                     <input type="text" id="lastname" name="lastname" required placeholder="Enter last name">
-
                     <label for="status">Employment Status:</label>
                     <select id="status" name="status" required>
                         <option value="">Select Employment Status</option>
@@ -258,19 +388,15 @@
                         <option value="Part-time">Part-time</option>
                         <option value="Contract">Contract</option>
                     </select>
-
                     <label for="master_specialization">Master's Specialization:</label>
                     <select name="master_specialization" id="master_specialization">
                         <option value="general_education">General Education</option>
                         <option value="computer_science">Computer Science</option>
                     </select>
-
                     <label for="address">Address:</label>
                     <textarea id="address" name="address" placeholder="Enter address"></textarea>
-
                     <label for="phone_no">Phone Number:</label>
                     <input type="text" id="phone_no" name="phone_no" required placeholder="Enter phone number">
-
                     <label for="role">Role:</label>
                     <select id="role" name="role" required>
                         <option value="">Select Role</option>
@@ -278,48 +404,34 @@
                         <option value="Department Head">Department Head</option>
                         <option value="Instructor">Instructor</option>
                     </select>
-
                     <input type="hidden" name="department" value="<?php echo $_GET['department']; ?>">
-
-                    <button type="submit">Submit</button>
+                    <input type="submit" value="Submit">
                 </form>
-
             </div>
         </div>
     </div>
 
-
     <!-- Edit Faculty Modal -->
     <div id="editFacultyModal" class="modal" style="display: <?php echo isset($selectedFaculty) ? 'block' : 'none'; ?>;">
         <div class="modal-content">
-            <span class="close" onclick="window.location.href='faculty.php?department=<?php echo $_GET['department']?>'">&times;</span>
+            <span class="close" onclick="window.location.href='faculty.php?department=<?php echo $_GET['department']?>'">×</span>
             <div class="modal-header">
                 <h2>Edit Faculty Attachment</h2>
             </div>
             <div class="modal-body">
-
                 <h4><?php echo $selectedFaculty['firstname'] . ' ' . $selectedFaculty['lastname']; ?></h4>
-
                 <form id="newFacultyForm" action="../back/faculty.php?action=edit&id=<?php echo $selectedFaculty['faculty_id']; ?>" method="post" enctype="multipart/form-data">
-
                     <label for="firstname">First Name:</label>
-                    <input type="text" id="firstname" name="firstname" required placeholder="Enter first name" 
-                        value="<?php echo htmlspecialchars($selectedFaculty['firstname']); ?>">
-
+                    <input type="text" id="firstname" name="firstname" required placeholder="Enter first name" value="<?php echo htmlspecialchars($selectedFaculty['firstname']); ?>">
                     <label for="middlename">Middle Name:</label>
-                    <input type="text" id="middlename" name="middlename" placeholder="Enter middle name" 
-                        value="<?php echo htmlspecialchars($selectedFaculty['middlename']); ?>">
-
+                    <input type="text" id="middlename" name="middlename" placeholder="Enter middle name" value="<?php echo htmlspecialchars($selectedFaculty['middlename']); ?>">
                     <label for="lastname">Last Name:</label>
-                    <input type="text" id="lastname" name="lastname" required placeholder="Enter last name"
-                        value="<?php echo htmlspecialchars($selectedFaculty['lastname']); ?>">
-
+                    <input type="text" id="lastname" name="lastname" required placeholder="Enter last name" value="<?php echo htmlspecialchars($selectedFaculty['lastname']); ?>">
                     <label for="master_specialization">Master's Specialization:</label>
                     <select name="master_specialization" id="master_specialization">
                         <option value="general_education" <?php echo ($selectedFaculty['master_specialization'] == 'general_education') ? 'selected' : ''; ?>>General Education</option>
                         <option value="computer_science" <?php echo ($selectedFaculty['master_specialization'] == 'computer_science') ? 'selected' : ''; ?>>Computer Science</option>
                     </select>
-
                     <label for="status">Employment Status:</label>
                     <select id="status" name="status" required>
                         <option value="">Select Employment Status</option>
@@ -327,14 +439,10 @@
                         <option value="Part-time" <?php echo ($selectedFaculty['employment_status'] == 'Part-time') ? 'selected' : ''; ?>>Part-time</option>
                         <option value="Contract" <?php echo ($selectedFaculty['employment_status'] == 'Contract') ? 'selected' : ''; ?>>Contract</option>
                     </select>
-
                     <label for="address">Address:</label>
                     <textarea id="address" name="address" placeholder="Enter address"><?php echo htmlspecialchars($selectedFaculty['address']); ?></textarea>
-
                     <label for="phone_no">Phone Number:</label>
-                    <input type="text" id="phone_no" name="phone_no" required placeholder="Enter phone number"
-                        value="<?php echo htmlspecialchars($selectedFaculty['phone_no']); ?>">
-
+                    <input type="text" id="phone_no" name="phone_no" required placeholder="Enter phone number" value="<?php echo htmlspecialchars($selectedFaculty['phone_no']); ?>">
                     <label for="role">Role:</label>
                     <select id="role" name="role" required>
                         <option value="">Select Role</option>
@@ -342,26 +450,25 @@
                         <option value="Department Head" <?php echo ($selectedFaculty['role'] == 'Department Head') ? 'selected' : ''; ?>>Department Head</option>
                         <option value="Dean" <?php echo ($selectedFaculty['role'] == 'Dean') ? 'selected' : ''; ?>>Dean</option>
                     </select>
-
-                    <button type="submit">Submit</button>
+                    <input type="submit" value="Submit">
                 </form>
-
             </div>
         </div>
     </div>
 
     <div class="main-content">
         <div class="header">
-            <h1><?php echo $_GET['department']?>&nbsp;Faculty</h1>  
+            <h1><?php echo $_GET['department']?> Faculty</h1>  
         </div>
-
-        <button class="add-btn" onclick="openAddNewModal()">Add New</button>
-
+        
         <div class="toolbar">
             <div class="toolbar-buttons">
-                <h6>faculty list</h6>
+                <h6>Faculty List</h6>
             </div>
-            <input type="text" placeholder="Search:" class="search-box">
+            <div class="search-container">
+                <input type="text" placeholder="Search: Last Name" class="search-box">
+                <button class="search-btn" onclick="searchFaculty()">Search</button>
+            </div>
         </div>
 
         <table border="1" id="faculty-table">
@@ -380,50 +487,65 @@
                     <th>Subject</th>
                     <th>Role</th>
                     <th>Master Specialization</th>
- 
                 </tr>
             </thead>
             <tbody id="faculty-table-body">
-                <?php
-                // Loop through faculty list and display each record in a table row
-                if (!empty($facultyList)) {
-                    foreach ($facultyList as $faculty) {
-                        echo "<tr>";
-                        echo "<td>" . htmlspecialchars($faculty['faculty_id']) . "</td>";
-                        echo "<td>" . htmlspecialchars($faculty['firstname']) . "</td>";
-                        echo "<td>" . htmlspecialchars($faculty['middlename']) . "</td>";
-                        echo "<td>" . htmlspecialchars($faculty['lastname']) . "</td>";
-                        echo "<td>" . htmlspecialchars($faculty['employment_status']) . "</td>";
-                        echo "<td>" . htmlspecialchars($faculty['role']) . "</td>";
-                        
-                        echo "<td>
-                        
-                                <a href='faculty.php?id=" . urlencode($faculty['faculty_id']) . "&department=" . urlencode($faculty['departmentID']) . "&role=" . urlencode($faculty['role']) . "&action=edit'><button class='edit-btn'>Edit</button></a> 
-                        
-                                <a href='?action=delete&id=" . urlencode($faculty['faculty_id']) . "'><button class='delete-btn'>Delete</button></a>
-
-                                <a href='../frame/viewfacultysched.php?id=" . urlencode($faculty['faculty_id']) . "&department=".($faculty['departmentID']) ."'><button class='schedule-btn'>View Schedule</button></a>
-
-                                <a href='../frame/info.php?id=" . urlencode($faculty['faculty_id']) . "'><button class='schedule-btn'>View Profile</button></a>
-
-                            </td>";
-                        echo "</tr>";
-                    }
-                } else {
-                    echo "<tr><td colspan='8'>No faculty members found.</td></tr>";
-                }
-                ?>
             </tbody>
         </table>
 
+        <div id="pagination" style="text-align: center; margin-top: 20px;"></div>
 
-
-
-    <button onclick="downloadExcel()">Download Faculty List</button>
-
+        <button onclick="downloadExcel()">Download Faculty List</button>
     </div>
+
     <script src="../scripts.js"></script>
+    <script>
+        addEventListener("load", function () {
+            fetch("../HR/HRtofaculty.php")
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === "success") {
+                        // Handle success if needed
+                    }
+                })
+                .catch(error => alert("❌ Sync failed: " + error));
+        });
 
+        async function assignSchedule(facultyId) {
+            try {
+                let response = await fetch("../back/assign_schedule.php", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ faculty_id: facultyId }), 
+                });
 
+                let text = await response.text();
+                console.log("Raw response:", text);
+
+                if (!response.ok) {
+                    throw new Error(`HTTP Error ${response.status}: ${response.statusText}`);
+                }
+
+                let result;
+                try {
+                    result = JSON.parse(text);
+                } catch (jsonError) {
+                    throw new Error("Invalid JSON response from server");
+                }
+
+                if (result.success) {
+                    alert("Schedule assigned successfully!");
+                    fetchFacultyData();
+                } else {
+                    alert("Failed to assign schedule: " + (result.message || "Unknown error"));
+                }
+            } catch (error) {
+                console.error("Error assigning schedule:", error);
+                alert("An error occurred while assigning the schedule. Please try again.");
+            }
+        }
+    </script>
 </body>
 </html>

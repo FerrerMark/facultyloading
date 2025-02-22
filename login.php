@@ -18,8 +18,8 @@
             </div>
             <h1>Faculty Login</h1>
             <form action="" method="POST">
-                <label class="label" for="email">Email:</label>
-                        <input type="email" id="email" name="email" required autocomplete="username"></input>
+                <label class="label" for="email">Username:</label>
+                        <input type="text" id="email" name="email" required autocomplete="username"></input>
                 <label for="password">Password:</label>
                 <input type="password" id="password" name="password" required autocomplete="current-password">
                 

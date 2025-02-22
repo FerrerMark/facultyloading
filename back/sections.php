@@ -1,6 +1,8 @@
 <?php
 
 include_once "../connections/connection.php";
+include_once "../registrar/sync_fetch_section.php";
+include_once "../registrar/sync_fetch_schedule.php";
 
 $dep = isset($_GET['department']) ? htmlspecialchars($_GET['department']) : '';
 $role = isset($_GET['role']) ? htmlspecialchars($_GET['role']) : '';
@@ -21,7 +23,6 @@ try {
 if($_SERVER['REQUEST_METHOD'] == 'POST') {
     
     if (isset($_POST['action']) && $_POST['action'] === 'add_section') {
-        // Get the data from the form
         $program_code = $_POST['program_code'];
         $section_name = $_POST['section_name'];
         $year_level = $_POST['year_level'];
@@ -38,7 +39,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
         try {
 
             
-            // // Check if the section already exists
             $checkStmt = $pdo->prepare("SELECT COUNT(*) FROM sections WHERE section_name = :section_name AND program_code = :program_code");
             $checkStmt->bindParam(':section_name', $combined);
             $checkStmt->bindParam(':program_code', $program_code);
@@ -50,7 +50,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
                 exit();
             }
 
-            // Insert new section
             $insertStmt = $pdo->prepare("INSERT INTO sections (program_code, section_name, year_level, semester) VALUES (:program_code, :section_name, :year_level, :semester)");
             $insertStmt->bindParam(':program_code', $program_code);
             $insertStmt->bindParam(':section_name', $combined);
@@ -58,7 +57,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
             $insertStmt->bindParam(':semester', $sem);
             $insertStmt->execute();
 
-            // Redirect to the sections page with success message
             header("Location: ../frame/sections.php?department=$program_code&role=$role&success=true");
 
         } catch (PDOException $e) {
@@ -76,3 +74,5 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
         
     }
 }
+
+

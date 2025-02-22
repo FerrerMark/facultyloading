@@ -23,7 +23,6 @@
             <span class="header-title">faculty dashboard</span>
         </div>
         <div class="header-icons">
-            <span class="icon-park-solid--dark-mode"></span>
             <i class="fa-solid fa-bell" onclick="toggleNotification()"></i>
             <a onclick="loadFrame('profile','<?php echo $role?>','<?php ?>')">
                 <i class="fa-solid fa-user"></i>
@@ -34,7 +33,6 @@
     <div class="container">
         <aside class="sidebar">
             <div class="profile">
-                
                 <img src="https://bootdey.com/img/Content/avatar/avatar7.png" alt="">
             </div>
             <h3><?php echo $row['firstname']." ".$row['lastname']?></h3>
@@ -45,8 +43,12 @@
                     <a href="#" onclick="loadFrame('view_sched','<?php echo $role;?>','<?php echo $departmentId;?>')" class="nav-item"><i class="fa-solid fa-calendar-days"></i>&nbsp;Schedule</a>
                     <a href="#" onclick="documents()" class="nav-item"><i class="fa-solid fa-file"></i>&nbsp;Documents</a>  
                     <a href="#" onclick="loadFrame('available','<?php echo $role;?>','<?php echo $departmentId;?>')" class="nav-item"><i class="fa-solid fa-calendar-days"></i>&nbsp;My Available</a>
-                    
                 <?php } ?> 
+
+                
+                <?php if(false){?>
+                    <a href="#" onclick="loadFrame('faculty','<?php echo $role;?>','<?php echo $departmentId;?>')" class="nav-item"><span class="mdi--teacher"></span>&nbsp;Faculty</a>
+                <?php } ?>
                 
                 <a href="#" onclick="loadFrame('programs','<?php echo $role;?>','<?php echo $departmentId;?>')" class="nav-item"><span class="nrk--media-programguide-active"></span>&nbsp;Programs</a>
 
@@ -81,7 +83,7 @@
             </iframe>
         <?php } ?>  
         <?php if($row['role'] == "Dean"){ ?>
-            <iframe id="frame" src="http://localhost/sms/faculty/frame/headdashboard.php" width="100%" height="100%" title="nav">
+            <iframe id="frame" src="../facultyloading/frame/dashboard.php" width="100%" height="100%" title="nav">
             </iframe>
         <?php } ?> 
 

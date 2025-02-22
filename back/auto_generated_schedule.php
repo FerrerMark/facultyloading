@@ -1,110 +1,168 @@
-<?php
-// Enable error reporting for debugging
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
+<?php 
+header("Content-Type: application/json");
+include "../connections/connection.php"; 
 
-include_once "../connections/connection.php";
+error_log("Starting schedule assignment for all faculty");
 
-// Check if database connection is successful
-if (!$conn) {
-    die("❌ Database connection failed: " . $conn->errorInfo()[2]);
-}
-
-echo "✅ Database connected successfully!<br>";
-
-// Fetch all instructors and their maximum load
-$instructors = [];
-$sql = "SELECT faculty_id, firstname, max_weekly_hours FROM faculty";
-$stmt = $conn->prepare($sql);
-$stmt->execute(); 
-
-while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {  
-    $instructors[$row['faculty_id']] = [
-        'name' => $row['firstname'],
-        'max_load' => $row['max_weekly_hours'],  
-        'assigned' => 0  
-    ];
-}
-
-echo "✅ Instructors fetched successfully!<br>";
-
-// Fetch all courses and their corresponding section_id
-$sql = "SELECT c.course_id, c.subject_code, c.course_title, s.section_id 
-        FROM courses c
-        JOIN sections s ON c.program_code = s.program_code";
-$stmt = $conn->prepare($sql);
+// Fetch all faculty members
+$facultyQuery = "SELECT faculty_id, max_weekly_hours, start_time, end_time, availability FROM faculty";
+$stmt = $conn->prepare($facultyQuery);
 $stmt->execute();
-$courses = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$allFaculty = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-echo "✅ Courses with sections fetched successfully!<br>";
-
-// Fetch available rooms
-$sql = "SELECT room_id FROM rooms";
-$stmt = $conn->prepare($sql);
-$stmt->execute();
-$rooms = $stmt->fetchAll(PDO::FETCH_COLUMN);
-
-if (empty($rooms)) {
-    die("❌ No rooms available. Cannot proceed with scheduling.");
+if (empty($allFaculty)) {
+    error_log("No faculty found in the database.");
+    echo json_encode(["success" => false, "message" => "No faculty found"]);
+    exit();
 }
 
-echo "✅ Rooms fetched successfully!<br>";
+$results = []; // To store results for all faculty
 
-// Available time slots (Monday-Friday, 8 AM - 5 PM)
-$time_slots = [
-    "Monday 8-10", "Monday 10-12", "Monday 1-3", "Monday 3-5",
-    "Tuesday 8-10", "Tuesday 10-12", "Tuesday 1-3", "Tuesday 3-5",
-    "Wednesday 8-10", "Wednesday 10-12", "Wednesday 1-3", "Wednesday 3-5",
-    "Thursday 8-10", "Thursday 10-12", "Thursday 1-3", "Thursday 3-5",
-    "Friday 8-10", "Friday 10-12", "Friday 1-3", "Friday 3-5"
-];
+foreach ($allFaculty as $faculty) {
+    $faculty_id = $faculty["faculty_id"];
+    error_log("Assigning schedule for Faculty ID: $faculty_id");
 
-$assigned_slots = []; 
+    $availableDays = array_unique(array_map('trim', explode(',', $faculty['availability'])));
+    error_log("Faculty ID $faculty_id is available on: " . implode(", ", $availableDays));
 
-foreach ($courses as $course) {  
-    echo "📌 Processing course: " . $course['subject_code'] . " (" . $course['course_title'] . ")<br>";
+    // Get current hours for this faculty
+    $currentHoursQuery = "
+        SELECT SUM(TIMESTAMPDIFF(HOUR, start_time, end_time)) 
+        FROM schedules WHERE faculty_id = :faculty_id";
+    $stmt = $conn->prepare($currentHoursQuery);
+    $stmt->execute(["faculty_id" => $faculty_id]);
+    $currentHours = (int) $stmt->fetchColumn();
 
-    if (empty($course['section_id'])) {
-        echo "⚠️ Skipping " . $course['subject_code'] . " (No section assigned)<br>";
+    // Get faculty's assigned courses
+    $coursesQuery = "SELECT subject_code FROM faculty_courses WHERE faculty_id = :faculty_id";
+    $stmt = $conn->prepare($coursesQuery);
+    $stmt->execute(["faculty_id" => $faculty_id]);
+    $facultyCourses = $stmt->fetchAll(PDO::FETCH_COLUMN);
+
+    if (empty($facultyCourses)) {
+        error_log("Faculty ID $faculty_id has no assigned courses.");
+        $results[$faculty_id] = ["success" => false, "message" => "No assigned courses"];
         continue;
     }
 
-    foreach ($instructors as $id => &$instructor) {  
-        if ($instructor['assigned'] < $instructor['max_load']) {  
-            foreach ($time_slots as $slot) {  
-                if (!isset($assigned_slots[$id][$slot])) {  
-                    try {
-                        // Assign the first available room
-                        $room_id = $rooms[array_rand($rooms)];
+    // Get available sections for this faculty's courses
+    $sectionsQuery = "
+        SELECT s.section_id, s.year_level, s.semester, sc.subject_code, sc.start_time, sc.end_time, sc.day_of_week 
+        FROM section_schedules sc
+        JOIN sections s ON sc.section_id = s.section_id
+        WHERE sc.subject_code IN (" . implode(",", array_fill(0, count($facultyCourses), "?")) . ")
+    ";
+    $stmt = $conn->prepare($sectionsQuery);
+    $stmt->execute($facultyCourses);
+    $sections = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-                        // Assign instructor to course with section_id and room_id
-                        $sql = "INSERT INTO schedules (faculty_id, subject_code, section_id, room_id, day_of_week, time_slot) 
-                                VALUES (:faculty_id, :subject_code, :section_id, :room_id, :day, :time_slot)";
-                        $stmt = $conn->prepare($sql);
-                        $stmt->execute([
-                            'faculty_id' => $id,
-                            'subject_code' => $course['subject_code'],
-                            'section_id' => $course['section_id'],
-                            'room_id' => $room_id, // Now correctly included
-                            'day' => explode(" ", $slot)[0], 
-                            'time_slot' => $slot
-                        ]);
-
-                        echo "✅ Assigned " . $instructor['name'] . " to " . $course['subject_code'] . 
-                             " (Section " . $course['section_id'] . ", Room " . $room_id . ") at " . $slot . "<br>";
-
-                        // Mark slot as used
-                        $assigned_slots[$id][$slot] = true;
-                        $instructor['assigned']++;
-                        break 2; // Move to next course
-                    } catch (PDOException $e) {
-                        die("❌ SQL Error: " . $e->getMessage());
-                    }
-                }
-            }
+    $assignedSchedules = [];
+    foreach ($sections as $row) {
+        if (!in_array($row["day_of_week"], $availableDays)) {
+            error_log("Skipping: Faculty ID $faculty_id is NOT available on {$row["day_of_week"]}.");
+            continue;
         }
+
+        if (strtotime($row["start_time"]) < strtotime($faculty["start_time"]) || 
+            strtotime($row["end_time"]) > strtotime($faculty["end_time"])) {
+            error_log("Faculty ID $faculty_id: Conflict with availability for subject {$row["subject_code"]} at {$row["start_time"]} - {$row["end_time"]}");
+            continue;
+        }
+
+        // Check for faculty time conflicts
+        $facultyConflictQuery = "
+            SELECT COUNT(*) FROM schedules 
+            WHERE faculty_id = :faculty_id 
+            AND day_of_week = :day_of_week 
+            AND (
+                (start_time < :end_time AND end_time > :start_time)
+            )";
+        $stmt = $conn->prepare($facultyConflictQuery);
+        $stmt->execute([
+            "faculty_id"  => $faculty_id,
+            "day_of_week" => $row["day_of_week"],
+            "start_time"  => $row["start_time"],
+            "end_time"    => $row["end_time"]
+        ]);
+
+        if ($stmt->fetchColumn() > 0) {
+            error_log("Skipping: Faculty ID $faculty_id already has a schedule conflict on {$row["day_of_week"]}.");
+            continue;
+        }
+
+        // Check for faculty-section conflicts
+        $facultySectionConflictQuery = "
+            SELECT COUNT(*) FROM schedules 
+            WHERE faculty_id = :faculty_id 
+            AND section_id = :section_id 
+            AND day_of_week = :day_of_week";
+        $stmt = $conn->prepare($facultySectionConflictQuery);
+        $stmt->execute([
+            "faculty_id"  => $faculty_id,
+            "section_id"  => $row["section_id"],
+            "day_of_week" => $row["day_of_week"]
+        ]);
+
+        if ($stmt->fetchColumn() > 0) {
+            error_log("Skipping: Faculty ID $faculty_id is already assigned to Section ID {$row["section_id"]} on {$row["day_of_week"]}.");
+            continue;
+        }
+
+        // Check for section conflicts with other faculty
+        $sectionConflictQuery = "
+            SELECT COUNT(*) FROM schedules 
+            WHERE section_id = :section_id 
+            AND day_of_week = :day_of_week 
+            AND (
+                (start_time < :end_time AND end_time > :start_time)
+            )";
+        $stmt = $conn->prepare($sectionConflictQuery);
+        $stmt->execute([
+            "section_id"  => $row["section_id"],
+            "day_of_week" => $row["day_of_week"],
+            "start_time"  => $row["start_time"],
+            "end_time"    => $row["end_time"]
+        ]);
+
+        if ($stmt->fetchColumn() > 0) {
+            error_log("Skipping: Section ID {$row["section_id"]} already has a faculty assigned on {$row["day_of_week"]} at {$row["start_time"]}.");
+            continue;
+        }
+
+        $newHours = (int) $currentHours + (strtotime($row["end_time"]) - strtotime($row["start_time"])) / 3600;
+        if ($newHours > $faculty["max_weekly_hours"]) {
+            error_log("Faculty ID $faculty_id has exceeded max weekly hours ({$faculty["max_weekly_hours"]}). Skipping...");
+            continue;
+        }
+
+        // Insert the new schedule
+        $insertQuery = "INSERT INTO schedules (faculty_id, subject_code, section_id, day_of_week, start_time, end_time) 
+                        VALUES (:faculty_id, :subject_code, :section_id, :day_of_week, :start_time, :end_time)";
+        $stmt = $conn->prepare($insertQuery);
+
+        if ($stmt->execute([
+            "faculty_id"   => $faculty_id,
+            "subject_code" => $row["subject_code"],
+            "section_id"   => $row["section_id"],
+            "day_of_week"  => $row["day_of_week"],
+            "start_time"   => $row["start_time"],
+            "end_time"     => $row["end_time"]
+        ])) {
+            error_log("Successfully assigned Faculty ID: $faculty_id to Section ID: {$row["section_id"]} for Subject: {$row["subject_code"]}");
+            $assignedSchedules[] = $row;
+            $currentHours = $newHours;
+        } else {
+            error_log("Failed to insert schedule for Faculty ID $faculty_id, Course: {$row["subject_code"]}");
+        }
+    }
+
+    if (empty($assignedSchedules)) {
+        error_log("No valid schedules assigned for Faculty ID: $faculty_id.");
+        $results[$faculty_id] = ["success" => false, "message" => "No valid schedules assigned"];
+    } else {
+        $results[$faculty_id] = ["success" => true, "assignedSchedules" => $assignedSchedules];
     }
 }
 
-echo "<br>✅ Scheduling completed successfully!";
-?>
+// Return results for all faculty
+echo json_encode(["success" => true, "facultyAssignments" => $results]);

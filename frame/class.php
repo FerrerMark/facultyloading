@@ -175,7 +175,7 @@
             border: 1px solid #888;
             width: 80%;
             max-width: 500px;
-            border-radius: 8px; /* Optional, for aesthetics */
+            border-radius: 8px;
         }
 
         .close-btn {

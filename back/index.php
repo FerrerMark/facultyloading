@@ -4,7 +4,7 @@ include_once("./connections/connection.php");
 
 if (!isset($_SESSION['id'])) {
     header("Location: /facultyloading/back/logout.php");
-    exit();  // Prevent further execution
+    exit(); 
 }
 
 $id = $_SESSION['id'];
@@ -20,7 +20,6 @@ try {
         $_SESSION['role'] = $row['role']; // Sync session role with DB role if necessary
         $departmentId = $row['departmentID'];
     } else {
-        // If no user found, force logout
         header("Location: /facultyloading/back/logout.php");
         exit();
     }

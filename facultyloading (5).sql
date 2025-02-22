@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jan 26, 2025 at 07:01 AM
+-- Generation Time: Feb 20, 2025 at 03:58 AM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -112,58 +112,28 @@ CREATE TABLE `faculty` (
   `role` enum('Dean','Department Head','Instructor') DEFAULT NULL,
   `master_specialization` varchar(255) DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  `max_weekly_hours` int(11) DEFAULT 18
+  `max_weekly_hours` int(11) DEFAULT 18,
+  `availability` text NOT NULL,
+  `start_time` time NOT NULL,
+  `end_time` time NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `faculty`
 --
 
-INSERT INTO `faculty` (`faculty_id`, `firstname`, `middlename`, `lastname`, `college`, `employment_status`, `address`, `phone_no`, `departmentID`, `role`, `master_specialization`, `created_at`, `max_weekly_hours`) VALUES
-(1, 'John', 'Doe', 'Smith', 'College of Computer Science', 'Full-Time', '123 Main St', '09171234567', 'BSIT', 'Dean', 'General Education', '2025-01-24 14:57:19', 18),
-(2, 'Alice', 'A.', 'Johnson', 'College of Computer Science', 'Full-Time', '456 Elm St', '09172345678', 'BSIT', 'Department Head', 'Dep_specific_course', '2025-01-24 14:57:19', 18),
-(3, 'Robert', 'B.', 'Brown', 'College of Computer Science', 'Full-Time', '789 Oak St', '09173456789', 'BSIT', 'Instructor', 'Dep_specific_course', '2025-01-24 14:57:19', 18),
-(4, 'Emily', 'C.', 'Williams', 'College of Computer Science', 'Part-Time', '321 Pine St', '09174567890', 'BSIT', 'Instructor', 'General Education', '2025-01-24 14:57:19', 12),
-(5, 'Michael', 'D.', 'Jones', 'College of Computer Science', 'Full-Time', '654 Birch St', '09175678901', 'BSIT', 'Instructor', 'Dep_specific_course', '2025-01-24 14:57:19', 18),
-(6, 'Sarah', 'E.', 'Garcia', 'College of Computer Science', 'Full-Time', '987 Cedar St', '09176789012', 'BSIT', 'Instructor', 'General Education', '2025-01-24 14:57:19', 18),
-(7, 'David', 'F.', 'Martinez', 'College of Computer Science', 'Full-Time', '543 Maple St', '09177890123', 'BSIT', 'Instructor', 'Dep_specific_course', '2025-01-24 14:57:19', 18),
-(8, 'Jessica', 'G.', 'Hernandez', 'College of Computer Science', 'Part-Time', '765 Walnut St', '09178901234', 'BSIT', 'Instructor', 'General Education', '2025-01-24 14:57:19', 12),
-(9, 'James', 'H.', 'Lopez', 'College of Computer Science', 'Full-Time', '234 Fir St', '09179012345', 'BSIT', 'Instructor', 'Dep_specific_course', '2025-01-24 14:57:19', 18),
-(10, 'Mary', 'I.', 'Gonzalez', 'College of Computer Science', 'Full-Time', '876 Ash St', '09180123456', 'BSIT', 'Instructor', 'General Education', '2025-01-24 14:57:19', 18),
-(11, 'William', 'J.', 'Perez', 'College of Computer Science', 'Full-Time', '543 Elm St', '09181234567', 'BSIT', 'Instructor', 'Dep_specific_course', '2025-01-24 14:57:19', 18),
-(12, 'Patricia', 'K.', 'Wilson', 'College of Computer Science', 'Part-Time', '876 Pine St', '09182345678', 'BSIT', 'Instructor', 'General Education', '2025-01-24 14:57:19', 12),
-(13, 'Christopher', 'L.', 'Anderson', 'College of Computer Science', 'Full-Time', '123 Oak St', '09183456789', 'BSIT', 'Instructor', 'Dep_specific_course', '2025-01-24 14:57:19', 18),
-(14, 'Linda', 'M.', 'Thomas', 'College of Computer Science', 'Full-Time', '345 Cedar St', '09184567890', 'BSIT', 'Instructor', 'General Education', '2025-01-24 14:57:19', 18),
-(15, 'Daniel', 'N.', 'Jackson', 'College of Computer Science', 'Full-Time', '678 Maple St', '09185678901', 'BSIT', 'Instructor', 'Dep_specific_course', '2025-01-24 14:57:19', 18),
-(16, 'Susan', 'O.', 'White', 'College of Computer Science', 'Part-Time', '987 Fir St', '09186789012', 'BSIT', 'Instructor', 'General Education', '2025-01-24 14:57:19', 12),
-(17, 'Joseph', 'P.', 'Lee', 'College of Computer Science', 'Full-Time', '321 Walnut St', '09187890123', 'BSIT', 'Instructor', 'Dep_specific_course', '2025-01-24 14:57:19', 18),
-(18, 'Karen', 'Q.', 'Young', 'College of Computer Science', 'Full-Time', '654 Ash St', '09188901234', 'BSIT', 'Instructor', 'General Education', '2025-01-24 14:57:19', 18),
-(19, 'Charles', 'R.', 'King', 'College of Computer Science', 'Full-Time', '876 Fir St', '09189012345', 'BSIT', 'Instructor', 'Dep_specific_course', '2025-01-24 14:57:19', 18),
-(20, 'Nancy', 'S.', 'Scott', 'College of Computer Science', 'Full-Time', '234 Cedar St', '09190123456', 'BSIT', 'Instructor', 'General Education', '2025-01-24 14:57:19', 18);
-
--- --------------------------------------------------------
-
---
--- Table structure for table `faculty_availability`
---
-
-CREATE TABLE `faculty_availability` (
-  `availability_id` int(11) NOT NULL,
-  `faculty_id` int(11) NOT NULL,
-  `day_of_week` enum('Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday') NOT NULL,
-  `start_time` time NOT NULL,
-  `end_time` time NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `faculty_availability`
---
-
-INSERT INTO `faculty_availability` (`availability_id`, `faculty_id`, `day_of_week`, `start_time`, `end_time`) VALUES
-(10, 15, 'Wednesday', '07:00:06', '15:00:00'),
-(11, 13, 'Monday', '06:00:00', '12:00:00'),
-(12, 18, 'Wednesday', '06:00:00', '12:00:00'),
-(13, 20, 'Saturday', '10:00:00', '17:00:00');
+INSERT INTO `faculty` (`faculty_id`, `firstname`, `middlename`, `lastname`, `college`, `employment_status`, `address`, `phone_no`, `departmentID`, `role`, `master_specialization`, `created_at`, `max_weekly_hours`, `availability`, `start_time`, `end_time`) VALUES
+(1, 'John', 'Doe', 'Smith', 'College of Computer Science', 'Full-Time', '123 Main St', '09171234567', 'BSIT', 'Dean', 'General Education', '2025-02-08 07:13:58', 40, 'Monday,Friday,Wednesday', '06:00:00', '17:00:00'),
+(2, 'Alice', 'A.', 'Johnson', 'College of Computer Science', 'Full-Time', '456 Elm St', '09172345678', 'BSIT', 'Department Head', 'Dep_specific_course', '2025-02-08 07:13:58', 40, 'Monday,Tuesday,Friday, Wednesday, Friday', '06:00:00', '17:00:00'),
+(3, 'Robert', 'B.', 'Brown', 'College of Computer Science', 'Full-Time', '789 Oak St', '09173456789', 'BSIT', 'Instructor', 'Dep_specific_course', '2025-02-08 07:13:58', 40, 'Monday,Friday,Wednesday', '06:00:00', '12:00:00'),
+(4, 'Emily', 'C.', 'Williams', 'College of Computer Science', 'Part-Time', '321 Pine St', '09174567890', 'BSIT', 'Instructor', 'General Education', '2025-02-08 07:13:58', 20, 'Monday,Friday,Wednesday', '06:00:00', '12:00:00'),
+(5, 'Michael', 'D.', 'Jones', 'College of Computer Science', 'Full-Time', '654 Birch St', '09175678901', 'BSIT', 'Instructor', 'Dep_specific_course', '2025-02-08 07:13:58', 40, 'Monday,Friday,Wednesday', '06:00:00', '17:00:00'),
+(6, 'Sarah', 'E.', 'Garcia', 'College of Computer Science', 'Full-Time', '987 Cedar St', '09176789012', 'BSIT', 'Instructor', 'General Education', '2025-02-08 07:13:58', 40, 'Monday,Friday,Wednesday', '06:00:00', '17:00:00'),
+(7, 'David', 'F.', 'Martinez', 'College of Computer Science', 'Full-Time', '543 Maple St', '09177890123', 'BSIT', 'Instructor', 'Dep_specific_course', '2025-02-08 07:13:58', 40, 'Monday,Tuesday,Friday, Wednesday, Friday', '06:00:00', '17:00:00'),
+(8, 'Jessica', 'G.', 'Hernandez', 'College of Computer Science', 'Part-Time', '765 Walnut St', '09178901234', 'BSIT', 'Instructor', 'General Education', '2025-02-08 07:13:58', 20, 'Monday,Tuesday,Friday, Wednesday, Friday', '06:00:00', '12:00:00'),
+(9, 'James', 'H.', 'Lopez', 'College of Computer Science', 'Full-Time', '234 Fir St', '09179012345', 'BSIT', 'Instructor', 'Dep_specific_course', '2025-02-08 07:13:58', 40, 'Monday,Tuesday,Friday, Wednesday, Friday', '06:00:00', '17:00:00'),
+(10, 'Mary', 'I.', 'Gonzalez', 'College of Computer Science', 'Full-Time', '876 Ash St', '09180123456', 'BSIT', 'Instructor', 'General Education', '2025-02-08 07:13:58', 40, 'Monday,Tuesday,Friday, Wednesday, Friday', '06:00:00', '17:00:00'),
+(49, 'johnmak', 'sibayan', 'Ferrer', 'test', 'Full-Time', 'test', '355555', 'BSIT', 'Instructor', 'test', '2025-02-10 07:32:30', 40, 'Monday,Tuesday,Friday, Wednesday, Friday', '06:00:00', '17:00:00');
 
 -- --------------------------------------------------------
 
@@ -181,13 +151,33 @@ CREATE TABLE `faculty_courses` (
 --
 
 INSERT INTO `faculty_courses` (`faculty_id`, `subject_code`) VALUES
-(8, 'GE1'),
-(9, 'GE2'),
-(12, 'KOMFIL'),
-(13, 'CC101'),
-(13, 'CC102'),
-(17, 'GE3'),
-(20, 'GE4');
+(1, 'BPM101'),
+(1, 'CC101'),
+(1, 'CC102'),
+(1, 'CC103'),
+(1, 'CC104'),
+(1, 'FLD15'),
+(2, 'CC101'),
+(2, 'CC102'),
+(2, 'CC103'),
+(2, 'CC104'),
+(2, 'CC105'),
+(2, 'CC106'),
+(2, 'DM102'),
+(3, 'BPM101'),
+(3, 'CC101'),
+(3, 'CC102'),
+(3, 'DM102'),
+(3, 'FLD15'),
+(4, 'GE1'),
+(4, 'GE2'),
+(4, 'GE3'),
+(4, 'GE4'),
+(5, 'CC101'),
+(6, 'KOMFIL'),
+(6, 'NSTP1'),
+(7, 'PE1'),
+(8, 'ge2');
 
 -- --------------------------------------------------------
 
@@ -206,11 +196,8 @@ CREATE TABLE `programs` (
 --
 
 INSERT INTO `programs` (`program_code`, `program_name`, `college`) VALUES
-('BSCPE', 'Bachelors of Science in computer science', 'College of Computer'),
-('BSCS', 'Bachelor of Science in Computer Science', 'College of Computing'),
-('BSIT', 'Bachelor of Science in Information Technology', 'College of Computing'),
-('BSMath', 'Bachelor of Science in Mathematics', 'College of Science'),
-('BSPhysics', 'Bachelor of Science in Physics', 'College of Science');
+('BSBA', 'Bachelor of Science in Business Administration', 'College of Business'),
+('BSIT', 'Bachelor of Science in Information Technology', 'College of Computing');
 
 -- --------------------------------------------------------
 
@@ -231,16 +218,16 @@ CREATE TABLE `rooms` (
 --
 
 INSERT INTO `rooms` (`room_id`, `building`, `room_no`, `room_type`, `capacity`) VALUES
-(4, 'MV campus', '301', 'Lab', 50),
-(5, 'MV Campus', '302', 'Lab', 50),
-(7, 'MV Campus', '303', 'Lab', 50),
-(8, 'MV Campus', '304', 'Lab', 50),
-(9, 'MV Campus', '305', 'Lab', 50),
-(10, 'MV Campus', '306', 'Lab', 50),
-(11, 'MV Campus', '307', 'Lab', 50),
-(12, 'MV Campus', '308', 'Lab', 50),
-(13, 'MV Campus', '309', 'Lab', 50),
-(14, 'MV Campus', '310', 'Lab', 50);
+(4, 'MV campus', '301', 'Lecture', 50),
+(5, 'MV Campus', '302', 'Lecture', 50),
+(7, 'MV Campus', '303', 'Lecture', 50),
+(8, 'MV Campus', '304', 'Lecture', 50),
+(9, 'MV Campus', '305', 'Lecture', 50),
+(10, 'MV Campus', '306', 'Lecture', 50),
+(11, 'MV Campus', '307', 'Lecture', 50),
+(12, 'MV Campus', '308', 'Lecture', 50),
+(13, 'MV Campus', '309', 'Lecture', 50),
+(14, 'MV Campus', '310', 'Lecture', 50);
 
 -- --------------------------------------------------------
 
@@ -260,26 +247,33 @@ CREATE TABLE `schedules` (
   `room_id` varchar(255) DEFAULT NULL,
   `department` varchar(35) DEFAULT NULL,
   `year_level` varchar(35) DEFAULT NULL,
-  `semester` varchar(10) DEFAULT NULL
+  `semester` varchar(10) DEFAULT NULL,
+  `start_time` time NOT NULL,
+  `end_time` time NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `schedules`
 --
 
-INSERT INTO `schedules` (`schedule_id`, `faculty_id`, `subject_code`, `section_id`, `day_of_week`, `time_slot`, `is_checked`, `course_id`, `room_id`, `department`, `year_level`, `semester`) VALUES
-(5413, 1, 'BPM101', 47, 'Monday', '1', 1, NULL, NULL, 'BSIT', '1', 'First'),
-(5414, 1, 'BPM101', 47, 'Tuesday', '1', 1, NULL, NULL, 'BSIT', '1', 'First'),
-(5415, 1, 'BPM101', 47, 'Tuesday', '2', 1, NULL, NULL, 'BSIT', '1', 'First'),
-(5416, 1, 'BPM101', 47, 'Thursday', '5', 1, NULL, NULL, 'BSIT', '1', 'First'),
-(5417, 6, 'PE1', 47, 'Thursday', '1', 1, NULL, NULL, 'BSIT', '1', 'First'),
-(5418, 6, 'PE1', 47, 'Monday', '4', 1, NULL, NULL, 'BSIT', '1', 'First'),
-(5419, 6, 'PE1', 47, 'Tuesday', '4', 1, NULL, NULL, 'BSIT', '1', 'First'),
-(5420, 6, 'PE1', 47, 'Monday', '5', 1, NULL, NULL, 'BSIT', '1', 'First'),
-(5421, 6, 'PE1', 47, 'Tuesday', '5', 1, NULL, NULL, 'BSIT', '1', 'First'),
-(5422, 10, 'CC102', 47, 'Monday', '3', 1, NULL, NULL, 'BSIT', '1', 'First'),
-(5423, 10, 'CC102', 47, 'Tuesday', '3', 1, NULL, NULL, 'BSIT', '1', 'First'),
-(5424, 10, 'CC102', 47, 'Wednesday', '3', 1, NULL, NULL, 'BSIT', '1', 'First');
+INSERT INTO `schedules` (`schedule_id`, `faculty_id`, `subject_code`, `section_id`, `day_of_week`, `time_slot`, `is_checked`, `course_id`, `room_id`, `department`, `year_level`, `semester`, `start_time`, `end_time`) VALUES
+(132, 1, 'CC101', 1, 'Monday', '', 0, NULL, NULL, NULL, NULL, NULL, '06:00:00', '07:00:00'),
+(133, 1, 'CC102', 1, 'Wednesday', '', 0, NULL, NULL, NULL, NULL, NULL, '06:00:00', '07:00:00'),
+(134, 1, 'CC101', 3, 'Monday', '', 0, NULL, NULL, NULL, NULL, NULL, '09:00:00', '10:00:00'),
+(135, 1, 'CC102', 3, 'Wednesday', '', 0, NULL, NULL, NULL, NULL, NULL, '09:00:00', '10:00:00'),
+(136, 2, 'CC101', 2, 'Monday', '', 0, NULL, NULL, NULL, NULL, NULL, '06:00:00', '07:00:00'),
+(137, 2, 'CC102', 2, 'Wednesday', '', 0, NULL, NULL, NULL, NULL, NULL, '06:00:00', '07:00:00'),
+(138, 4, 'GE1', 1, 'Monday', '', 0, NULL, NULL, NULL, NULL, NULL, '07:00:00', '08:00:00'),
+(139, 4, 'GE3', 1, 'Wednesday', '', 0, NULL, NULL, NULL, NULL, NULL, '07:00:00', '08:00:00'),
+(140, 4, 'GE1', 3, 'Monday', '', 0, NULL, NULL, NULL, NULL, NULL, '10:00:00', '11:00:00'),
+(141, 4, 'GE3', 3, 'Wednesday', '', 0, NULL, NULL, NULL, NULL, NULL, '10:00:00', '11:00:00'),
+(142, 4, 'GE2', 2, 'Monday', '', 0, NULL, NULL, NULL, NULL, NULL, '08:00:00', '09:00:00'),
+(143, 4, 'GE4', 2, 'Wednesday', '', 0, NULL, NULL, NULL, NULL, NULL, '08:00:00', '09:00:00'),
+(144, 6, 'KOMFIL', 1, 'Friday', '', 0, NULL, NULL, NULL, NULL, NULL, '06:00:00', '07:00:00'),
+(145, 6, 'KOMFIL', 3, 'Friday', '', 0, NULL, NULL, NULL, NULL, NULL, '09:00:00', '10:00:00'),
+(146, 6, 'NSTP1', 2, 'Friday', '', 0, NULL, NULL, NULL, NULL, NULL, '07:00:00', '08:00:00'),
+(147, 8, 'GE2', 1, 'Monday', '', 0, NULL, NULL, NULL, NULL, NULL, '08:00:00', '09:00:00'),
+(148, 8, 'GE2', 3, 'Monday', '', 0, NULL, NULL, NULL, NULL, NULL, '11:00:00', '12:00:00');
 
 -- --------------------------------------------------------
 
@@ -292,34 +286,70 @@ CREATE TABLE `sections` (
   `program_code` varchar(50) NOT NULL,
   `year_level` int(11) NOT NULL,
   `section_name` varchar(10) NOT NULL,
-  `semester` varchar(255) DEFAULT NULL
+  `semester` varchar(255) DEFAULT NULL,
+  `start_time` time DEFAULT NULL,
+  `end_time` time DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `sections`
 --
 
-INSERT INTO `sections` (`section_id`, `program_code`, `year_level`, `section_name`, `semester`) VALUES
-(47, 'BSIT', 1, 'BSIT-1101', 'First'),
-(48, 'BSIT', 1, 'BSIT-1102', 'First'),
-(49, 'BSIT', 3, 'BSIT-3103', 'First'),
-(50, 'BSIT', 1, 'BSIT-1104', 'First'),
-(51, 'BSIT', 1, 'BSIT-1105', 'First'),
-(52, 'BSIT', 1, 'BSIT-1106', 'First'),
-(53, 'BSIT', 1, 'BSIT-1107', 'First'),
-(54, 'BSIT', 1, 'BSIT-1108', 'First'),
-(55, 'BSIT', 1, 'BSIT-1109', 'First'),
-(56, 'BSIT', 1, 'BSIT-1110', 'First'),
-(57, 'BSIT', 1, 'BSIT-1111', 'First'),
-(58, 'BSIT', 1, 'BSIT-1112', 'First'),
-(59, 'BSIT', 1, 'BSIT-1113', 'First'),
-(60, 'BSIT', 1, 'BSIT-1114', 'First'),
-(61, 'BSIT', 1, 'BSIT-1115', 'First'),
-(62, 'BSIT', 1, 'BSIT-1116', 'First'),
-(63, 'BSIT', 1, 'BSIT-1117', 'First'),
-(64, 'BSIT', 1, 'BSIT-1118', 'First'),
-(65, 'BSIT', 1, 'BSIT-1119', 'First'),
-(66, 'BSIT', 1, 'BSIT-1120', 'First');
+INSERT INTO `sections` (`section_id`, `program_code`, `year_level`, `section_name`, `semester`, `start_time`, `end_time`) VALUES
+(1, 'BSIT', 1, 'BSIT-1101', '1', '06:00:00', '12:00:00'),
+(2, 'BSIT', 1, 'BSIT-1102', '1', '05:00:00', '12:00:00'),
+(3, 'BSIT', 1, 'BSIT-1103', '1', '13:00:00', '12:00:00');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `section_schedules`
+--
+
+CREATE TABLE `section_schedules` (
+  `schedule_id` int(11) NOT NULL,
+  `section_id` varchar(50) NOT NULL,
+  `subject_code` varchar(50) NOT NULL,
+  `day_of_week` enum('Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday') NOT NULL,
+  `start_time` time NOT NULL,
+  `end_time` time NOT NULL,
+  `semester` enum('First','Second','Summer') NOT NULL,
+  `program_code` varchar(20) NOT NULL,
+  `section_name` varchar(50) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `section_schedules`
+--
+
+INSERT INTO `section_schedules` (`schedule_id`, `section_id`, `subject_code`, `day_of_week`, `start_time`, `end_time`, `semester`, `program_code`, `section_name`) VALUES
+(1, '1', 'CC101', 'Monday', '06:00:00', '07:00:00', 'First', 'BSIT', 'BSIT-1101'),
+(2, '1', 'GE1', 'Monday', '07:00:00', '08:00:00', 'First', 'BSIT', 'BSIT-1101'),
+(3, '1', 'GE2', 'Monday', '08:00:00', '09:00:00', 'First', 'BSIT', 'BSIT-1101'),
+(4, '1', 'CC102', 'Wednesday', '06:00:00', '07:00:00', 'First', 'BSIT', 'BSIT-1101'),
+(5, '1', 'GE3', 'Wednesday', '07:00:00', '08:00:00', 'First', 'BSIT', 'BSIT-1101'),
+(6, '1', 'GE4', 'Wednesday', '08:00:00', '09:00:00', 'First', 'BSIT', 'BSIT-1101'),
+(7, '1', 'KOMFIL', 'Friday', '06:00:00', '07:00:00', 'First', 'BSIT', 'BSIT-1101'),
+(8, '1', 'NSTP1', 'Friday', '07:00:00', '08:00:00', 'First', 'BSIT', 'BSIT-1101'),
+(9, '1', 'PE1', 'Friday', '08:00:00', '09:00:00', 'First', 'BSIT', 'BSIT-1101'),
+(19, '3', 'CC101', 'Monday', '09:00:00', '10:00:00', 'First', 'BSIT', 'BSIT-1103'),
+(20, '3', 'GE1', 'Monday', '10:00:00', '11:00:00', 'First', 'BSIT', 'BSIT-1103'),
+(21, '3', 'GE2', 'Monday', '11:00:00', '12:00:00', 'First', 'BSIT', 'BSIT-1103'),
+(22, '3', 'CC102', 'Wednesday', '09:00:00', '10:00:00', 'First', 'BSIT', 'BSIT-1103'),
+(23, '3', 'GE3', 'Wednesday', '10:00:00', '11:00:00', 'First', 'BSIT', 'BSIT-1103'),
+(24, '3', 'GE4', 'Wednesday', '11:00:00', '12:00:00', 'First', 'BSIT', 'BSIT-1103'),
+(25, '3', 'KOMFIL', 'Friday', '09:00:00', '10:00:00', 'First', 'BSIT', 'BSIT-1103'),
+(26, '3', 'NSTP1', 'Friday', '10:00:00', '11:00:00', 'First', 'BSIT', 'BSIT-1103'),
+(27, '3', 'PE1', 'Friday', '11:00:00', '12:00:00', 'First', 'BSIT', 'BSIT-1103'),
+(28, '2', 'CC101', 'Monday', '06:00:00', '07:00:00', 'First', 'BSIT', 'BSIT-1102'),
+(29, '2', 'GE1', 'Monday', '07:00:00', '08:00:00', 'First', 'BSIT', 'BSIT-1102'),
+(30, '2', 'GE2', 'Monday', '08:00:00', '09:00:00', 'First', 'BSIT', 'BSIT-1102'),
+(31, '2', 'CC102', 'Wednesday', '06:00:00', '07:00:00', 'First', 'BSIT', 'BSIT-1102'),
+(32, '2', 'GE3', 'Wednesday', '07:00:00', '08:00:00', 'First', 'BSIT', 'BSIT-1102'),
+(33, '2', 'GE4', 'Wednesday', '08:00:00', '09:00:00', 'First', 'BSIT', 'BSIT-1102'),
+(34, '2', 'KOMFIL', 'Friday', '06:00:00', '07:00:00', 'First', 'BSIT', 'BSIT-1102'),
+(35, '2', 'NSTP1', 'Friday', '07:00:00', '08:00:00', 'First', 'BSIT', 'BSIT-1102'),
+(36, '2', 'PE1', 'Friday', '08:00:00', '09:00:00', 'First', 'BSIT', 'BSIT-1102');
 
 -- --------------------------------------------------------
 
@@ -328,7 +358,6 @@ INSERT INTO `sections` (`section_id`, `program_code`, `year_level`, `section_nam
 --
 
 CREATE TABLE `users` (
-  `user_id` int(11) NOT NULL,
   `faculty_id` int(11) NOT NULL,
   `username` varchar(35) NOT NULL,
   `password` varchar(255) NOT NULL,
@@ -339,27 +368,18 @@ CREATE TABLE `users` (
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`user_id`, `faculty_id`, `username`, `password`, `role`) VALUES
-(1, 1, 'John@gmail.com', 'jo8080', 'Dean'),
-(2, 2, 'Alice@gmail.com', 'al8080', 'Department Head'),
-(3, 3, 'Robert@gmail.com', 'ro8080', 'Instructor'),
-(4, 4, 'Emily@gmail.com', 'em8080', 'Instructor'),
-(5, 5, 'Michael@gmail.com', 'mi8080', 'Instructor'),
-(6, 6, 'Sarah@gmail.com', 'sa8080', 'Instructor'),
-(7, 7, 'David@gmail.com', 'da8080', 'Instructor'),
-(8, 8, 'Jessica@gmail.com', 'je8080', 'Instructor'),
-(9, 9, 'James@gmail.com', 'ja8080', 'Instructor'),
-(10, 10, 'Mary@gmail.com', 'ma8080', 'Instructor'),
-(11, 11, 'William@gmail.com', 'wi8080', 'Instructor'),
-(12, 12, 'Patricia@gmail.com', 'pa8080', 'Instructor'),
-(13, 13, 'Christopher@gmail.com', 'ch8080', 'Instructor'),
-(14, 14, 'Linda@gmail.com', 'li8080', 'Instructor'),
-(15, 15, 'Daniel@gmail.com', 'da8080', 'Instructor'),
-(16, 16, 'Susan@gmail.com', 'su8080', 'Instructor'),
-(17, 17, 'Joseph@gmail.com', 'jo8080', 'Instructor'),
-(18, 18, 'Karen@gmail.com', 'ka8080', 'Instructor'),
-(19, 19, 'Charles@gmail.com', 'ch8080', 'Instructor'),
-(20, 20, 'Nancy@gmail.com', 'na8080', 'Instructor');
+INSERT INTO `users` (`faculty_id`, `username`, `password`, `role`) VALUES
+(2, 'alice.johnson', '#Jo8080', 'Department Head'),
+(7, 'david.martinez', '#Ma8080', 'Instructor'),
+(4, 'emily.williams', '#Wi8080', 'Instructor'),
+(9, 'james.lopez', '#Lo8080', 'Instructor'),
+(8, 'jessica.hernandez', '#He8080', 'Instructor'),
+(1, 'john.smith', '#Sm8080', 'Dean'),
+(49, 'johnmak.ferrer', '#Fe8080', 'Instructor'),
+(10, 'mary.gonzalez', '#Go8080', 'Instructor'),
+(5, 'michael.jones', '#Jo8080', 'Instructor'),
+(3, 'robert.brown', '#Br8080', 'Instructor'),
+(6, 'sarah.garcia', '#Ga8080', 'Instructor');
 
 --
 -- Indexes for dumped tables
@@ -381,18 +401,10 @@ ALTER TABLE `faculty`
   ADD UNIQUE KEY `phone_no` (`phone_no`);
 
 --
--- Indexes for table `faculty_availability`
---
-ALTER TABLE `faculty_availability`
-  ADD PRIMARY KEY (`availability_id`),
-  ADD KEY `faculty_id` (`faculty_id`);
-
---
 -- Indexes for table `faculty_courses`
 --
 ALTER TABLE `faculty_courses`
-  ADD PRIMARY KEY (`faculty_id`,`subject_code`),
-  ADD KEY `subject_code` (`subject_code`);
+  ADD PRIMARY KEY (`faculty_id`,`subject_code`);
 
 --
 -- Indexes for table `programs`
@@ -412,10 +424,7 @@ ALTER TABLE `rooms`
 --
 ALTER TABLE `schedules`
   ADD PRIMARY KEY (`schedule_id`),
-  ADD UNIQUE KEY `no_conflicting_schedules` (`faculty_id`,`day_of_week`,`time_slot`),
-  ADD KEY `subject_code` (`subject_code`),
-  ADD KEY `section_id` (`section_id`),
-  ADD KEY `fk_course` (`course_id`);
+  ADD UNIQUE KEY `no_conflicting_schedules` (`faculty_id`,`day_of_week`,`start_time`);
 
 --
 -- Indexes for table `sections`
@@ -425,10 +434,15 @@ ALTER TABLE `sections`
   ADD KEY `program_code` (`program_code`);
 
 --
+-- Indexes for table `section_schedules`
+--
+ALTER TABLE `section_schedules`
+  ADD PRIMARY KEY (`schedule_id`);
+
+--
 -- Indexes for table `users`
 --
 ALTER TABLE `users`
-  ADD PRIMARY KEY (`user_id`),
   ADD UNIQUE KEY `username` (`username`),
   ADD KEY `faculty_id` (`faculty_id`);
 
@@ -440,19 +454,13 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `courses`
 --
 ALTER TABLE `courses`
-  MODIFY `course_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=103;
+  MODIFY `course_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=128;
 
 --
 -- AUTO_INCREMENT for table `faculty`
 --
 ALTER TABLE `faculty`
-  MODIFY `faculty_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=39;
-
---
--- AUTO_INCREMENT for table `faculty_availability`
---
-ALTER TABLE `faculty_availability`
-  MODIFY `availability_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `faculty_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12346;
 
 --
 -- AUTO_INCREMENT for table `rooms`
@@ -464,7 +472,7 @@ ALTER TABLE `rooms`
 -- AUTO_INCREMENT for table `schedules`
 --
 ALTER TABLE `schedules`
-  MODIFY `schedule_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5425;
+  MODIFY `schedule_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=149;
 
 --
 -- AUTO_INCREMENT for table `sections`
@@ -473,10 +481,10 @@ ALTER TABLE `sections`
   MODIFY `section_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=67;
 
 --
--- AUTO_INCREMENT for table `users`
+-- AUTO_INCREMENT for table `section_schedules`
 --
-ALTER TABLE `users`
-  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+ALTER TABLE `section_schedules`
+  MODIFY `schedule_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=72;
 
 --
 -- Constraints for dumped tables
@@ -489,26 +497,11 @@ ALTER TABLE `courses`
   ADD CONSTRAINT `courses_ibfk_1` FOREIGN KEY (`program_code`) REFERENCES `programs` (`program_code`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
--- Constraints for table `faculty_availability`
---
-ALTER TABLE `faculty_availability`
-  ADD CONSTRAINT `faculty_availability_ibfk_1` FOREIGN KEY (`faculty_id`) REFERENCES `faculty` (`faculty_id`) ON DELETE CASCADE;
-
---
 -- Constraints for table `faculty_courses`
 --
 ALTER TABLE `faculty_courses`
   ADD CONSTRAINT `faculty_courses_ibfk_1` FOREIGN KEY (`faculty_id`) REFERENCES `faculty` (`faculty_id`) ON DELETE CASCADE,
   ADD CONSTRAINT `faculty_courses_ibfk_2` FOREIGN KEY (`subject_code`) REFERENCES `courses` (`subject_code`) ON DELETE CASCADE;
-
---
--- Constraints for table `schedules`
---
-ALTER TABLE `schedules`
-  ADD CONSTRAINT `fk_course` FOREIGN KEY (`course_id`) REFERENCES `courses` (`course_id`),
-  ADD CONSTRAINT `schedules_ibfk_1` FOREIGN KEY (`faculty_id`) REFERENCES `faculty` (`faculty_id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `schedules_ibfk_2` FOREIGN KEY (`subject_code`) REFERENCES `courses` (`subject_code`) ON DELETE CASCADE,
-  ADD CONSTRAINT `schedules_ibfk_3` FOREIGN KEY (`section_id`) REFERENCES `sections` (`section_id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `sections`

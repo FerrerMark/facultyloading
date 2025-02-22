@@ -20,7 +20,6 @@ if (isset($_GET['action'])) {
         }
     } elseif ($action === 'edit' && isset($_POST['program_code']) && $role === 'Dean') {
 
-        // handleEditProgram($conn, $programCode, $programName, $college);
         try {
 
             $programCode = $_POST['program_code'];

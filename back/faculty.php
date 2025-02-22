@@ -1,7 +1,9 @@
 <?php
+session_start();
 include_once "../connections/connection.php";
 
-session_start();
+// include_once "../HR/HRtoFaculty.php";
+
 $role = $_SESSION['role'];
 
 $id = $_SESSION['id'];
@@ -29,7 +31,7 @@ if(!empty($department) && $role != 'instructor') {
             // Set max_weekly_hours based on employment status
             $max_weekly_hours = ($status === 'Full-time') ? 18 : (($status === 'Part-time') ? 12 : NULL);
         
-            try {   
+            try {
                 $sql = "INSERT INTO faculty (
                             firstname, 
                             middlename, 

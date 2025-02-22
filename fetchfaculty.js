@@ -37,6 +37,9 @@ function displayFacultyData(facultyData) {
                     Delete
                 </button>
                 <a href='../frame/info.php?id=${faculty.faculty_id}'><button class='schedule-btn'>View Profile</button></a>
+
+                <button class='schedule-btn' onclick="assignSchedule('${faculty.faculty_id}')">Assign Schedule</button>
+
             </td>
         `;
         tableBody.appendChild(row);
@@ -67,5 +70,28 @@ function downloadExcel() {
     XLSX.writeFile(wb, "Faculty_List.xlsx");
 }
 
-fetchFacultyData();
+// Function to handle search when the button is clicked
+function searchFaculty() {
+    const searchTerm = document.querySelector(".search-box").value.toLowerCase();
+    filterFacultyData(searchTerm);
+}
 
+// Function to filter faculty data based on search input
+function filterFacultyData(searchTerm) {
+    const rows = document.querySelectorAll("#faculty-table-body tr");
+
+    rows.forEach(row => {
+        const cells = row.querySelectorAll("td");
+        const facultyName = cells[3].innerText.toLowerCase(); // Assuming column 1 is First Name
+        const departmentTitle = cells[9].innerText.toLowerCase(); // Assuming column 9 is Department Title
+        const role = cells[11].innerText.toLowerCase(); // Assuming column 11 is Role
+
+        if (facultyName.includes(searchTerm) || departmentTitle.includes(searchTerm) || role.includes(searchTerm)) {
+            row.style.display = ""; // Show row if matches search term
+        } else {
+            row.style.display = "none"; // Hide row if no match
+        }
+    });
+}
+
+fetchFacultyData();

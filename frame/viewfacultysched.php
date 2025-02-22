@@ -9,7 +9,6 @@ include_once "../back/viewfacultysched.php";
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Faculty Schedule</title>
-    <!-- Bootstrap for Styling -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
@@ -38,11 +37,9 @@ include_once "../back/viewfacultysched.php";
 </head>
 <body>
 
-<!-- <div class="container"> -->
     <h2>Faculty Schedule</h2>
 
     <?php if (!empty($schedules)): ?>
-        <!-- Display Faculty Information -->
         <div class="faculty-info">
             <h4 class="text-center">
                 <?php echo htmlspecialchars($schedules[0]['firstname']) . " " . 
@@ -57,7 +54,6 @@ include_once "../back/viewfacultysched.php";
             <p><strong>Max Weekly Hours:</strong> <?php echo htmlspecialchars($schedules[0]['max_weekly_hours']); ?> hours</p>
         </div>
 
-        <!-- Schedule Table -->
         <table class="table table-bordered table-striped">
             <thead class="table-primary">
                 <tr>
@@ -95,7 +91,6 @@ include_once "../back/viewfacultysched.php";
         <a href="../frame/faculty.php?department=<?php echo $_GET['department']; ?>" class="btn btn-secondary">Back to Faculty List</a>
     </div>
 
-<!-- </div> -->
 
 </body>
 </html>

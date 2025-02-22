@@ -82,7 +82,7 @@ body::before{
     color: var( --font-color);
 }
 
-.login-container .form-container form input[type="email"],
+.login-container .form-container form input[type="text"],
 .form-container form input[type="password"] {
     padding: 0.75rem;
     margin-bottom: 1rem;

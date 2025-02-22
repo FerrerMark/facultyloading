@@ -17,19 +17,22 @@
             <div class="dashboard-cards">
                 <div class="card">
                     <h3>Total Faculty</h3>
-                    <p class="number"><?php echo $data['faculty_count']?></p>
+                    <p class="number"><?php echo $faculty_count ?></p>
                     <p class="subtext">+2 from last month</p>
                 </div>
                 <div class="card">
-                    <h3>Active Faculty</h3>
-                    <p class="number">38</p>
+                    <h3>Sections</h3>
+                    <p class="number"><?php echo $section_count?></p>
                     <p class="subtext">Currently teaching</p>
                 </div>
                 <div class="card">
-                    <h3>to be edit</h3>
-                    <p class="number">...</p>
-                    <p class="subtext">to be edit</p>
+                    <h3>Your Total Teaching Hrs</h3>
+                    <p class="number"><?php echo number_format($faculty_teaching_hours, 2); ?> hrs</p>
+                    <p class="subtext">Total hours you are scheduled to teach</p>
                 </div>
+
+
+
                 
             </div>
             <div class="new-requests">
