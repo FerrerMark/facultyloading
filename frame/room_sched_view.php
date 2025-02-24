@@ -30,7 +30,7 @@ $scheduleData = $stmt->fetchAll(PDO::FETCH_ASSOC);
 $startTime = strtotime('06:00 AM');
 $endTime = strtotime('09:00 PM');
 $interval = 30 * 60; 
-$time_slots = [];
+$time_slots = [];  
 
 while ($startTime < $endTime) {
     $current_time = date('H:i:s', $startTime);

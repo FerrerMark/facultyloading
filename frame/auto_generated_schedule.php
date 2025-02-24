@@ -1,20 +1,16 @@
 <?php
-// Enable error reporting
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-// Database connection using PDO
 include_once("..\connections\connection.php");
 
-// Function to check if a time slot is within faculty availability
 function isTimeSlotAvailable($faculty, $day, $start_time, $end_time) {
     $days = explode(',', $faculty['availability']);
     if (!in_array($day, $days)) return false;
     return ($start_time >= $faculty['start_time'] && $end_time <= $faculty['end_time']);
 }
 
-// Function to check for conflicts
 function hasConflict($conn, $faculty_id, $day, $start_time, $end_time) {
     $query = "SELECT * FROM schedules 
               WHERE faculty_id = :faculty_id AND day_of_week = :day 
@@ -31,7 +27,6 @@ function hasConflict($conn, $faculty_id, $day, $start_time, $end_time) {
     return $count > 0;
 }
 
-// Function to schedule a course
 function scheduleCourse($conn, $course, $section, $faculty_list, $rooms) {
     $lecture_hours = $course['lecture_hours'];
     $subject_code = $course['subject_code'];
@@ -41,7 +36,6 @@ function scheduleCourse($conn, $course, $section, $faculty_list, $rooms) {
 
     echo "Scheduling course: {$subject_code} (ID: {$course_id}) for section {$section['section_name']}<br>";
 
-    // Find eligible faculty
     $faculty_query = "SELECT f.* FROM faculty f
                       JOIN faculty_courses fc ON f.faculty_id = fc.faculty_id
                       WHERE fc.subject_code = :subject_code";
@@ -65,17 +59,15 @@ function scheduleCourse($conn, $course, $section, $faculty_list, $rooms) {
                 continue;
             }
 
-            $start_time = "06:00:00"; // Start at 6 AM
+            $start_time = "06:00:00";
             while ($hours_assigned < $lecture_hours) {
-                $end_time = date("H:i:s", strtotime($start_time) + 3600); // 1-hour slot
+                $end_time = date("H:i:s", strtotime($start_time) + 3600);
                 echo "Attempting {$start_time} to {$end_time} on {$day}<br>";
 
                 if (!hasConflict($conn, $faculty['faculty_id'], $day, $start_time, $end_time)) {
-                    // Find a suitable room
                     foreach ($rooms as $room) {
                         if ($room['room_type'] == 'Lecture' && $room['capacity'] >= $slots) {
                             echo "Found room: {$room['room_no']} (ID: {$room['room_id']})<br>";
-                            // Insert schedule
                             $insert = "INSERT INTO schedules (faculty_id, subject_code, section_id, day_of_week, start_time, end_time, course_id, room_id, semester)
                                        VALUES (:faculty_id, :subject_code, :section_id, :day_of_week, :start_time, :end_time, :course_id, :room_id, :semester)";
                             try {
@@ -113,27 +105,22 @@ function scheduleCourse($conn, $course, $section, $faculty_list, $rooms) {
     }
 }
 
-// Main scheduling logic
 $semester = "First";
 
-// Fetch courses
 $courses_query = "SELECT * FROM courses WHERE semester = :semester AND program_code = 'BSIT'";
 $stmt = $conn->prepare($courses_query);
 $stmt->execute([':semester' => $semester]);
 $courses = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Fetch sections
 $sections_query = "SELECT * FROM sections WHERE program_code = 'BSIT' AND semester = :semester";
 $stmt = $conn->prepare($sections_query);
 $stmt->execute([':semester' => $semester]);
 $sections = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Fetch rooms
 $rooms_query = "SELECT * FROM rooms";
 $stmt = $conn->query($rooms_query);
 $rooms = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Fetch faculty
 $faculty_query = "SELECT * FROM faculty";
 $stmt = $conn->query($faculty_query);
 $faculty_list = $stmt->fetchAll(PDO::FETCH_ASSOC);

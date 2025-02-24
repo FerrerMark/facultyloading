@@ -24,10 +24,17 @@ include_once("../connections/connection.php");
                    section.year_level,
                    sched.end_time,
                 sched.start_time,
-                section.semester
+                section.semester,
+                r.room_no
+                
             FROM faculty f
             LEFT JOIN schedules sched ON f.faculty_id = sched.faculty_id
             LEFT JOIN sections section ON section.section_id = sched.section_id
+            LEFT JOIN room_assignments ra ON ra.section_id = section.section_id
+            AND ra.subject_code = sched.subject_code
+            AND ra.day_of_week = sched.day_of_week
+            AND ra.start_time = sched.start_time
+            LEFT JOIN rooms r ON ra.room_id = r.room_id
             WHERE f.faculty_id = :faculty_id
         ");
     
@@ -180,7 +187,7 @@ include_once("../connections/connection.php");
                         <td><?php echo htmlspecialchars($schedule['program_code'] ?? 'N/A'); ?></td>
                         <td><?php echo htmlspecialchars($schedule['year_level'] ?? 'N/A'); ?></td>
                         <td><?php echo htmlspecialchars($schedule['semester'] ?? 'N/A'); ?></td>
-                        <td><?php echo htmlspecialchars($schedule['room_id'] ?? 'N/A'); ?></td>
+                        <td><?php echo htmlspecialchars($schedule['room_no'] ?? 'N/A'); ?></td>
                     </tr>
                 <?php endforeach; ?>
             <?php else: ?>

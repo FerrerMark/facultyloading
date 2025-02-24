@@ -30,10 +30,11 @@
                     <p class="number"><?php echo number_format($faculty_teaching_hours, 2); ?> hrs</p>
                     <p class="subtext">Total hours you are scheduled to teach</p>
                 </div>
-
-
-
-                
+                <div class="card">
+                    <h3>Your Total Teaching Hrs</h3>
+                    <p class="number"><?php echo number_format($faculty_teaching_hours, 2); ?> hrs</p>
+                    <p class="subtext">Total hours you are scheduled to teach</p>
+                </div>
             </div>
             <div class="new-requests">
                 <h2>New Requests</h2>
