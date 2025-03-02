@@ -1,10 +1,10 @@
 <?php 
+include_once "../session/session.php";
 header("Content-Type: application/json");
 include "../connections/connection.php"; 
 
 error_log("Starting schedule assignment for all faculty");
 
-// Fetch all faculty members
 $facultyQuery = "SELECT faculty_id, max_weekly_hours, start_time, end_time, availability FROM faculty";
 $stmt = $conn->prepare($facultyQuery);
 $stmt->execute();
@@ -16,7 +16,7 @@ if (empty($allFaculty)) {
     exit();
 }
 
-$results = []; // To store results for all faculty
+$results = [];
 
 foreach ($allFaculty as $faculty) {
     $faculty_id = $faculty["faculty_id"];
@@ -25,7 +25,6 @@ foreach ($allFaculty as $faculty) {
     $availableDays = array_unique(array_map('trim', explode(',', $faculty['availability'])));
     error_log("Faculty ID $faculty_id is available on: " . implode(", ", $availableDays));
 
-    // Get current hours for this faculty
     $currentHoursQuery = "
         SELECT SUM(TIMESTAMPDIFF(HOUR, start_time, end_time)) 
         FROM schedules WHERE faculty_id = :faculty_id";
@@ -33,7 +32,6 @@ foreach ($allFaculty as $faculty) {
     $stmt->execute(["faculty_id" => $faculty_id]);
     $currentHours = (int) $stmt->fetchColumn();
 
-    // Get faculty's assigned courses
     $coursesQuery = "SELECT subject_code FROM faculty_courses WHERE faculty_id = :faculty_id";
     $stmt = $conn->prepare($coursesQuery);
     $stmt->execute(["faculty_id" => $faculty_id]);
@@ -45,7 +43,6 @@ foreach ($allFaculty as $faculty) {
         continue;
     }
 
-    // Get available sections for this faculty's courses
     $sectionsQuery = "
         SELECT s.section_id, s.year_level, s.semester, sc.subject_code, sc.start_time, sc.end_time, sc.day_of_week 
         FROM section_schedules sc
@@ -69,7 +66,6 @@ foreach ($allFaculty as $faculty) {
             continue;
         }
 
-        // Check for faculty time conflicts
         $facultyConflictQuery = "
             SELECT COUNT(*) FROM schedules 
             WHERE faculty_id = :faculty_id 
@@ -90,7 +86,6 @@ foreach ($allFaculty as $faculty) {
             continue;
         }
 
-        // Check for faculty-section conflicts
         $facultySectionConflictQuery = "
             SELECT COUNT(*) FROM schedules 
             WHERE faculty_id = :faculty_id 
@@ -108,7 +103,6 @@ foreach ($allFaculty as $faculty) {
             continue;
         }
 
-        // Check for section conflicts with other faculty
         $sectionConflictQuery = "
             SELECT COUNT(*) FROM schedules 
             WHERE section_id = :section_id 
@@ -135,7 +129,6 @@ foreach ($allFaculty as $faculty) {
             continue;
         }
 
-        // Insert the new schedule
         $insertQuery = "INSERT INTO schedules (faculty_id, subject_code, section_id, day_of_week, start_time, end_time) 
                         VALUES (:faculty_id, :subject_code, :section_id, :day_of_week, :start_time, :end_time)";
         $stmt = $conn->prepare($insertQuery);
@@ -164,5 +157,4 @@ foreach ($allFaculty as $faculty) {
     }
 }
 
-// Return results for all faculty
 echo json_encode(["success" => true, "facultyAssignments" => $results]);

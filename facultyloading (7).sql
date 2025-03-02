@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Feb 24, 2025 at 03:59 AM
+-- Generation Time: Mar 02, 2025 at 12:26 AM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -159,9 +159,6 @@ INSERT INTO `faculty_courses` (`faculty_id`, `subject_code`) VALUES
 (1, 'CC103'),
 (1, 'CC104'),
 (1, 'FLD15'),
-(1, 'GE5'),
-(1, 'GE6'),
-(1, 'ITSP2A'),
 (2, 'CC101'),
 (2, 'CC102'),
 (2, 'CC103'),
@@ -169,50 +166,113 @@ INSERT INTO `faculty_courses` (`faculty_id`, `subject_code`) VALUES
 (2, 'CC105'),
 (2, 'CC106'),
 (2, 'DM102'),
-(2, 'SA101'),
-(2, 'SP101'),
-(2, 'WEB101'),
 (3, 'BPM101'),
 (3, 'CC101'),
 (3, 'CC102'),
+(3, 'CC103'),
+(3, 'CC104'),
+(3, 'CC105'),
+(3, 'CC106'),
 (3, 'DM102'),
 (3, 'FLD15'),
-(3, 'IAS101'),
-(3, 'ITE2'),
-(3, 'MS102'),
 (4, 'GE1'),
 (4, 'GE2'),
 (4, 'GE3'),
 (4, 'GE4'),
-(4, 'GE8'),
-(4, 'GE9'),
-(4, 'SOSLIT'),
 (5, 'CC101'),
-(5, 'CC106'),
-(5, 'IAS102'),
-(5, 'NET101'),
-(6, 'GE2'),
-(6, 'GE7'),
 (6, 'KOMFIL'),
 (6, 'NSTP1'),
-(6, 'PE2'),
-(7, 'BPM101'),
-(7, 'DM102'),
-(7, 'ITE3'),
-(7, 'PE1'),
-(8, 'GE1'),
-(8, 'ge2'),
-(8, 'NSTP2'),
-(8, 'PE3'),
-(9, 'CC105'),
-(9, 'ITSP1-A'),
-(9, 'SA101'),
-(10, 'FLD15'),
-(10, 'GE6'),
-(10, 'PE4'),
-(49, 'HCI101'),
-(49, 'IPT101'),
-(49, 'NET102');
+(7, 'PE1');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `pending_preferred_courses`
+--
+
+CREATE TABLE `pending_preferred_courses` (
+  `pending_id` int(11) NOT NULL,
+  `faculty_id` int(11) NOT NULL,
+  `subject_code` varchar(50) NOT NULL,
+  `available_days` text DEFAULT NULL,
+  `start_time` time DEFAULT NULL,
+  `end_time` time DEFAULT NULL,
+  `status` enum('Pending','Accepted','Rejected') DEFAULT 'Pending',
+  `submission_date` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `pending_preferred_courses`
+--
+
+INSERT INTO `pending_preferred_courses` (`pending_id`, `faculty_id`, `subject_code`, `available_days`, `start_time`, `end_time`, `status`, `submission_date`) VALUES
+(1, 3, 'CC101', NULL, NULL, NULL, 'Accepted', '2025-02-27 16:26:15'),
+(2, 3, 'GE3', NULL, NULL, NULL, 'Accepted', '2025-02-27 16:26:15'),
+(3, 3, 'NSTP1', NULL, NULL, NULL, 'Accepted', '2025-02-27 16:26:15'),
+(4, 3, 'ITE2', NULL, NULL, NULL, 'Accepted', '2025-02-27 16:27:48'),
+(5, 3, 'GE4', NULL, NULL, NULL, 'Rejected', '2025-02-27 16:46:18'),
+(6, 3, 'CC106', NULL, NULL, NULL, 'Rejected', '2025-02-27 16:46:26'),
+(7, 3, 'IAS102', NULL, NULL, NULL, 'Rejected', '2025-02-27 16:46:26'),
+(8, 3, 'GE4', NULL, NULL, NULL, 'Rejected', '2025-02-27 16:48:08'),
+(9, 3, 'KOMFIL', NULL, NULL, NULL, 'Rejected', '2025-02-27 16:49:50'),
+(13, 3, 'GE1', NULL, NULL, NULL, 'Rejected', '2025-02-27 16:53:30'),
+(14, 3, 'IAS102', NULL, NULL, NULL, 'Rejected', '2025-02-27 16:54:28'),
+(15, 3, 'CC103', NULL, NULL, NULL, 'Rejected', '2025-02-27 16:54:50'),
+(16, 3, 'CC103', NULL, NULL, NULL, 'Rejected', '2025-02-27 16:55:19'),
+(17, 3, 'CC104', NULL, NULL, NULL, 'Rejected', '2025-02-27 16:55:24'),
+(18, 3, 'GE1', NULL, NULL, NULL, 'Rejected', '2025-02-27 16:55:40'),
+(19, 3, 'CC105', NULL, NULL, NULL, 'Rejected', '2025-02-27 16:58:25'),
+(20, 3, 'CC105', NULL, NULL, NULL, 'Accepted', '2025-02-27 16:58:46'),
+(21, 3, 'CC106', NULL, NULL, NULL, 'Rejected', '2025-02-27 17:01:28'),
+(22, 3, 'GE1', NULL, NULL, NULL, 'Rejected', '2025-02-27 17:01:31'),
+(23, 3, 'CC104', NULL, NULL, NULL, 'Rejected', '2025-02-27 17:01:46'),
+(24, 3, 'HCI101', NULL, NULL, NULL, 'Accepted', '2025-02-28 01:31:29'),
+(25, 3, 'IAS101', NULL, NULL, NULL, 'Accepted', '2025-02-28 01:31:29'),
+(26, 3, 'IAS102', NULL, NULL, NULL, 'Accepted', '2025-02-28 01:31:29'),
+(27, 3, 'CC101', NULL, NULL, NULL, 'Accepted', '2025-02-28 01:51:17'),
+(28, 3, 'CC101', NULL, NULL, NULL, 'Accepted', '2025-02-28 01:51:30'),
+(29, 3, 'BPM101', NULL, NULL, NULL, 'Accepted', '2025-02-28 01:58:02'),
+(30, 3, 'CC103', NULL, NULL, NULL, 'Accepted', '2025-02-28 01:58:15'),
+(31, 3, 'CC103', NULL, NULL, NULL, '', '2025-02-28 02:06:38'),
+(32, 3, 'SP101', NULL, NULL, NULL, 'Accepted', '2025-02-28 02:08:20'),
+(33, 3, 'TEC101', NULL, NULL, NULL, 'Accepted', '2025-02-28 02:08:20'),
+(34, 3, 'WEB101', NULL, NULL, NULL, 'Accepted', '2025-02-28 02:08:20'),
+(36, 3, 'NET101', NULL, NULL, NULL, 'Rejected', '2025-02-28 02:12:41'),
+(37, 3, 'NET102', NULL, NULL, NULL, 'Rejected', '2025-02-28 02:12:41'),
+(38, 3, 'CC104', NULL, NULL, NULL, 'Accepted', '2025-02-28 02:18:36'),
+(43, 3, 'CC103', NULL, NULL, NULL, 'Accepted', '2025-02-28 02:30:13'),
+(44, 3, 'CC104', NULL, NULL, NULL, 'Accepted', '2025-02-28 02:30:13'),
+(45, 3, 'ITE1', NULL, NULL, NULL, 'Rejected', '2025-02-28 02:31:58'),
+(47, 3, 'IAS102', NULL, NULL, NULL, 'Accepted', '2025-02-28 04:29:13'),
+(48, 3, 'ITE1', NULL, NULL, NULL, 'Accepted', '2025-02-28 04:29:29'),
+(50, 3, 'FLD15', NULL, NULL, NULL, '', '2025-03-01 17:51:47'),
+(51, 3, 'FLD15', NULL, NULL, NULL, '', '2025-03-01 17:53:38'),
+(52, 3, 'FLD15', NULL, NULL, NULL, '', '2025-03-01 17:54:27'),
+(53, 3, 'FLD15', NULL, NULL, NULL, '', '2025-03-01 17:54:49'),
+(54, 3, 'FLD15', NULL, NULL, NULL, '', '2025-03-01 17:55:47'),
+(55, 3, 'FLD15', NULL, NULL, NULL, '', '2025-03-01 17:55:53'),
+(56, 3, 'FLD15', NULL, NULL, NULL, '', '2025-03-01 17:57:08'),
+(57, 3, 'FLD15', NULL, NULL, NULL, '', '2025-03-01 17:57:13'),
+(58, 3, 'IAS102', NULL, NULL, NULL, '', '2025-03-01 18:00:06'),
+(59, 3, 'IAS102', NULL, NULL, NULL, '', '2025-03-01 18:00:15'),
+(60, 3, 'IAS102', NULL, NULL, NULL, '', '2025-03-01 18:02:13'),
+(61, 3, 'BPM101', NULL, NULL, NULL, '', '2025-03-01 18:02:18'),
+(62, 3, 'BPM101', NULL, NULL, NULL, '', '2025-03-01 18:05:16'),
+(63, 3, 'IAS102', NULL, NULL, NULL, '', '2025-03-01 18:06:36'),
+(64, 3, 'GE1', NULL, NULL, NULL, 'Accepted', '2025-03-01 18:07:50'),
+(65, 3, 'KOMFIL', NULL, NULL, NULL, 'Accepted', '2025-03-01 18:08:05'),
+(67, 3, 'SP101', NULL, NULL, NULL, 'Rejected', '2025-03-01 18:08:30'),
+(68, 3, 'WEB101', NULL, NULL, NULL, 'Rejected', '2025-03-01 18:08:30'),
+(69, 3, 'PM101', NULL, NULL, NULL, 'Rejected', '2025-03-01 18:10:47'),
+(70, 3, 'SA101', NULL, NULL, NULL, 'Rejected', '2025-03-01 18:10:47'),
+(71, 3, 'MIS101', NULL, NULL, NULL, 'Rejected', '2025-03-01 18:10:53'),
+(72, 3, 'ITE1', NULL, NULL, NULL, '', '2025-03-01 18:16:14'),
+(74, 3, 'KOMFIL', NULL, NULL, NULL, '', '2025-03-01 18:21:05'),
+(75, 3, 'KOMFIL', NULL, NULL, NULL, '', '2025-03-01 18:22:29'),
+(76, 3, 'KOMFIL', NULL, NULL, NULL, '', '2025-03-01 18:26:49'),
+(77, 3, 'TEC101', NULL, NULL, NULL, 'Rejected', '2025-03-01 18:31:37'),
+(78, 3, 'KOMFIL', NULL, NULL, NULL, '', '2025-03-01 18:31:50'),
+(80, 3, 'KOMFIL', NULL, NULL, NULL, '', '2025-03-01 18:36:50');
 
 -- --------------------------------------------------------
 
@@ -286,41 +346,55 @@ CREATE TABLE `room_assignments` (
 --
 
 INSERT INTO `room_assignments` (`assignment_id`, `section_id`, `subject_code`, `day_of_week`, `start_time`, `end_time`, `room_id`) VALUES
-(1, 1, 'CC101', 'Monday', '06:00:00', '07:00:00', 4),
-(2, 1, 'GE1', 'Monday', '07:00:00', '08:00:00', 4),
-(3, 1, 'GE2', 'Monday', '08:00:00', '09:00:00', 4),
-(4, 1, 'CC102', 'Wednesday', '06:00:00', '07:00:00', 4),
-(5, 1, 'GE3', 'Wednesday', '07:00:00', '08:00:00', 4),
-(6, 1, 'GE4', 'Wednesday', '08:00:00', '09:00:00', 4),
-(7, 1, 'KOMFIL', 'Friday', '06:00:00', '07:00:00', 4),
-(8, 1, 'NSTP1', 'Friday', '07:00:00', '08:00:00', 4),
-(9, 1, 'PE1', 'Friday', '08:00:00', '09:00:00', 4),
-(10, 5, 'CC104', 'Monday', '12:00:00', '13:00:00', 4),
-(11, 5, 'HCI101', 'Monday', '13:00:00', '14:00:00', 4),
-(12, 5, 'IPT101', 'Monday', '14:00:00', '15:00:00', 4),
-(13, 5, 'ITE1', 'Wednesday', '12:00:00', '13:00:00', 4),
-(14, 5, 'MS102', 'Wednesday', '13:00:00', '14:00:00', 4),
-(15, 5, 'NET101', 'Wednesday', '14:00:00', '15:00:00', 4),
-(16, 5, 'SOSLIT', 'Friday', '12:00:00', '13:00:00', 4),
-(17, 5, 'PE3', 'Friday', '13:00:00', '14:00:00', 4),
-(18, 3, 'CC101', 'Monday', '09:00:00', '10:00:00', 4),
-(19, 3, 'GE1', 'Monday', '10:00:00', '11:00:00', 4),
-(20, 3, 'GE2', 'Monday', '11:00:00', '12:00:00', 4),
-(21, 3, 'CC102', 'Wednesday', '09:00:00', '10:00:00', 4),
-(22, 3, 'GE3', 'Wednesday', '10:00:00', '11:00:00', 4),
-(23, 3, 'GE4', 'Wednesday', '11:00:00', '12:00:00', 4),
-(24, 3, 'KOMFIL', 'Friday', '09:00:00', '10:00:00', 4),
-(25, 3, 'NSTP1', 'Friday', '10:00:00', '11:00:00', 4),
-(26, 3, 'PE1', 'Friday', '11:00:00', '12:00:00', 4),
-(27, 4, 'CC101', 'Tuesday', '09:00:00', '10:00:00', 4),
-(28, 4, 'GE1', 'Tuesday', '10:00:00', '11:00:00', 4),
-(29, 4, 'GE2', 'Tuesday', '11:00:00', '12:00:00', 4),
-(30, 4, 'CC102', 'Thursday', '09:00:00', '10:00:00', 4),
-(31, 4, 'GE3', 'Thursday', '10:00:00', '11:00:00', 4),
-(32, 4, 'GE4', 'Thursday', '11:00:00', '12:00:00', 4),
-(33, 4, 'KOMFIL', 'Saturday', '09:00:00', '10:00:00', 4),
-(34, 4, 'NSTP1', 'Saturday', '10:00:00', '11:00:00', 4),
-(35, 4, 'PE1', 'Saturday', '11:00:00', '12:00:00', 4);
+(529, 1, 'CC101', 'Monday', '06:00:00', '07:00:00', 15),
+(530, 1, 'GE1', 'Monday', '07:00:00', '08:00:00', 4),
+(531, 1, 'GE2', 'Monday', '08:00:00', '09:00:00', 4),
+(532, 1, 'CC102', 'Wednesday', '06:00:00', '07:00:00', 15),
+(533, 1, 'GE3', 'Wednesday', '07:00:00', '08:00:00', 4),
+(534, 1, 'GE4', 'Wednesday', '08:00:00', '09:00:00', 4),
+(535, 1, 'KOMFIL', 'Friday', '06:00:00', '07:00:00', 4),
+(536, 1, 'NSTP1', 'Friday', '07:00:00', '08:00:00', 4),
+(537, 1, 'PE1', 'Friday', '08:00:00', '09:00:00', 4),
+(538, 3, 'CC101', 'Monday', '09:00:00', '10:00:00', 15),
+(539, 3, 'GE1', 'Monday', '10:00:00', '11:00:00', 4),
+(540, 3, 'GE2', 'Monday', '11:00:00', '12:00:00', 4),
+(541, 3, 'CC102', 'Wednesday', '09:00:00', '10:00:00', 15),
+(542, 3, 'GE3', 'Wednesday', '10:00:00', '11:00:00', 4),
+(543, 3, 'GE4', 'Wednesday', '11:00:00', '12:00:00', 4),
+(544, 3, 'KOMFIL', 'Friday', '09:00:00', '10:00:00', 4),
+(545, 3, 'NSTP1', 'Friday', '10:00:00', '11:00:00', 4),
+(546, 3, 'PE1', 'Friday', '11:00:00', '12:00:00', 4),
+(547, 2, 'GE1', 'Monday', '07:00:00', '08:00:00', 5),
+(548, 2, 'GE2', 'Monday', '08:00:00', '09:00:00', 5),
+(549, 2, 'GE3', 'Wednesday', '07:00:00', '08:00:00', 5),
+(550, 2, 'GE4', 'Wednesday', '08:00:00', '09:00:00', 5),
+(551, 2, 'KOMFIL', 'Friday', '06:00:00', '07:00:00', 5),
+(552, 2, 'NSTP1', 'Friday', '07:00:00', '08:00:00', 5),
+(553, 2, 'PE1', 'Friday', '08:00:00', '09:00:00', 5),
+(554, 4, 'CC101', 'Tuesday', '09:00:00', '10:00:00', 15),
+(555, 4, 'GE1', 'Tuesday', '10:00:00', '11:00:00', 4),
+(556, 4, 'GE2', 'Tuesday', '11:00:00', '12:00:00', 4),
+(557, 4, 'CC102', 'Thursday', '09:00:00', '10:00:00', 15),
+(558, 4, 'GE3', 'Thursday', '10:00:00', '11:00:00', 4),
+(559, 4, 'GE4', 'Thursday', '11:00:00', '12:00:00', 4),
+(560, 4, 'KOMFIL', 'Saturday', '09:00:00', '10:00:00', 4),
+(561, 4, 'NSTP1', 'Saturday', '10:00:00', '11:00:00', 4),
+(562, 4, 'PE1', 'Saturday', '11:00:00', '12:00:00', 4),
+(563, 5, 'CC104', 'Monday', '12:00:00', '13:00:00', 15),
+(564, 5, 'HCI101', 'Monday', '13:00:00', '14:00:00', 4),
+(565, 5, 'IPT101', 'Monday', '14:00:00', '15:00:00', 4),
+(566, 5, 'ITE1', 'Wednesday', '12:00:00', '13:00:00', 4),
+(567, 5, 'MS102', 'Wednesday', '13:00:00', '14:00:00', 4),
+(568, 5, 'NET101', 'Wednesday', '14:00:00', '15:00:00', 15),
+(569, 5, 'SOSLIT', 'Friday', '12:00:00', '13:00:00', 4),
+(570, 5, 'PE3', 'Friday', '13:00:00', '14:00:00', 4),
+(571, 6, 'HCI101', 'Monday', '13:00:00', '14:00:00', 5),
+(572, 6, 'IPT101', 'Monday', '14:00:00', '15:00:00', 5),
+(573, 6, 'ITE1', 'Wednesday', '12:00:00', '13:00:00', 5),
+(574, 6, 'MS102', 'Wednesday', '13:00:00', '14:00:00', 5),
+(575, 6, 'SOSLIT', 'Friday', '12:00:00', '13:00:00', 5),
+(576, 6, 'PE3', 'Friday', '13:00:00', '14:00:00', 5),
+(577, 2, 'CC101', 'Monday', '06:00:00', '07:00:00', 5);
 
 -- --------------------------------------------------------
 
@@ -350,36 +424,38 @@ CREATE TABLE `schedules` (
 --
 
 INSERT INTO `schedules` (`schedule_id`, `faculty_id`, `subject_code`, `section_id`, `day_of_week`, `time_slot`, `is_checked`, `course_id`, `room_id`, `department`, `year_level`, `semester`, `start_time`, `end_time`) VALUES
-(3319, 1, 'CC101', 1, 'Monday', '', 0, NULL, NULL, NULL, NULL, NULL, '06:00:00', '07:00:00'),
-(3320, 1, 'CC102', 1, 'Wednesday', '', 0, NULL, NULL, NULL, NULL, NULL, '06:00:00', '07:00:00'),
-(3321, 1, 'CC101', 3, 'Monday', '', 0, NULL, NULL, NULL, NULL, NULL, '09:00:00', '10:00:00'),
-(3322, 1, 'CC102', 3, 'Wednesday', '', 0, NULL, NULL, NULL, NULL, NULL, '09:00:00', '10:00:00'),
-(3323, 1, 'CC101', 4, 'Tuesday', '', 0, NULL, NULL, NULL, NULL, NULL, '09:00:00', '10:00:00'),
-(3324, 1, 'CC102', 4, 'Thursday', '', 0, NULL, NULL, NULL, NULL, NULL, '09:00:00', '10:00:00'),
-(3325, 1, 'CC104', 5, 'Monday', '', 0, NULL, NULL, NULL, NULL, NULL, '12:00:00', '13:00:00'),
-(3326, 2, 'CC101', 2, 'Monday', '', 0, NULL, NULL, NULL, NULL, NULL, '06:00:00', '07:00:00'),
-(3327, 2, 'CC102', 2, 'Wednesday', '', 0, NULL, NULL, NULL, NULL, NULL, '06:00:00', '07:00:00'),
-(3328, 2, 'CC104', 6, 'Monday', '', 0, NULL, NULL, NULL, NULL, NULL, '12:00:00', '13:00:00'),
-(3329, 3, 'MS102', 5, 'Wednesday', '', 0, NULL, NULL, NULL, NULL, NULL, '13:00:00', '14:00:00'),
-(3330, 4, 'GE1', 1, 'Monday', '', 0, NULL, NULL, NULL, NULL, NULL, '07:00:00', '08:00:00'),
-(3331, 4, 'GE3', 1, 'Wednesday', '', 0, NULL, NULL, NULL, NULL, NULL, '07:00:00', '08:00:00'),
-(3332, 4, 'GE1', 3, 'Monday', '', 0, NULL, NULL, NULL, NULL, NULL, '10:00:00', '11:00:00'),
-(3333, 4, 'GE3', 3, 'Wednesday', '', 0, NULL, NULL, NULL, NULL, NULL, '10:00:00', '11:00:00'),
-(3334, 4, 'GE2', 2, 'Monday', '', 0, NULL, NULL, NULL, NULL, NULL, '08:00:00', '09:00:00'),
-(3335, 4, 'GE4', 2, 'Wednesday', '', 0, NULL, NULL, NULL, NULL, NULL, '08:00:00', '09:00:00'),
-(3336, 5, 'NET101', 5, 'Wednesday', '', 0, NULL, NULL, NULL, NULL, NULL, '14:00:00', '15:00:00'),
-(3337, 6, 'GE2', 1, 'Monday', '', 0, NULL, NULL, NULL, NULL, NULL, '08:00:00', '09:00:00'),
-(3338, 6, 'KOMFIL', 1, 'Friday', '', 0, NULL, NULL, NULL, NULL, NULL, '06:00:00', '07:00:00'),
-(3339, 6, 'GE2', 3, 'Monday', '', 0, NULL, NULL, NULL, NULL, NULL, '11:00:00', '12:00:00'),
-(3340, 6, 'KOMFIL', 3, 'Friday', '', 0, NULL, NULL, NULL, NULL, NULL, '09:00:00', '10:00:00'),
-(3341, 6, 'NSTP1', 2, 'Friday', '', 0, NULL, NULL, NULL, NULL, NULL, '07:00:00', '08:00:00'),
-(3342, 6, 'GE2', 4, 'Tuesday', '', 0, NULL, NULL, NULL, NULL, NULL, '11:00:00', '12:00:00'),
-(3343, 7, 'PE1', 1, 'Friday', '', 0, NULL, NULL, NULL, NULL, NULL, '08:00:00', '09:00:00'),
-(3344, 7, 'PE1', 3, 'Friday', '', 0, NULL, NULL, NULL, NULL, NULL, '11:00:00', '12:00:00'),
-(3345, 8, 'GE1', 2, 'Monday', '', 0, NULL, NULL, NULL, NULL, NULL, '07:00:00', '08:00:00'),
-(3346, 8, 'GE1', 4, 'Tuesday', '', 0, NULL, NULL, NULL, NULL, NULL, '10:00:00', '11:00:00'),
-(3347, 49, 'HCI101', 5, 'Monday', '', 0, NULL, NULL, NULL, NULL, NULL, '13:00:00', '14:00:00'),
-(3348, 49, 'IPT101', 6, 'Monday', '', 0, NULL, NULL, NULL, NULL, NULL, '14:00:00', '15:00:00');
+(3410, 3, 'CC101', 1, 'Monday', '', 0, NULL, NULL, NULL, NULL, NULL, '06:00:00', '07:00:00'),
+(3411, 6, 'KOMFIL', 1, 'Friday', '', 0, NULL, NULL, NULL, NULL, NULL, '06:00:00', '07:00:00'),
+(3412, 2, 'CC102', 1, 'Wednesday', '', 0, NULL, NULL, NULL, NULL, NULL, '06:00:00', '07:00:00'),
+(3413, 6, 'NSTP1', 1, 'Friday', '', 0, NULL, NULL, NULL, NULL, NULL, '07:00:00', '08:00:00'),
+(3414, 1, 'CC101', 3, 'Monday', '', 0, NULL, NULL, NULL, NULL, NULL, '09:00:00', '10:00:00'),
+(3415, 1, 'CC102', 3, 'Wednesday', '', 0, NULL, NULL, NULL, NULL, NULL, '09:00:00', '10:00:00'),
+(3416, 1, 'CC102', 2, 'Wednesday', '', 0, NULL, NULL, NULL, NULL, NULL, '06:00:00', '07:00:00'),
+(3417, 1, 'CC101', 4, 'Tuesday', '', 0, NULL, NULL, NULL, NULL, NULL, '09:00:00', '10:00:00'),
+(3418, 1, 'CC102', 4, 'Thursday', '', 0, NULL, NULL, NULL, NULL, NULL, '09:00:00', '10:00:00'),
+(3419, 1, 'CC104', 5, 'Monday', '', 0, NULL, NULL, NULL, NULL, NULL, '12:00:00', '13:00:00'),
+(3420, 2, 'CC101', 2, 'Monday', '', 0, NULL, NULL, NULL, NULL, NULL, '06:00:00', '07:00:00'),
+(3421, 2, 'CC104', 6, 'Monday', '', 0, NULL, NULL, NULL, NULL, NULL, '12:00:00', '13:00:00'),
+(3422, 3, 'MS102', 5, 'Wednesday', '', 0, NULL, NULL, NULL, NULL, NULL, '13:00:00', '14:00:00'),
+(3423, 4, 'GE1', 1, 'Monday', '', 0, NULL, NULL, NULL, NULL, NULL, '07:00:00', '08:00:00'),
+(3424, 0, 'GE3', 1, 'Wednesday', '', 0, NULL, NULL, NULL, NULL, NULL, '07:00:00', '08:00:00'),
+(3425, 4, 'GE1', 3, 'Monday', '', 0, NULL, NULL, NULL, NULL, NULL, '10:00:00', '11:00:00'),
+(3426, 4, 'GE3', 3, 'Wednesday', '', 0, NULL, NULL, NULL, NULL, NULL, '10:00:00', '11:00:00'),
+(3427, 4, 'GE2', 2, 'Monday', '', 0, NULL, NULL, NULL, NULL, NULL, '08:00:00', '09:00:00'),
+(3428, 4, 'GE4', 2, 'Wednesday', '', 0, NULL, NULL, NULL, NULL, NULL, '08:00:00', '09:00:00'),
+(3429, 5, 'NET101', 5, 'Wednesday', '', 0, NULL, NULL, NULL, NULL, NULL, '14:00:00', '15:00:00'),
+(3430, 6, 'GE2', 1, 'Monday', '', 0, NULL, NULL, NULL, NULL, NULL, '08:00:00', '09:00:00'),
+(3431, 6, 'GE2', 3, 'Monday', '', 0, NULL, NULL, NULL, NULL, NULL, '11:00:00', '12:00:00'),
+(3432, 6, 'KOMFIL', 3, 'Friday', '', 0, NULL, NULL, NULL, NULL, NULL, '09:00:00', '10:00:00'),
+(3433, 6, 'GE2', 4, 'Tuesday', '', 0, NULL, NULL, NULL, NULL, NULL, '11:00:00', '12:00:00'),
+(3434, 7, 'PE1', 1, 'Friday', '', 0, NULL, NULL, NULL, NULL, NULL, '08:00:00', '09:00:00'),
+(3435, 7, 'PE1', 3, 'Friday', '', 0, NULL, NULL, NULL, NULL, NULL, '11:00:00', '12:00:00'),
+(3436, 8, 'GE1', 2, 'Monday', '', 0, NULL, NULL, NULL, NULL, NULL, '07:00:00', '08:00:00'),
+(3437, 8, 'GE1', 4, 'Tuesday', '', 0, NULL, NULL, NULL, NULL, NULL, '10:00:00', '11:00:00'),
+(3438, 49, 'HCI101', 5, 'Monday', '', 0, NULL, NULL, NULL, NULL, NULL, '13:00:00', '14:00:00'),
+(3439, 49, 'IPT101', 6, 'Monday', '', 0, NULL, NULL, NULL, NULL, NULL, '14:00:00', '15:00:00'),
+(3440, 6, 'NSTP1', 3, 'Friday', '', 0, NULL, NULL, NULL, NULL, NULL, '10:00:00', '11:00:00'),
+(3441, 4, 'GE4', 3, 'Wednesday', '', 0, NULL, NULL, NULL, NULL, NULL, '11:00:00', '12:00:00');
 
 -- --------------------------------------------------------
 
@@ -504,19 +580,20 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`faculty_id`, `username`, `password`, `role`) VALUES
-(2, 'alice.johnson', '#Jo8080', 'Department Head'),
-(91, 'asef.asfeasdf', '#as8080', 'Instructor'),
-(7, 'david.martinez', '#Ma8080', 'Instructor'),
-(4, 'emily.williams', '#Wi8080', 'Instructor'),
-(9, 'james.lopez', '#Lo8080', 'Instructor'),
-(8, 'jessica.hernandez', '#He8080', 'Instructor'),
-(1, 'john.smith', '#Sm8080', 'Dean'),
-(49, 'johnmak.ferrer', '#Fe8080', 'Instructor'),
-(90, 'johnmak.tesla', '#Te8080', 'Instructor'),
-(10, 'mary.gonzalez', '#Go8080', 'Instructor'),
-(5, 'michael.jones', '#Jo8080', 'Instructor'),
-(3, 'robert.brown', '#Br8080', 'Instructor'),
-(6, 'sarah.garcia', '#Ga8080', 'Instructor');
+(2, 'alice.johnson@faculty', 'johnson8080', 'Department Head'),
+(91, 'asef.asfeasdf@faculty', 'asfeasdf8080', 'Instructor'),
+(7, 'david.martinez@faculty', 'martinez8080', 'Instructor'),
+(4, 'emily.williams@faculty', 'williams8080', 'Instructor'),
+(9, 'james.lopez@faculty', 'lopez8080', 'Instructor'),
+(8, 'jessica.hernandez@faculty', 'hernandez8080', 'Instructor'),
+(1, 'john.smith', 'smith8080', 'Dean'),
+(1, 'john.smith@faculty', 'smith8080', 'Dean'),
+(49, 'johnmak.ferrer@faculty', 'ferrer8080', 'Instructor'),
+(90, 'johnmak.tesla@faculty', 'tesla8080', 'Instructor'),
+(10, 'mary.gonzalez@faculty', 'gonzalez8080', 'Instructor'),
+(5, 'michael.jones@faculty', 'jones8080', 'Instructor'),
+(3, 'robert.brown@faculty', 'brown8080', 'Instructor'),
+(6, 'sarah.garcia@faculty', 'garcia8080', 'Instructor');
 
 --
 -- Indexes for dumped tables
@@ -542,6 +619,14 @@ ALTER TABLE `faculty`
 --
 ALTER TABLE `faculty_courses`
   ADD PRIMARY KEY (`faculty_id`,`subject_code`);
+
+--
+-- Indexes for table `pending_preferred_courses`
+--
+ALTER TABLE `pending_preferred_courses`
+  ADD PRIMARY KEY (`pending_id`),
+  ADD KEY `faculty_id` (`faculty_id`),
+  ADD KEY `subject_code` (`subject_code`);
 
 --
 -- Indexes for table `programs`
@@ -609,6 +694,12 @@ ALTER TABLE `faculty`
   MODIFY `faculty_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12346;
 
 --
+-- AUTO_INCREMENT for table `pending_preferred_courses`
+--
+ALTER TABLE `pending_preferred_courses`
+  MODIFY `pending_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=81;
+
+--
 -- AUTO_INCREMENT for table `rooms`
 --
 ALTER TABLE `rooms`
@@ -618,13 +709,13 @@ ALTER TABLE `rooms`
 -- AUTO_INCREMENT for table `room_assignments`
 --
 ALTER TABLE `room_assignments`
-  MODIFY `assignment_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=36;
+  MODIFY `assignment_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=578;
 
 --
 -- AUTO_INCREMENT for table `schedules`
 --
 ALTER TABLE `schedules`
-  MODIFY `schedule_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3349;
+  MODIFY `schedule_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3442;
 
 --
 -- AUTO_INCREMENT for table `sections`
@@ -648,6 +739,13 @@ ALTER TABLE `courses`
 ALTER TABLE `faculty_courses`
   ADD CONSTRAINT `faculty_courses_ibfk_1` FOREIGN KEY (`faculty_id`) REFERENCES `faculty` (`faculty_id`) ON DELETE CASCADE,
   ADD CONSTRAINT `faculty_courses_ibfk_2` FOREIGN KEY (`subject_code`) REFERENCES `courses` (`subject_code`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `pending_preferred_courses`
+--
+ALTER TABLE `pending_preferred_courses`
+  ADD CONSTRAINT `pending_preferred_courses_ibfk_1` FOREIGN KEY (`faculty_id`) REFERENCES `faculty` (`faculty_id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `pending_preferred_courses_ibfk_2` FOREIGN KEY (`subject_code`) REFERENCES `courses` (`subject_code`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `room_assignments`

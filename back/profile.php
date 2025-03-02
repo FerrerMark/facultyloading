@@ -1,6 +1,5 @@
 <?php
-
-    session_start();
+include_once("./session/session.php");
     if (!isset($_SESSION['role'])){
         header("Location: ../login.php");
         exit();

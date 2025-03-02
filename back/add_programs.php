@@ -1,12 +1,11 @@
 <?php
-session_start();
+include_once "../session/session.php";
 include_once("../connections/connection.php");
 
 if (!$conn) {
     die("Connection failed: ");    
 }
 
-include_once "../registrar/sync_fetch_programs.php";
 
 $searchQuery = isset($_GET['search']) ? $_GET['search'] : '';
 

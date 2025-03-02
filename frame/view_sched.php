@@ -1,5 +1,5 @@
 <?php
-session_start();
+include_once("../session/session.php");
 include_once "../connections/connection.php";
 
 

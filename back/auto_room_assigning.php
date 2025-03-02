@@ -1,163 +1,187 @@
 <?php
-include_once "../connections/connection.php";
-$db = $conn;
+include_once "../session/session.php";
+try {
+    include_once "../connections/connection.php";
+    function assignRooms($pdo) {
+        try {
+            $result = [
+                'assigned' => [],
+                'unassigned' => [],
+                'message' => ''
+            ];
 
-function assignRoomToSection($db, $section_id) {
-    try {
-        // Get all schedules for this section
-        $schedules_query = "
-            SELECT 
-                ss.schedule_id,
-                ss.section_id,
-                ss.subject_code,
-                ss.day_of_week,
-                ss.start_time,
-                ss.end_time,
-                s.section_name
-            FROM section_schedules ss
-            JOIN sections s ON ss.section_id = s.section_id
-            WHERE ss.section_id = :section_id";
-        
-        $stmt = $db->prepare($schedules_query);
-        $stmt->execute([':section_id' => $section_id]);
-        $schedules = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-        if (empty($schedules)) {
-            echo "No schedules found for Section ID $section_id\n";
-            return;
-        }
-
-        $required_capacity = 50;
-        $section_name = $schedules[0]['section_name'];
-
-        foreach ($schedules as $schedule) {
-            // Find an available room
-            $room_query = "
-                SELECT r.room_id, r.room_no
-                FROM rooms r
-                WHERE r.capacity >= :capacity
-                AND r.room_id NOT IN (
-                    SELECT ra.room_id 
-                    FROM room_assignments ra 
-                    WHERE ra.day_of_week = :day_of_week
-                    AND (
-                        (:start_time < ra.end_time AND :end_time > ra.start_time)
-                    )
-                )
-                AND r.room_type = 'Lecture'
-                LIMIT 1";
+            $sql = "SELECT ss.schedule_id, ss.section_id, ss.subject_code, 
+                           ss.day_of_week, ss.start_time, ss.end_time, 
+                           ss.semester, ss.program_code, ss.section_name, ss.year_level,
+                           c.course_type, c.slots
+                    FROM section_schedules ss
+                    LEFT JOIN room_assignments ra 
+                        ON ra.section_id = ss.section_id 
+                        AND ra.subject_code = ss.subject_code 
+                        AND ra.day_of_week = ss.day_of_week 
+                        AND ra.start_time = ss.start_time 
+                        AND ra.end_time = ss.end_time
+                    JOIN courses c ON ss.subject_code = c.subject_code
+                    WHERE ra.assignment_id IS NULL";
             
-            $room_stmt = $db->prepare($room_query);
-            $room_stmt->execute([
-                ':capacity' => $required_capacity,
-                ':day_of_week' => $schedule['day_of_week'],
-                ':start_time' => $schedule['start_time'],
-                ':end_time' => $schedule['end_time']
-            ]);
-            
-            $room = $room_stmt->fetch(PDO::FETCH_ASSOC);
+            $stmt = $pdo->query($sql);
+            $schedules = $stmt->fetchAll();
 
-            if ($room) {
-                // Check if room is already assigned for this schedule
-                $check_query = "
-                    SELECT assignment_id 
-                    FROM room_assignments 
-                    WHERE section_id = :section_id 
-                    AND subject_code = :subject_code 
-                    AND day_of_week = :day_of_week 
-                    AND start_time = :start_time 
-                    AND end_time = :end_time 
-                    LIMIT 1";
-                
-                $check_stmt = $db->prepare($check_query);
-                $check_stmt->execute([
-                    ':section_id' => $schedule['section_id'],
-                    ':subject_code' => $schedule['subject_code'],
-                    ':day_of_week' => $schedule['day_of_week'],
-                    ':start_time' => $schedule['start_time'],
-                    ':end_time' => $schedule['end_time']
-                ]);
-                
-                $existing = $check_stmt->fetch();
+            $assigned_rooms = [];
 
-                if ($existing) {
-                    // Update existing assignment
-                    $update_query = "
-                        UPDATE room_assignments 
-                        SET room_id = :room_id
-                        WHERE assignment_id = :assignment_id";
+            foreach ($schedules as $schedule) {
+                $required_room_type = determineRoomType($schedule['subject_code'], $pdo);
+                $required_capacity = $schedule['slots'];
+                
+                $available_rooms = findAvailableRooms(
+                    $pdo,
+                    $schedule['day_of_week'],
+                    $schedule['start_time'],
+                    $schedule['end_time'],
+                    $required_room_type,
+                    $required_capacity,
+                    $assigned_rooms
+                );
+                
+                if (!empty($available_rooms)) {
+                    $room_id = $available_rooms[0]['room_id'];
+                    $room_no = $available_rooms[0]['room_no'];
                     
-                    $update_stmt = $db->prepare($update_query);
-                    $update_stmt->execute([
-                        ':room_id' => $room['room_id'],
-                        ':assignment_id' => $existing['assignment_id']
-                    ]);
-                } else {
-                    // Insert new assignment
-                    $insert_query = "
-                        INSERT INTO room_assignments 
-                        (section_id, subject_code, day_of_week, start_time, end_time, room_id)
-                        VALUES 
-                        (:section_id, :subject_code, :day_of_week, :start_time, :end_time, :room_id)";
+                    $pdo->beginTransaction();
                     
-                    $insert_stmt = $db->prepare($insert_query);
+                    $insert_sql = "INSERT INTO room_assignments 
+                                 (section_id, subject_code, day_of_week, start_time, end_time, room_id)
+                                 VALUES (:section_id, :subject_code, :day_of_week, :start_time, :end_time, :room_id)";
+                    
+                    $insert_stmt = $pdo->prepare($insert_sql);
                     $insert_stmt->execute([
                         ':section_id' => $schedule['section_id'],
                         ':subject_code' => $schedule['subject_code'],
                         ':day_of_week' => $schedule['day_of_week'],
                         ':start_time' => $schedule['start_time'],
                         ':end_time' => $schedule['end_time'],
-                        ':room_id' => $room['room_id']
+                        ':room_id' => $room_id
                     ]);
+                    
+                    $pdo->commit();
+                    
+                    $result['assigned'][] = [
+                        'schedule_id' => $schedule['schedule_id'],
+                        'section_name' => $schedule['section_name'],
+                        'subject_code' => $schedule['subject_code'],
+                        'day_of_week' => $schedule['day_of_week'],
+                        'start_time' => $schedule['start_time'],
+                        'end_time' => $schedule['end_time'],
+                        'room_id' => $room_id,
+                        'room_no' => $room_no
+                    ];
+                    
+                    $assigned_rooms[] = [
+                        'room_id' => $room_id,
+                        'day_of_week' => $schedule['day_of_week'],
+                        'start_time' => $schedule['start_time'],
+                        'end_time' => $schedule['end_time']
+                    ];
+                } else {
+                    $result['unassigned'][] = [
+                        'schedule_id' => $schedule['schedule_id'],
+                        'section_name' => $schedule['section_name'],
+                        'subject_code' => $schedule['subject_code'],
+                        'day_of_week' => $schedule['day_of_week'],
+                        'start_time' => $schedule['start_time'],
+                        'end_time' => $schedule['end_time'],
+                        'reason' => 'No available rooms'
+                    ];
                 }
-                
-                echo "Assigned room {$room['room_no']} to {$section_name} for {$schedule['subject_code']} on {$schedule['day_of_week']} {$schedule['start_time']}-{$schedule['end_time']}\n";
-            } else {
-                echo "No available room found for {$section_name} - {$schedule['subject_code']} on {$schedule['day_of_week']} {$schedule['start_time']}-{$schedule['end_time']}\n";
+            }
+            
+            $result['message'] = "Room assignment process completed. " .
+                               count($result['assigned']) . " schedules assigned, " .
+                               count($result['unassigned']) . " schedules unassigned.";
+            
+            return $result;
+        } catch (PDOException $e) {
+            if ($pdo->inTransaction()) {
+                $pdo->rollBack();
+            }
+            throw new Exception("Error in room assignment: " . $e->getMessage());
+        }
+    }
+
+    function determineRoomType($subject_code, $pdo) {
+        $lab_courses = ['CC101', 'CC102', 'CC103', 'CC104', 'NET101', 'NET102'];
+        return in_array($subject_code, $lab_courses) ? 'Computer Lab' : 'Lecture';
+    }
+
+    function findAvailableRooms($pdo, $day, $start_time, $end_time, $room_type, $min_capacity, $assigned_rooms) {
+        $sql = "SELECT r.room_id, r.room_no, r.building, r.capacity
+                FROM rooms r
+                WHERE r.room_type = :room_type
+                AND r.capacity >= :capacity
+                AND r.room_id NOT IN (
+                    SELECT ra.room_id 
+                    FROM room_assignments ra
+                    WHERE ra.day_of_week = :day_of_week
+                    AND (
+                        (ra.start_time < :end_time1 AND ra.end_time > :start_time1)
+                        OR (ra.start_time < :end_time2 AND ra.end_time > :start_time2)
+                        OR (ra.start_time >= :start_time3 AND ra.end_time <= :end_time3)
+                    )
+                )";
+        
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute([
+            ':room_type' => $room_type,
+            ':capacity' => $min_capacity,
+            ':day_of_week' => $day,
+            ':start_time1' => $start_time,
+            ':end_time1' => $end_time,
+            ':start_time2' => $start_time,
+            ':end_time2' => $end_time,
+            ':start_time3' => $start_time,
+            ':end_time3' => $end_time
+        ]);
+        
+        $rooms = $stmt->fetchAll();
+        
+        $available_rooms = [];
+        foreach ($rooms as $room) {
+            $is_assigned = false;
+            foreach ($assigned_rooms as $assigned) {
+                if ($room['room_id'] == $assigned['room_id'] &&
+                    $assigned['day_of_week'] == $day &&
+                    $assigned['start_time'] == $start_time &&
+                    $assigned['end_time'] == $end_time) {
+                    $is_assigned = true;
+                    break;
+                }
+            }
+            if (!$is_assigned) {
+                $available_rooms[] = $room;
             }
         }
-    } catch (PDOException $e) {
-        echo "Error: " . $e->getMessage() . "\n";
+        
+        return $available_rooms;
     }
-}
 
-function getSectionReport($db, $section_id) {
-    $query = "
-        SELECT 
-            ss.schedule_id,
-            ss.day_of_week,
-            ss.start_time,
-            ss.end_time,
-            ss.subject_code,
-            sec.section_name,
-            ra.room_id,
-            r.room_no,
-            r.capacity
-        FROM section_schedules ss
-        LEFT JOIN room_assignments ra ON ss.section_id = ra.section_id 
-            AND ss.subject_code = ra.subject_code 
-            AND ss.day_of_week = ra.day_of_week 
-            AND ss.start_time = ra.start_time 
-            AND ss.end_time = ra.end_time
-        LEFT JOIN rooms r ON ra.room_id = r.room_id
-        JOIN sections sec ON ss.section_id = sec.section_id
-        WHERE ss.section_id = :section_id
-        ORDER BY ss.day_of_week, ss.start_time";
-    
-    $stmt = $db->prepare($query);
-    $stmt->execute([':section_id' => $section_id]);
-    return $stmt->fetchAll(PDO::FETCH_ASSOC);
-}
+    $result = assignRooms($pdo);
 
-// Usage example
-$section_id = 4;
-assignRoomToSection($db, $section_id);
+    header('Content-Type: application/json');
+    echo json_encode($result, JSON_PRETTY_PRINT);
 
-$report = getSectionReport($db, $section_id);
-foreach ($report as $assignment) {
-    echo "Section: {$assignment['section_name']}, ";
-    echo "Subject: {$assignment['subject_code']}, ";
-    echo "Day: {$assignment['day_of_week']}, ";
-    echo "Time: {$assignment['start_time']}-{$assignment['end_time']}, ";
-    echo "Room: " . ($assignment['room_no'] ?? 'Not Assigned') . "\n";
+} catch (PDOException $e) {
+    $error = [
+        'error' => 'Connection failed',
+        'message' => $e->getMessage()
+    ];
+    header('Content-Type: application/json');
+    echo json_encode($error, JSON_PRETTY_PRINT);
+} catch (Exception $e) {
+    $error = [
+        'error' => 'Assignment failed',
+        'message' => $e->getMessage()
+    ];
+    header('Content-Type: application/json');
+    echo json_encode($error, JSON_PRETTY_PRINT);
 }
+?>

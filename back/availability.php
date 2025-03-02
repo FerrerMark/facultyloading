@@ -1,24 +1,89 @@
 <?php
+include_once "../connections/connection.php";
 session_start();
-include "../connections/connection.php";
+
 $faculty_id = $_SESSION['id'];
-
-$query = "SELECT availability, start_time, end_time FROM faculty WHERE faculty_id = ?";
-$stmt = $conn->prepare($query);
-$stmt->bind_param("i", $faculty_id);
+$employment_status_query = "SELECT employment_status FROM faculty WHERE faculty_id = :faculty_id";
+$stmt = $conn->prepare($employment_status_query);
+$stmt->bindParam(':faculty_id', $faculty_id, PDO::PARAM_INT);
 $stmt->execute();
-$result = $stmt->get_result();
-$availability = $result->fetch_assoc() ?? ['available_days' => '', 'start_time' => '06:00', 'end_time' => '17:00'];
+$employment_status = $stmt->fetch(PDO::FETCH_ASSOC)['employment_status'];
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $days = implode(',', $_POST['available_days'] ?? []);
-    $start_time = $_POST['start_time'] . ':00';
-    $end_time = $_POST['end_time'] . ':00';
-    
-    $update = "UPDATE faculty SET availability = ?, start_time = ?, end_time = ? WHERE faculty_id = ?";
-    $stmt = $conn->prepare($update);
-    $stmt->bind_param("sssi", $days, $start_time, $end_time, $faculty_id);
+$assigned_courses_query = "SELECT subject_code FROM faculty_courses WHERE faculty_id = :faculty_id";
+$stmt = $conn->prepare($assigned_courses_query);
+$stmt->bindParam(':faculty_id', $faculty_id, PDO::PARAM_INT);
+$stmt->execute();
+$assigned_courses = $stmt->fetchAll(PDO::FETCH_COLUMN);
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_course'])) {
+    $subject_code = $_POST['subject_code'];
+
+    $query = "DELETE FROM faculty_courses WHERE faculty_id = :faculty_id AND subject_code = :subject_code";
+    $stmt = $conn->prepare($query);
+    $stmt->bindParam(':faculty_id', $faculty_id, PDO::PARAM_INT);
+    $stmt->bindParam(':subject_code', $subject_code, PDO::PARAM_STR);
     $stmt->execute();
-    header("Location: availability.php");
-    exit;
+
+    header("Location: ../frame/available.php");
+    exit();
 }
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['cancel_request'])) {
+    $pending_id = $_POST['pending_id'];
+
+    $query = "DELETE FROM pending_preferred_courses WHERE faculty_id = :faculty_id AND pending_id = :pending_id AND status = 'Pending'";
+    $stmt = $conn->prepare($query);
+    $stmt->bindParam(':faculty_id', $faculty_id, PDO::PARAM_INT);
+    $stmt->bindParam(':pending_id', $pending_id, PDO::PARAM_INT);
+    $stmt->execute();
+
+    header("Location: ../frame/available.php");
+    exit();
+}
+
+$available_days = ($employment_status === 'Part-Time' && isset($_POST['available_days'])) ? implode(',', $_POST['available_days']) : null;
+$start_time = ($employment_status === 'Part-Time' && isset($_POST['start_time'])) ? $_POST['start_time'] : null;
+$end_time = ($employment_status === 'Part-Time' && isset($_POST['end_time'])) ? $_POST['end_time'] : null;
+$courses = isset($_POST['courses']) && is_array($_POST['courses']) ? $_POST['courses'] : [];
+
+if (count($courses) === 0) {
+    $_SESSION['message'] = "Please select at least one course.";
+    header("Location: ../frame/available.php");
+    exit();
+}
+
+$duplicate_courses = [];
+$new_courses = array_diff($courses, $assigned_courses);
+if (!empty($new_courses)) {
+    $placeholders = implode(',', array_fill(0, count($new_courses), '?'));
+    $query = "SELECT subject_code FROM pending_preferred_courses 
+              WHERE faculty_id = ? AND subject_code IN ($placeholders) 
+              AND status = 'Pending'";
+    $stmt = $conn->prepare($query);
+    $params = array_merge([$faculty_id], array_values($new_courses));
+    $stmt->execute($params);
+    $existing_pending = $stmt->fetchAll(PDO::FETCH_COLUMN);
+
+    if (!empty($existing_pending)) {
+        $duplicate_courses = $existing_pending;
+        $_SESSION['message'] = "You have already submitted the following course(s) for approval: " . implode(', ', $duplicate_courses) . ". Duplicates are not allowed.";
+        header("Location: ../frame/available.php");
+        exit();
+    }
+
+    foreach ($new_courses as $subject_code) {
+        $query = "INSERT INTO pending_preferred_courses (faculty_id, subject_code, available_days, start_time, end_time, status) 
+                  VALUES (:faculty_id, :subject_code, :available_days, :start_time, :end_time, 'Pending')";
+        $stmt = $conn->prepare($query);
+        $stmt->bindParam(':faculty_id', $faculty_id, PDO::PARAM_INT);
+        $stmt->bindParam(':subject_code', $subject_code, PDO::PARAM_STR);
+        $stmt->bindParam(':available_days', $available_days, PDO::PARAM_STR);
+        $stmt->bindParam(':start_time', $start_time, PDO::PARAM_STR);
+        $stmt->bindParam(':end_time', $end_time, PDO::PARAM_STR);
+        $stmt->execute();
+    }
+}
+
+header("Location: ../frame/available.php");
+exit();
+?>

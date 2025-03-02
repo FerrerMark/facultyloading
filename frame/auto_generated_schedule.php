@@ -1,8 +1,6 @@
 <?php
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
 
+include_once("./session/session.php");
 include_once("..\connections\connection.php");
 
 function isTimeSlotAvailable($faculty, $day, $start_time, $end_time) {

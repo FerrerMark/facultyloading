@@ -1,4 +1,5 @@
-<?php
+<?
+include_once "../session/session.php";
 include_once "../connections/connection.php";
 $api_url = "http://localhost/registrar/coursesAPI.php";
 $response = file_get_contents($api_url);

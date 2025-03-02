@@ -1,3 +1,8 @@
+<?php
+include_once("./session/session.php");
+
+
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>

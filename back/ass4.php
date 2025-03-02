@@ -1,4 +1,5 @@
 <?php 
+include_once "../session/session.php";
 header("Content-Type: application/json");
 include "../connections/connection.php"; 
 

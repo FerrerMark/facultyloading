@@ -1,4 +1,5 @@
 <?php  
+include_once "../session/session.php";
 include_once "../connections/connection.php";
 
 $program_code = $_GET['program_code'] ?? '';

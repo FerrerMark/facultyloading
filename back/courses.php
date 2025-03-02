@@ -1,8 +1,8 @@
 <?php
-session_start();
+include_once("../session/session.php");
 include_once "../connections/connection.php";
 
-include_once "../registrar/sync_fetch_courses.php";
+// include_once "../registrar/sync_fetch_courses.php";
 
 $programCode = $_GET['program_code'] ?? $_POST['program_code'] ?? null;
 
@@ -12,7 +12,6 @@ if (!$programCode) {
 }
 
 try {
-    // Fetch program details
     $stmt = $conn->prepare("SELECT program_name, college FROM programs WHERE program_code = :program_code");
     $stmt->bindParam(':program_code', $programCode, PDO::PARAM_STR);
     $stmt->execute();
@@ -22,13 +21,11 @@ try {
         die("Program not found.");
     }
 
-    // Fetch courses associated with the program
     $stmt = $conn->prepare("SELECT * FROM courses WHERE program_code = :program_code");
     $stmt->bindParam(':program_code', $programCode, PDO::PARAM_STR);
     $stmt->execute();
     $courses = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    // Handle form submission for adding a new course
     if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_GET['action'] === 'add' && $_GET['role'] === 'Dean') {
         $subjectCode = $_POST['subject_code'];
         $courseTitle = $_POST['course_title'];
@@ -54,15 +51,13 @@ try {
         $stmt->bindParam(':slots', $slots, PDO::PARAM_INT);
         $stmt->execute();
 
-        header("Location: courses.php?program_code=" . urlencode($programCode) . "&role=" . urlencode($role) . "&success=Course deleted successfully&department=" . urlencode($programCode) . "&role=Dean");
+        header("Location: courses.php?program_code=" . urlencode($programCode) . "&role=" . urlencode($_GET['role']) . "&success=Course added successfully&department=" . urlencode($programCode));
         exit;
     }
 
-    // Handle deletion of a course
     if (isset($_GET['delete_course_code'])) {
         $programCode = $_GET['program_code'];
         $role = $_GET['role'];
-
 
         $courseCodeToDelete = $_GET['delete_course_code'];
 
@@ -72,84 +67,58 @@ try {
         $stmt->execute();
 
         header("Location: courses.php?program_code=" . urlencode($programCode) . "&role=" . urlencode($role) . "&success=Course deleted successfully&department=" . urlencode($programCode));
-
-        
         exit;
     }
 
-    
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_GET['action'] === 'edit' && $_GET['role'] === 'Dean') {
+        $role = $_GET['role'];
 
-        // Handle form submission for adding/editing courses
-        if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_GET['action'] === 'edit' && $_GET['role'] === 'Dean') {
-            $role = $_GET['role'];
+        $subject_code = $_POST['subject_code'];
+        $course_title = $_POST['course_title'];
+        $year_level = $_POST['year_level'];
+        $semester = $_POST['semester'];
+        $lecture_hours = $_POST['lecture_hours'];
+        $lab_hours = $_POST['lab_hours'];
+        $credit_units = $_POST['credit_units'];
+        $slots = $_POST['slots'];
+        $program_code = $_POST['program_code'];
 
+        $query = "SELECT * FROM courses WHERE subject_code = :subject_code";
+        $stmt = $pdo->prepare($query);
+        $stmt->execute(['subject_code' => $subject_code]);
+        $existingCourse = $stmt->fetch();
 
-            $subject_code = $_POST['subject_code'];
-            $course_title = $_POST['course_title'];
-            $year_level = $_POST['year_level'];
-            $semester = $_POST['semester'];
-            $lecture_hours = $_POST['lecture_hours'];
-            $lab_hours = $_POST['lab_hours'];
-            $credit_units = $_POST['credit_units'];
-            $slots = $_POST['slots'];
-            $program_code = $_POST['program_code'];
+        if ($existingCourse && !isset($_POST['edit_course'])) {
+            echo "Course code already exists!";
+        } else {
+            if (isset($_POST['edit_course'])) {
+                $course_id = $_POST['course_id'];
 
-            $query = "SELECT * FROM courses WHERE subject_code = :subject_code";
-            $stmt = $pdo->prepare($query);
-            $stmt->execute(['subject_code' => $subject_code]);
-            $existingCourse = $stmt->fetch();
+                $query = "UPDATE courses SET subject_code = :subject_code, 
+                        course_title = :course_title, 
+                        year_level = :year_level, semester = :semester, lecture_hours = :lecture_hours, 
+                        lab_hours = :lab_hours, credit_units = :credit_units, slots = :slots
+                        WHERE course_id = :course_id";
+                $stmt = $pdo->prepare($query);
+                $stmt->execute([
+                    'subject_code' => $subject_code,
+                    'course_title' => $course_title,
+                    'year_level' => $year_level,
+                    'semester' => $semester,
+                    'lecture_hours' => $lecture_hours,
+                    'lab_hours' => $lab_hours,
+                    'credit_units' => $credit_units,
+                    'slots' => $slots,
+                    'course_id' => $course_id
+                ]);
 
-            if ($existingCourse && !isset($_POST['edit_course'])) {
-                echo "Course code already exists!";
-            } else {
-
-                if (isset($_POST['edit_course'])) {
-                    $course_id = $_POST['course_id'];  
-                    $query = "UPDATE courses SET subject_code = :subject_code, 
-                            course_title = :course_title, 
-                            year_level = :year_level, semester = :semester, lecture_hours = :lecture_hours, 
-                            lab_hours = :lab_hours, credit_units = :credit_units, slots = :slots
-                            WHERE course_id = :course_id";
-                    $stmt = $pdo->prepare($query);
-                    $stmt->execute([
-                        'subject_code' => $subject_code,
-                        'course_title' => $course_title,
-                        'year_level' => $year_level,
-                        'semester' => $semester,
-                        'lecture_hours' => $lecture_hours,
-                        'lab_hours' => $lab_hours,
-                        'credit_units' => $credit_units,
-                        'slots' => $slots,
-                        'course_id' => $course_id
-                    ]);
-                    
-                    
-                    header("Location: courses.php?program_code=" . urlencode($programCode) . "&role=" . urlencode($role) . "&success=Course updated successfully&department=" . urlencode($programCode));
-
-                } 
-                // else {
-
-                //     $query = "INSERT INTO courses (subject_code, course_title, year_level, semester, lecture_hours, lab_hours, credit_units, slots, program_code)
-                //             VALUES (:subject_code, :course_title, :year_level, :semester, :lecture_hours, :lab_hours, :credit_units, :slots, :program_code)";
-                //     $stmt = $pdo->prepare($query);
-                //     $stmt->execute([
-                //         'subject_code' => $subject_code,
-                //         'course_title' => $course_title,
-                //         'year_level' => $year_level,
-                //         'semester' => $semester,
-                //         'lecture_hours' => $lecture_hours,
-                //         'lab_hours' => $lab_hours,
-                //         'credit_units' => $credit_units,
-                //         'slots' => $slots,
-                //         'program_code' => $program_code
-                //     ]);
-                //     echo "New course added successfully!";
-                // }
+                header("Location: courses.php?program_code=" . urlencode($programCode) . "&role=" . urlencode($role) . "&success=Course updated successfully&department=" . urlencode($programCode));
             }
         }
-
+    }
 
 } catch (PDOException $e) {
     echo "Error: " . $e->getMessage();
 }
 ?>
+

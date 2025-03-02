@@ -1,4 +1,5 @@
 <?php
+include_once("../session/session.php");
 include_once "../back/add_programs.php";
 ?>
 

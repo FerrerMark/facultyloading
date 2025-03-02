@@ -1,4 +1,5 @@
 <?php
+include_once("../session/session.php");
 
     include_once "../connections/connection.php";
 
@@ -10,7 +11,6 @@ if($_SERVER['REQUEST_METHOD'] === 'POST' || $role === 'Department Head') {
     if(isset($_GET['action'])){
 
         $action = $_GET['action'];
-        // $action = "edit";
 
         if ($action === "add") {
             $building = $_POST['building'];
@@ -19,7 +19,6 @@ if($_SERVER['REQUEST_METHOD'] === 'POST' || $role === 'Department Head') {
             $capacity = $_POST['capacity'];
         
             try {
-                // Insert the room data (excluding section)
                 $stmt = $conn->prepare("
                     INSERT INTO rooms (building, room_no, room_type, capacity) 
                     VALUES (:building, :room_no, :room_type, :capacity)
@@ -30,7 +29,6 @@ if($_SERVER['REQUEST_METHOD'] === 'POST' || $role === 'Department Head') {
                 $stmt->bindParam(':capacity', $capacity, PDO::PARAM_INT);
                 $stmt->execute();
         
-                // Redirect to rooms page with department parameter
                 header("Location: ../frame/rooms.php?department=$dep");
                 exit;
             } catch (PDOException $e) {
@@ -50,8 +48,6 @@ if($_SERVER['REQUEST_METHOD'] === 'POST' || $role === 'Department Head') {
             header("location: ../frame/rooms.php?role=Department Head&department=$dep");    
             exit;
 
-            echo "triggered";
-
         }else if ($action === "edit") {
             if (isset($_GET['building'], $_GET['room']) && isset($_POST['building'], $_POST['room_no'], $_POST['room_type'], $_POST['capacity'])) {
         
@@ -61,7 +57,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST' || $role === 'Department Head') {
                 $new_building = $_POST['building'];
                 $new_room = $_POST['room_no'];
                 $room_type = $_POST['room_type'];
-                $capacity = $_POST['capacity']; // Use capacity instead of section
+                $capacity = $_POST['capacity'];
         
                 try {
                     $sql = "UPDATE rooms 
@@ -73,7 +69,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST' || $role === 'Department Head') {
                     $stmt->bindParam(':new_building', $new_building, PDO::PARAM_STR);
                     $stmt->bindParam(':new_room', $new_room, PDO::PARAM_STR);
                     $stmt->bindParam(':room_type', $room_type, PDO::PARAM_STR);
-                    $stmt->bindParam(':capacity', $capacity, PDO::PARAM_INT); // Updated binding to match column
+                    $stmt->bindParam(':capacity', $capacity, PDO::PARAM_INT);
                     $stmt->bindParam(':original_building', $original_building, PDO::PARAM_STR);
                     $stmt->bindParam(':original_room', $original_room, PDO::PARAM_STR);
         

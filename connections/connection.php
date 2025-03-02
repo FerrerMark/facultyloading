@@ -1,5 +1,6 @@
 <?php
 
+
 $host = "localhost";
 $dbname = "facultyloading";
 $dbusername = "root";
@@ -16,6 +17,7 @@ try {
 
     echo "Error: " . $e->getMessage();
     exit();
+    
 }
 
 ?>

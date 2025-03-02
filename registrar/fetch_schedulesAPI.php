@@ -1,4 +1,5 @@
 <?php
+include_once "../session/session.php";
 // API URL (Change this to your actual API URL)
 $api_url = "http://localhost/registrar/scheduleAPI.php";
 

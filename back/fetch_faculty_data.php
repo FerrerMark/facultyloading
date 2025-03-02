@@ -1,8 +1,8 @@
 <?php
+include_once("../session/session.php");
 include_once "../connections/connection.php";
 header('Content-Type: application/json');
 
-session_start();
 
 if (!isset($_SESSION['id'])) {
     echo json_encode(["error" => "User not logged in"]);

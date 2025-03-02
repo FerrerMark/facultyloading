@@ -1,4 +1,5 @@
 <?php
+include_once "../session/session.php";
 $url = 'http://localhost/registrar/sectionsApi.php';
 $response = json_decode(file_get_contents($url), true);
 

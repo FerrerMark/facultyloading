@@ -1,12 +1,14 @@
 <?php
-session_start();
+include_once("./session/session.php");
 include_once("./connections/connection.php");
+
+
 
 if (isset($_SESSION['id'])) {
     if ($_SESSION['role'] === 'Department Head') {
         header("Location: ../facultyloading/index.php");
     } elseif ($_SESSION['role'] === 'Instructor') {
-        header("Location: ../faculty/index.php");
+        header("Location: ../faculty/index.php"); 
     }
 }
 
@@ -29,19 +31,9 @@ if (isset($_POST['submit'])) {
         $_SESSION['role'] = $role;
         $_SESSION['department'] = $department;
 
-        // echo $_SESSION['id'];
-
-
-        // $print = $_SESSION['department'];
         header("Location: /facultyloading/index.php");
 
-        // if ($role === 'department head') {
-        //     header("Location: ../faculty/head/headDashboard.php");
-        // } elseif ($role === 'faculty') {
-        //     header("Location: ../faculty/index.php");
-        // } else {
-        //     echo "Unknown role. Please contact the administrator.";
-        // }
+       
     } else {
         echo "Invalid username or password";
     }

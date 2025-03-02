@@ -1,5 +1,139 @@
 <?php
+include_once("../session/session.php");
 include_once "../connections/connection.php";
+
+if (isset($_GET['action']) && $_GET['action'] === 'delete' && isset($_GET['schedule_id'])) {
+    $schedule_id = intval($_GET['schedule_id']);
+    $section_id = isset($_GET['section_id']) ? intval($_GET['section_id']) : 1;
+    $stmt = $pdo->prepare("UPDATE schedules SET faculty_id = NULL WHERE schedule_id = :schedule_id");
+    $stmt->bindParam(':schedule_id', $schedule_id, PDO::PARAM_INT);
+    
+    if ($stmt->execute()) {
+        header("Location: manual_scheduling.php?section_id=$section_id");
+        exit;
+    } else {
+        die("Error: Unable to delete faculty assignment.");
+    }
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['schedule_id']) && isset($_POST['faculty_id'])) {
+    $schedule_id = intval($_POST['schedule_id']);
+    $faculty_id = intval($_POST['faculty_id']);
+
+    $scheduleStmt = $pdo->prepare("
+        SELECT subject_code, day_of_week, start_time, end_time, section_id
+        FROM section_schedules
+        WHERE schedule_id = :schedule_id
+    ");
+    $scheduleStmt->bindParam(':schedule_id', $schedule_id);
+    $scheduleStmt->execute();
+    $schedule = $scheduleStmt->fetch(PDO::FETCH_ASSOC);
+
+    if ($schedule) {
+        $checkStmt = $pdo->prepare("
+            SELECT schedule_id FROM schedules 
+            WHERE section_id = :section_id 
+            AND subject_code = :subject_code 
+            AND day_of_week = :day_of_week 
+            AND start_time = :start_time 
+            AND end_time = :end_time
+        ");
+        $checkStmt->bindParam(':section_id', $schedule['section_id']);
+        $checkStmt->bindParam(':subject_code', $schedule['subject_code']);
+        $checkStmt->bindParam(':day_of_week', $schedule['day_of_week']);
+        $checkStmt->bindParam(':start_time', $schedule['start_time']);
+        $checkStmt->bindParam(':end_time', $schedule['end_time']);
+        $checkStmt->execute();
+        $existingSchedule = $checkStmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($existingSchedule) {
+            $updateStmt = $pdo->prepare("
+                UPDATE schedules 
+                SET faculty_id = :faculty_id 
+                WHERE schedule_id = :schedule_id
+            ");
+            $updateStmt->bindParam(':faculty_id', $faculty_id);
+            $updateStmt->bindParam(':schedule_id', $existingSchedule['schedule_id']);
+            $result = $updateStmt->execute();
+        } else {
+            $insertStmt = $pdo->prepare("
+                INSERT INTO schedules (faculty_id, subject_code, section_id, day_of_week, start_time, end_time)
+                VALUES (:faculty_id, :subject_code, :section_id, :day_of_week, :start_time, :end_time)
+            ");
+            $insertStmt->bindParam(':faculty_id', $faculty_id);
+            $insertStmt->bindParam(':subject_code', $schedule['subject_code']);
+            $insertStmt->bindParam(':section_id', $schedule['section_id']);
+            $insertStmt->bindParam(':day_of_week', $schedule['day_of_week']);
+            $insertStmt->bindParam(':start_time', $schedule['start_time']);
+            $insertStmt->bindParam(':end_time', $schedule['end_time']);
+            $result = $insertStmt->execute();
+        }
+
+        if ($result) {
+            echo "Faculty assigned successfully";
+        } else {
+            echo "Error assigning faculty";
+        }
+    } else {
+        echo "Schedule not found";
+    }
+    exit; 
+}
+
+if (isset($_GET['action']) && $_GET['action'] === 'fetch_available_faculty' && isset($_GET['schedule_id'])) {
+    header('Content-Type: application/json');
+    $schedule_id = intval($_GET['schedule_id']);
+
+    $scheduleStmt = $pdo->prepare("
+        SELECT subject_code, day_of_week, start_time, end_time, section_id
+        FROM section_schedules
+        WHERE schedule_id = :schedule_id
+    ");
+    $scheduleStmt->bindParam(':schedule_id', $schedule_id);
+    $scheduleStmt->execute();
+    $schedule = $scheduleStmt->fetch(PDO::FETCH_ASSOC);
+
+    if (!$schedule) {
+        echo json_encode([]);
+        exit;
+    }
+
+    $subject_code = $schedule['subject_code'];
+    $day_of_week = $schedule['day_of_week'];
+    $start_time = $schedule['start_time'];
+    $end_time = $schedule['end_time'];
+
+    $facultyStmt = $pdo->prepare("
+        SELECT 
+            f.faculty_id,
+            CONCAT(f.firstname, ' ', COALESCE(f.middlename, ''), ' ', f.lastname) AS name
+        FROM faculty f
+        INNER JOIN faculty_courses fc ON f.faculty_id = fc.faculty_id
+        WHERE 
+            fc.subject_code = :subject_code
+            AND FIND_IN_SET(:day_of_week, f.availability) > 0
+            AND f.start_time <= :start_time
+            AND f.end_time >= :end_time
+            AND NOT EXISTS (
+                SELECT 1
+                FROM schedules s
+                WHERE s.faculty_id = f.faculty_id
+                AND s.day_of_week = :day_of_week
+                AND (
+                    (s.start_time < :end_time AND s.end_time > :start_time)
+                )
+            )
+    ");
+    $facultyStmt->bindParam(':subject_code', $subject_code);
+    $facultyStmt->bindParam(':day_of_week', $day_of_week);
+    $facultyStmt->bindParam(':start_time', $start_time);
+    $facultyStmt->bindParam(':end_time', $end_time);
+    $facultyStmt->execute();
+    $availableFaculty = $facultyStmt->fetchAll(PDO::FETCH_ASSOC);
+
+    echo json_encode($availableFaculty);
+    exit;
+}
 
 $sectionStmt = $pdo->query("SELECT section_id, section_name FROM sections ORDER BY section_name");
 $sections = $sectionStmt->fetchAll(PDO::FETCH_ASSOC);
@@ -8,7 +142,7 @@ $section_id = isset($_GET['section_id']) ? intval($_GET['section_id']) : 0;
 
 $stmt = $pdo->prepare("
     SELECT 
-        ss.schedule_id, 
+        ss.schedule_id,
         ss.section_id, 
         ss.subject_code, 
         ss.day_of_week, 
@@ -21,7 +155,8 @@ $stmt = $pdo->prepare("
         r.room_no,
         f.firstname, 
         f.middlename, 
-        f.lastname 
+        f.lastname,
+        s.schedule_id AS faculty_schedule_id
     FROM section_schedules ss
     LEFT JOIN room_assignments ra ON ss.section_id = ra.section_id 
         AND ss.subject_code = ra.subject_code 
@@ -44,10 +179,9 @@ $stmt->bindParam(':section_id', $section_id);
 $stmt->execute();
 $scheduleData = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Modify the time slots generation to check for scheduled classes
 $startTime = strtotime('06:00 AM');
 $endTime = strtotime('09:00 PM');
-$interval = 15 * 60;
+$interval = 15 * 60; 
 $time_slots = [];
 
 while ($startTime <= $endTime) {
@@ -79,6 +213,39 @@ function formatTime($time) {
     return date('h:i A', strtotime($time));
 }
 
+function getAvailableFaculty($pdo, $schedule) {
+    $subject_code = $schedule['subject_code'];
+    $day_of_week = $schedule['day_of_week'];
+    $start_time = $schedule['start_time'];
+    $end_time = $schedule['end_time'];
+
+    $facultyStmt = $pdo->prepare("
+        SELECT 
+            CONCAT(f.firstname, ' ', COALESCE(f.middlename, ''), ' ', f.lastname) AS name
+        FROM faculty f
+        INNER JOIN faculty_courses fc ON f.faculty_id = fc.faculty_id
+        WHERE 
+            fc.subject_code = :subject_code
+            AND FIND_IN_SET(:day_of_week, f.availability) > 0
+            AND f.start_time <= :start_time
+            AND f.end_time >= :end_time
+            AND NOT EXISTS (
+                SELECT 1
+                FROM schedules s
+                WHERE s.faculty_id = f.faculty_id
+                AND s.day_of_week = :day_of_week
+                AND (
+                    (s.start_time < :end_time AND s.end_time > :start_time)
+                )
+            )
+    ");
+    $facultyStmt->bindParam(':subject_code', $subject_code);
+    $facultyStmt->bindParam(':day_of_week', $day_of_week);
+    $facultyStmt->bindParam(':start_time', $start_time);
+    $facultyStmt->bindParam(':end_time', $end_time);
+    $facultyStmt->execute();
+    return $facultyStmt->fetchAll(PDO::FETCH_ASSOC);
+}
 ?>
 
 <!DOCTYPE html>
@@ -88,13 +255,13 @@ function formatTime($time) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manual Scheduling</title>
     <style>
-        body { font-family: Arial, sans-serif; padding: 20px; background: aliceblue;}
+        body { font-family: Arial, sans-serif; padding: 20px; background: aliceblue; }
         h2 { text-align: center; }
         table { width: 100%; border-collapse: collapse; margin-top: 20px; }
         th, td { border: 1px solid black; padding: 10px; text-align: center; }
-        th { background-color: #f4f4f4; }
+        th { background-color: #504e4e75; }
         select, button { padding: 5px; }
-        td { min-width: 120px; height: 40px; position: relative; }
+        td { min-width: 120px; height: 45px; position: relative;} 
         .delete-btn, .add-btn {
             position: absolute;
             top: 5px;
@@ -105,23 +272,52 @@ function formatTime($time) {
             border: none;
             background: none;
             padding: 0;
-            display: none; /* Hidden by default */
+            display: none;
         }
-        .delete-btn {
-            color: red;
+        .delete-btn { color: red; }
+        .add-btn { color: green; }
+        .delete-btn:hover { color: darkred; }
+        .add-btn:hover { color: darkgreen; }
+        td:hover .delete-btn, td:hover .add-btn { display: block; }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
         }
-        .add-btn {
-            color: White;
+        .modal-content {
+            background: white;
+            padding: 20px;
+            width: 300px;
+            margin: 10% auto;
+            border-radius: 5px;
         }
-        .delete-btn:hover {
-            color: darkred;
+        .close-modal { float: right; cursor: pointer; font-size: 24px; }
+        .scrolling-faculty {
+            height: 40px;
+            overflow: hidden;
+            position: relative;
+            text-align: center;
+            color: #555;
+            line-height: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
-        .add-btn:hover {
-            color: darkgreen;
+        .scrolling-faculty span {
+            position: absolute;
+            width: 100%;
+            text-align: center;
+            animation: scrollVertical 10s linear infinite;
         }
-        td:hover .delete-btn, td:hover .add-btn {
-            display: block; /* Show on hover */
+        @keyframes scrollVertical {
+            0% { transform: translateY(100%); }
+            100% { transform: translateY(-100%); }
         }
+        h6 { margin: 5px 0 0 0; font-size: 12px; } 
     </style>
 </head>
 <body>
@@ -185,14 +381,25 @@ function formatTime($time) {
                             $teacher_display = !empty($teacher_name) ? $teacher_name : "<small style='color: gray;'>No Faculty</small>";
                             $room_display = !empty($schedule['room_no']) ? $schedule['room_no'] : "<small style='color: gray;'>No Room</small>";
 
-                            // Conditional button based on whether there's a faculty
                             $action_button = !empty($teacher_name) ? 
-                                "<button class='delete-btn' onclick='deleteFaculty({$schedule['schedule_id']})'>×</button>" :
+                                "<button class='delete-btn' onclick='deleteFaculty({$schedule['faculty_schedule_id']})'>×</button>" :
                                 "<button class='add-btn' onclick='addFaculty({$schedule['schedule_id']})'>+</button>";
+
+                            $available_faculty = !empty($teacher_name) ? '' : getAvailableFaculty($pdo, $schedule);
+                            $faculty_display = '';
+                            if (empty($teacher_name)) {
+                                if (!empty($available_faculty)) {
+                                    $faculty_names = implode('<br>', array_column($available_faculty, 'name'));
+                                    $faculty_display = "<h6>Available</h6><div class='scrolling-faculty'><span>$faculty_names</span></div>";
+                                } else {
+                                    $faculty_display = "<small style='color: gray;'>No Faculty Available</small>";
+                                }
+                            }
 
                             $new_content = "<strong style='color: black;'>{$schedule['subject_code']}</strong><br>" .
                                            "<small>Teacher: $teacher_display</small><br>" .
-                                           "<small>Room: $room_display</small>" .
+                                           "<small>Room: $room_display</small><br>" .
+                                           $faculty_display .
                                            $action_button;
 
                             if (!empty($teacher_name)) {
@@ -230,63 +437,65 @@ function formatTime($time) {
     <p>Please select a section to view the schedule.</p>
 <?php endif; ?>
 
+<div id="addModalForSchedule" class="modal">
+    <div class="modal-content">
+        <span class="close-modal">×</span>
+        <h3>Select Faculty</h3>
+        <form id="assignFacultyForm">
+            <input type="hidden" id="schedule_id" name="schedule_id">
+            <label for="faculty_id">Faculty:</label>
+            <select id="faculty_id" name="faculty_id" required>
+                <option value="">-- Select Faculty --</option>
+            </select>
+            <br><br>
+            <button type="submit">Assign Faculty</button>
+        </form>
+    </div>
+</div>
+
 <script>
 function deleteFaculty(scheduleId) {
     if (confirm('Are you sure you want to remove the faculty from this schedule?')) {
-        // Here you would typically make an AJAX call to a PHP script to handle the deletion
-        console.log('Deleting faculty for schedule ID: ' + scheduleId);
-        
-        // Example AJAX call (uncomment and modify according to your setup):
-        /*
-        fetch('delete_faculty.php', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ schedule_id: scheduleId })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                location.reload();
-            } else {
-                alert('Error deleting faculty: ' + data.message);
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('An error occurred while deleting the faculty');
-        });
-        */
+        window.location.href = `manual_scheduling.php?section_id=<?php echo $section_id; ?>&schedule_id=${scheduleId}&action=delete`;
     }
 }
 
 function addFaculty(scheduleId) {
-    if (confirm('Do you want to assign a faculty to this schedule?')) {
-        // Here you would typically redirect to a form or open a modal to select faculty
-        console.log('Adding faculty for schedule ID: ' + scheduleId);
-        
-        // Example AJAX call or redirect (uncomment and modify according to your setup):
-        /*
-        // Option 1: Redirect to a faculty assignment page
-        window.location.href = 'assign_faculty.php?schedule_id=' + scheduleId;
-        
-        // Option 2: AJAX call to get faculty list
-        fetch('get_available_faculty.php', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ schedule_id: scheduleId })
-        })
+    document.getElementById('schedule_id').value = scheduleId;
+    document.getElementById('addModalForSchedule').style.display = 'block';
+    
+    fetch(`manual_scheduling.php?action=fetch_available_faculty&schedule_id=${scheduleId}`)
         .then(response => response.json())
         .then(data => {
-            // Handle faculty selection logic here
-            console.log('Available faculty:', data);
-        });
-        */
-    }
+            const facultyDropdown = document.getElementById('faculty_id');
+            facultyDropdown.innerHTML = '<option value="">-- Select Faculty --</option>';
+            data.forEach(faculty => {
+                facultyDropdown.innerHTML += `<option value="${faculty.faculty_id}">${faculty.name}</option>`;
+            });
+        })
+        .catch(error => console.error('Error fetching faculty:', error));
 }
+
+document.querySelector('.close-modal').addEventListener('click', function() {
+    document.getElementById('addModalForSchedule').style.display = 'none';
+});
+
+document.getElementById('assignFacultyForm').addEventListener('submit', function(event) {
+    event.preventDefault();
+    const formData = new FormData(this);
+    
+    fetch('manual_scheduling.php', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.text())
+    .then(result => {
+        alert(result);
+        document.getElementById('addModalForSchedule').style.display = 'none';
+        location.reload();
+    })
+    .catch(error => console.error('Error assigning faculty:', error));
+});
 </script>
 
 </body>

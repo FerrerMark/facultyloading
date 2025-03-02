@@ -1,15 +1,33 @@
 <?php
-session_start(); 
+include_once("../session/session.php");
+$facultyApiUrl = 'http://localhost/Hr/HRfacultyAPI.php';
+$sectionsApiUrl = 'http://localhost/registrar/sectionsApi.php';
 
-$url = 'http://localhost/Hr/HRfacultyAPI.php';
-$response = json_decode(file_get_contents($url), true);
-$faculty_count = $response['faculty_count'];
+$options = [
+    "http" => [
+        "header" => "Authorization: Bearer m\r\n"
+    ]
+];
 
+$context = stream_context_create($options);
 
-$url = 'http://localhost/registrar/sectionsApi.php';
-$response = json_decode(file_get_contents($url), true);
-$section_count = $response['section_count'];
+$response = file_get_contents($facultyApiUrl, false, $context);
+$facultyData = json_decode($response, true);
 
+if (!$facultyData || !isset($facultyData['faculty_count'])) {
+    die(json_encode(["error" => "Failed to fetch faculty data. Check API authentication."]));
+}
+
+$faculty_count = $facultyData['faculty_count'];
+
+$response = file_get_contents($sectionsApiUrl);
+$sectionData = json_decode($response, true);
+
+if (!$sectionData || !isset($sectionData['section_count'])) {
+    die(json_encode(["error" => "Failed to fetch section data."]));
+}
+
+$section_count = $sectionData['section_count'];
 
 include_once "../connections/connection.php";
 
@@ -29,5 +47,12 @@ try {
     $faculty_teaching_hours = $result['total_teaching_hours'] ?? 0;
 
 } catch (PDOException $e) {
-    echo "Error: " . $e->getMessage();
+    die(json_encode(["error" => "Database error: " . $e->getMessage()]));
 }
+
+// echo json_encode([
+//     "faculty_count" => $faculty_count,
+//     "section_count" => $section_count,
+//     "faculty_teaching_hours" => $faculty_teaching_hours
+// ]);
+
