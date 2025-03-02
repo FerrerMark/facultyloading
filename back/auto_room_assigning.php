@@ -169,6 +169,9 @@ try {
     header('Content-Type: application/json');
     echo json_encode($result, JSON_PRETTY_PRINT);
 
+    header("location: ../frame/rooms.php?role=Department%20Head&department=BSIT");
+
+
 } catch (PDOException $e) {
     $error = [
         'error' => 'Connection failed',

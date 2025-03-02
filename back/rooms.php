@@ -1,6 +1,7 @@
 <?php
-include_once("../session/session.php");
 
+
+    include_once("../session/session.php");
     include_once "../connections/connection.php";
 
     $role = "Department Head";

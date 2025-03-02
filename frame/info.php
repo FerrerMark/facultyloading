@@ -1,54 +1,61 @@
 <?php
 include_once("../session/session.php");
-
 include_once("../connections/connection.php");
 
-    $sql = "SELECT * FROM `faculty` WHERE `faculty_id` = ?";
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute([$_GET['id']]);
-    $result = $stmt->fetch();
+// Fetch faculty details
+$sql = "SELECT * FROM `faculty` WHERE `faculty_id` = ?";
+$stmt = $pdo->prepare($sql);
+$stmt->execute([$_GET['id']]);
+$result = $stmt->fetch();
 
-    if ($result !== false) {
-        $row = $result;
-    } else {
-        $row = [];
+if ($result !== false) {
+    $row = $result;
+} else {
+    $row = [];
+}
+
+// Fetch faculty schedules
+try {
+    $stmt = $conn->prepare("
+        SELECT section.section_name, 
+               CONCAT(f.firstname, ' ', f.lastname) AS teacher, 
+               sched.*, f.*, 
+               section.program_code,
+               section.year_level,
+               sched.end_time,
+               sched.start_time,
+               section.semester,
+               r.room_no
+        FROM faculty f
+        LEFT JOIN schedules sched ON f.faculty_id = sched.faculty_id
+        LEFT JOIN sections section ON section.section_id = sched.section_id
+        LEFT JOIN room_assignments ra ON ra.section_id = section.section_id
+        AND ra.subject_code = sched.subject_code
+        AND ra.day_of_week = sched.day_of_week
+        AND ra.start_time = sched.start_time
+        LEFT JOIN rooms r ON ra.room_id = r.room_id
+        WHERE f.faculty_id = :faculty_id
+    ");
+    $stmt->bindParam(':faculty_id', $_GET['id']);
+    $stmt->execute();
+    $schedules = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} catch (PDOException $e) {
+    echo "db_error: " . $e->getMessage();
+}
+
+// Calculate total teaching hours
+$total_hours = 0;
+foreach ($schedules as $schedule) {
+    if ($schedule['start_time'] && $schedule['end_time']) {
+        $start = new DateTime($schedule['start_time']);
+        $end = new DateTime($schedule['end_time']);
+        $interval = $start->diff($end);
+        $hours = $interval->h + ($interval->i / 60);
+        $total_hours += $hours;
     }
-
-
-    try {
-        $stmt = $conn->prepare("
-            SELECT section.section_name, 
-                   CONCAT(f.firstname, ' ', f.lastname) AS teacher, 
-                   sched.*, f.*, 
-                   section.program_code,
-                   section.year_level,
-                   sched.end_time,
-                sched.start_time,
-                section.semester,
-                r.room_no
-                
-            FROM faculty f
-            LEFT JOIN schedules sched ON f.faculty_id = sched.faculty_id
-            LEFT JOIN sections section ON section.section_id = sched.section_id
-            LEFT JOIN room_assignments ra ON ra.section_id = section.section_id
-            AND ra.subject_code = sched.subject_code
-            AND ra.day_of_week = sched.day_of_week
-            AND ra.start_time = sched.start_time
-            LEFT JOIN rooms r ON ra.room_id = r.room_id
-            WHERE f.faculty_id = :faculty_id
-        ");
-    
-        $stmt->bindParam(':faculty_id', $_GET['id']);
-        $stmt->execute();
-    
-        $schedules = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    
-    } catch (PDOException $e) {
-        echo "db_error: " . $e->getMessage();
-    }
-    
-
+}
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -56,16 +63,12 @@ include_once("../connections/connection.php");
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Faculty Profile</title>
     <style>
-       
-
         body {
             font-family: Arial, sans-serif;
             background-color: #f4f4f4;
             margin: 17px;
             padding: 0px;
         }
-
-        
         .container {
             width: 100%;
             margin: auto;
@@ -74,13 +77,11 @@ include_once("../connections/connection.php");
             border-radius: 8px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
-
         h2 {
             text-align: center;
             color: #333;
             padding: 19px 0;
         }
-
         .profile-card {
             background: #ffffff;
             padding: 15px;
@@ -88,26 +89,39 @@ include_once("../connections/connection.php");
             border-radius: 5px;
             box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
         }
-
         .profile-card h3 {
             color: #007bff;
             margin-bottom: 10px;
         }
-
         .profile-card p {
             margin: 5px 0;
             color: #555;
         }
-
         .profile-card strong {
             color: #000;
         }
-
         .profile-card .line {
             border-bottom: 2px solid #ccc;
             margin: 10px 0;
         }
-
+        .table-info {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        .table-info td, .table-info th {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+        .table-info tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        .table-info th {
+            padding-top: 12px;
+            padding-bottom: 12px;
+            text-align: left;
+            background-color: #777777;
+            color: white;
+        }
     </style>
 </head>
 <body>
@@ -127,6 +141,7 @@ include_once("../connections/connection.php");
             <div class="line"></div>
             <p><strong>Specialization:</strong> <?php echo htmlspecialchars($row['master_specialization']); ?></p>
             <p><strong>Max Weekly Hours:</strong> <?php echo htmlspecialchars($row['max_weekly_hours']); ?> hours</p>
+            <p><strong>Current Teaching Hours per Week:</strong> <?php echo number_format($total_hours, 2); ?> hours</p>
             <div class="line"></div>
             <p><strong>Address:</strong> <?php echo htmlspecialchars($row['address']); ?></p>
             <p><strong>Phone:</strong> <?php echo htmlspecialchars($row['phone_no']); ?></p>
@@ -135,31 +150,6 @@ include_once("../connections/connection.php");
     <?php else: ?>
         <p>No faculty records found.</p>
     <?php endif; ?>
-
-    <style>
-
-        .table-info {
-            border-collapse: collapse;
-            width: 100%;
-        }
-
-        .table-info td, .table-info th {
-            border: 1px solid #ddd;
-            padding: 8px;
-        }
-
-        .table-info tr:nth-child(even) {
-            background-color: #f2f2f2;
-        }
-
-        .table-info th {
-            padding-top: 12px;
-            padding-bottom: 12px;
-            text-align: left;
-            background-color: #777777;
-            color: white;
-        }
-    </style>
 
     <table class="table-info">
         <thead>
@@ -197,10 +187,7 @@ include_once("../connections/connection.php");
             <?php endif; ?>
         </tbody>
     </table>
-
 </div>
 
 </body>
 </html>
-
-

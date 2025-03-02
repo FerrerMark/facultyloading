@@ -396,6 +396,8 @@ include_once "../back/rooms.php";
         </div>
 
         <button class="add-new" onclick="openAddRoomModal()">Add New</button>
+        <button class="add-new" onclick="autoroom()">Auto Room</button>
+
 
         <div class="toolbar">
             <h3>ROOMS</h3>
@@ -455,5 +457,11 @@ include_once "../back/rooms.php";
         </div>
 
     <script src="../scripts.js"></script>
+    <script>
+        function autoroom(){
+            window.location.href = "../back/auto_room_assigning.php?department=<?php echo $_GET['department'] ?>&role=<?php echo $role?>&action=autoroom";
+        }
+        
+    </script>
 </body>
 </html>
