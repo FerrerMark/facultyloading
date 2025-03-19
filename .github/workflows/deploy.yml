@@ -19,5 +19,5 @@ jobs:
         server: ${{ secrets.FTP_SERVER }}
         username: ${{ secrets.FTP_USERNAME }}
         password: ${{ secrets.FTP_PASSWORD }}
-        local-dir: ./public_html/ 
+        local-dir: ./  # Changed from ./public_html/ to ./ to deploy the root of the repository
         server-dir: /home/faculty.schoolmanagementsystem2.com/public_html/
