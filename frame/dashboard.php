@@ -30,53 +30,9 @@
                     <p class="number"><?php echo number_format($faculty_teaching_hours, 2); ?> hrs</p>
                     <p class="subtext">Total hours you are scheduled to teach</p>
                 </div>
-                <div class="card">
-                    <h3>Your Total Teaching Hrs</h3>
-                    <p class="number"><?php echo number_format($faculty_teaching_hours, 2); ?> hrs</p>
-                    <p class="subtext">Total hours you are scheduled to teach</p>
-                </div>
             </div>
-            <div class="new-requests">
-                <h2>New Requests</h2>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Type</th>
-                            <th>Faculty</th>
-                            <th>Department</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-                    <tbody id="requestsTableBody">
-                    </tbody>
-                </table>
-            </div>
+            
         </main>
     </div>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const newRequests = [
-                { type: '...', faculty: 'Dr. Jane Smith', department: 'Computer Science', status: 'Pending' },
-                { type: '...', faculty: 'Prof. John Doe', department: 'Information Technology', status: 'Pending' },
-                { type: '...', faculty: 'Dr. Emily Brown', department: 'Software Engineering', status: 'Pending' }
-            ];
-
-            const requestsTableBody = document.getElementById('requestsTableBody');
-
-            newRequests.forEach(request => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${request.type}</td>
-                    <td>${request.faculty}</td>
-                    <td>${request.department}</td>
-                    <td><span class="status status-${request.status.toLowerCase()}">${request.status}</span></td>
-                `;
-                requestsTableBody.appendChild(row);
-            });
-
-            const newRequestsNumber = document.querySelector('.card:nth-child(4) .number');
-            newRequestsNumber.textContent = newRequests.length;
-        });
-    </script>
 </body>
 </html>

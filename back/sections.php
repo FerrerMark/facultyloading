@@ -2,8 +2,8 @@
 include_once("../session/session.php");
 
 include_once "../connections/connection.php";
-include_once "../registrar/sync_fetch_section.php";
-include_once "../registrar/sync_fetch_schedule.php";
+// include_once "../registrar/sync_fetch_section.php";
+// include_once "../registrar/sync_fetch_schedule.php";
 
 
 $dep = isset($_GET['department']) ? htmlspecialchars($_GET['department']) : '';

@@ -41,7 +41,7 @@
             <nav class="side_nav" id="navMenu">
                 <?php if($row['role'] == "Instructor"){ ?>
                     <a href="#" onclick="loadFrame('view_sched','<?php echo $role;?>','<?php echo $departmentId;?>')" class="nav-item"><i class="fa-solid fa-calendar-days"></i>&nbsp;Schedule</a>
-                    <a href="#" onclick="documents()" class="nav-item"><i class="fa-solid fa-file"></i>&nbsp;Documents</a>  
+                    
                     <a href="#" onclick="loadFrame('available','<?php echo $role;?>','<?php echo $departmentId;?>')" class="nav-item"><i class="fa-solid fa-calendar-days"></i>&nbsp;My Courses</a>
                 <?php } ?> 
 
@@ -52,7 +52,6 @@
                 
                 <a href="#" onclick="loadFrame('programs','<?php echo $role;?>','<?php echo $departmentId;?>')" class="nav-item"><span class="nrk--media-programguide-active"></span>&nbsp;Programs</a>
 
-                <a href="#" onclick="todo()" class="nav-item"><span class="lucide--list-todo"></span>&nbsp;To-Do List</a>
                 
                 <?php if($role == "Department Head"){ ?>
                     <a href="#" onclick="loadFrame('faculty','<?php echo $role;?>','<?php echo $departmentId;?>')" class="nav-item"><span class="mdi--teacher"></span>&nbsp;Faculty</a>
@@ -64,6 +63,8 @@
                     <a href="#" onclick="loadFrame('sections','<?php echo $role;?>','<?php echo $departmentId;?>')" class="nav-item"><span class="ic--outline-hdr-auto"></span>&nbsp;Sections</a>
 
                     <a href="#" onclick="loadFrame('review_availability','<?php echo $role;?>','<?php echo $departmentId;?>')" class="nav-item"><i class="fa-solid fa-calendar-days"></i>&nbsp;Faculty Course/s Request</a>
+
+                    <a href="#" onclick="loadFrame('available','<?php echo $role;?>','<?php echo $departmentId;?>')" class="nav-item"><i class="fa-solid fa-calendar-days"></i>&nbsp;My Courses</a>
                 <?php } ?>
             </nav>
 
@@ -163,28 +164,7 @@
 <div id="reportProblemModal" class="modal">
     <div class="modal-content">
         <span class="close">&times;</span>
-        <h2>Report a Problem</h2>
-        <form id="problemForm">
-            <label for="category">Problem Category:</label>
-            <select id="category" name="category" required>
-                <option value="">Select a category</option>
-                <option value="technical">Room </option>
-                <option value="account">Account Problem</option>
-                <option value="scheduling">Scheduling Conflict</option>
-                <option value="other">Other</option>
-            </select>
-
-            <label for="subject">Subject:</label>
-            <input type="text" id="subject" name="subject" required>
-
-            <label for="description">Description:</label>
-            <textarea id="description" name="description" required></textarea>
-
-            <label for="attachment">Attachment (optional):</label>
-            <input type="file" id="attachment" name="attachment">
-
-            <button type="submit" id="submitBtn"><Strong>Submit Report</Strong></button>
-        </form>
+        <h2>To be continue...</h2>
     </div>
 </div>
 

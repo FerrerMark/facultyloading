@@ -379,75 +379,12 @@ include_once "../back/courses.php";
     </style>
 </head>
 <body>
-    <!-- Edit Course Modal -->
-    <div id="editCourseModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeEditCourseModal()">×</span>
-            <h2>Edit Course</h2>
-            <form action="courses.php?role=<?php echo $_GET['role']; ?>&department=<?php echo $_GET['department']; ?>&action=edit" method="POST">
-                <input type="hidden" id="edit_course_id" name="course_id">
-                <input type="hidden" name="program_code" value="<?php echo htmlspecialchars($programCode); ?>">
-                <label for="edit_subject_code">Subject Code:</label>
-                <input type="text" id="edit_subject_code" name="subject_code" required>
-                <label for="edit_course_title">Course Title:</label>
-                <input type="text" id="edit_course_title" name="course_title" required>
-                <label for="edit_year_level">Year Level:</label>
-                <input type="number" id="edit_year_level" name="year_level" required>
-                <label for="edit_semester">Semester:</label>
-                <input type="text" id="edit_semester" name="semester" required>
-                <label for="edit_lecture_hours">Lecture Hours:</label>
-                <input type="number" id="edit_lecture_hours" name="lecture_hours" required>
-                <label for="edit_lab_hours">Lab Hours:</label>
-                <input type="number" id="edit_lab_hours" name="lab_hours" required>
-                <label for="edit_credit_units">Credit Units:</label>
-                <input type="number" id="edit_credit_units" name="credit_units" required>
-                <label for="edit_slots">Slots:</label>
-                <input type="number" id="edit_slots" name="slots" required>
-                <button type="submit" name="edit_course">Update Course</button>
-            </form>
-        </div>
-    </div>
-
-    <!-- Add Course Modal -->
-    <div id="addCourseModal" class="modal">
-        <div class="modal-content">
-            <span class="close-btn" onclick="closeAddCourseModal()">×</span>
-            <h2>Add New Course</h2>
-            <form action="courses.php?role=<?php echo $_GET['role']; ?>&program_code=<?php echo $_GET['department']; ?>&action=add" method="POST">
-                <input type="hidden" name="program_code" value="<?php echo htmlspecialchars($programCode); ?>">
-                <label for="subject_code">Subject Code:</label>
-                <input type="text" id="subject_code" name="subject_code" required>
-                <label for="course_title">Course Title:</label>
-                <input type="text" id="course_title" name="course_title" required>
-                <label for="year_level">Year Level:</label>
-                <input type="number" id="year_level" name="year_level" required>
-                <label for="semester">Semester:</label>
-                <input type="text" id="semester" name="semester" required>
-                <label for="lecture_hours">Lecture Hours:</label>
-                <input type="number" id="lecture_hours" name="lecture_hours" required>
-                <label for="lab_hours">Lab Hours:</label>
-                <input type="number" id="lab_hours" name="lab_hours" required>
-                <label for="credit_units">Credit Units:</label>
-                <input type="number" id="credit_units" name="credit_units" required>
-                <label for="slots">Slots:</label>
-                <input type="number" id="slots" name="slots" required>
-                <button type="submit">Add Course</button>
-            </form>
-        </div>
-    </div>
-
+    
     <div class="header">
         <div class="program-title"><?php echo htmlspecialchars($programCode); ?></div>
         <div class="program-subtitle"><?php echo htmlspecialchars($program['program_name']); ?></div>
         <div class="program-subtitle">College: <?php echo htmlspecialchars($program['college']); ?></div>
-        <div class="action-buttons">
-            <h5>Courses</h5>
-            <?php if ($_GET['role'] == 'Dean' && $_GET['department'] === $_GET['program_code']) { ?>
-                <button class="btn btn-primary" onclick="openAddCourseModal()">Add New Course</button>
-            <?php } else { ?>
-                <button class="btn btn-primary disabled-btn">Add New Course</button>
-            <?php } ?>
-        </div>
+        
     </div>
 
     <div class="toolbar">
@@ -498,8 +435,6 @@ include_once "../back/courses.php";
                     <th>Semester</th>
                     <th>Lecture/Lab Hrs</th>
                     <th>Credit Units</th>
-                    <th>Slots</th>
-                    <th>Options</th>
                 </tr>
             </thead>
             <tbody>
@@ -512,18 +447,8 @@ include_once "../back/courses.php";
                         <td><?php echo htmlspecialchars($course['semester']); ?></td>
                         <td><?php echo htmlspecialchars($course['lecture_hours']) . '/' . htmlspecialchars($course['lab_hours']); ?></td>
                         <td><?php echo htmlspecialchars($course['credit_units']); ?></td>
-                        <td><?php echo htmlspecialchars($course['slots']); ?></td>
-                        <td>
-                            <div class="action-icons">
-                                <?php if ($_GET['role'] == 'Dean' && $_GET['department'] === $course['program_code']) { ?>
-                                    <a href="courses.php?delete_course_code=<?php echo urlencode($course['subject_code']); ?>&program_code=<?php echo urlencode($programCode); ?>&role=<?php echo $_GET['role']; ?>" class="action-icon delete-icon">🗑</a>
-                                    <span class="action-icon edit-icon" onclick="openEditCourseModal('<?php echo htmlspecialchars(json_encode($course)); ?>')">✎</span>
-                                <?php } else { ?>
-                                    <span class="action-icon delete-icon disabled-btn">🗑</span>
-                                    <span class="action-icon edit-icon disabled-btn">✎</span>
-                                <?php } ?>
-                            </div>
-                        </td>
+                        
+                        
                     </tr>
                 <?php endforeach; ?>
             </tbody>

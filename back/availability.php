@@ -24,7 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_course'])) {
     $stmt->bindParam(':subject_code', $subject_code, PDO::PARAM_STR);
     $stmt->execute();
 
-    header("Location: ../frame/available.php");
+    header("Location: ../frame/available.php?delete_success");
     exit();
 }
 
@@ -37,7 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['cancel_request'])) {
     $stmt->bindParam(':pending_id', $pending_id, PDO::PARAM_INT);
     $stmt->execute();
 
-    header("Location: ../frame/available.php");
+    header("Location: ../frame/available.php?cancel_success=1");
     exit();
 }
 
@@ -84,6 +84,6 @@ if (!empty($new_courses)) {
     }
 }
 
-header("Location: ../frame/available.php");
+header("Location: ../frame/available.php?request_success");
 exit();
 ?>

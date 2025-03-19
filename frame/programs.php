@@ -321,45 +321,12 @@ include_once "../back/add_programs.php";
     </style>    
 </head>
 <body>
-    <!-- Add New Program Modal -->
-    <div id="addProgramModal" class="modal">
-        <div class="modal-content">
-            <span class="close-btn" onclick="closeModal()">×</span>
-            <h2>Add New Program</h2>
-            <form action="/facultyloading/back/actions.php?action=add&department=<?php echo $_GET['department']?>&role=<?php echo $_GET['role']?>" method="POST">
-                <label for="programCode">Program Code:</label>
-                <input type="text" id="programCode" name="programCode" required>
-                <label for="program">Program:</label>
-                <input type="text" id="program" name="program" required>
-                <label for="college">College:</label>
-                <input type="text" id="college" name="college" required>
-                <button type="submit" name="submit">Add Program</button>
-            </form>
-        </div>
-    </div>
 
-    <!-- Edit Program Modal -->
-    <div id="editProgramModal" class="modal">
-        <div class="modal-content">
-            <span class="close-btn" onclick="closeEditModal()">×</span>
-            <h2>Edit Program</h2>
-            <form action="/facultyloading/back/actions.php?action=edit" method="POST">
-                <label for="editProgramCode">Program Code:</label>
-                <input type="text" id="editProgramCode" name="program_code">
-                <label for="editProgramName">Program:</label>
-                <input type="text" id="editProgramName" name="program_name">
-                <label for="editCollege">College:</label>
-                <input type="text" id="editCollege" name="college">
-                <button type="submit">Update Program</button>
-            </form>
-        </div>
-    </div>
 
     <!-- <div class="container"> -->
-        <h1>Programs</h1>
-        <?php if ($_GET['role'] == 'Dean'){?>   
-            <button class="add-new">Add New</button>
-        <?php }?>
+    <div class="header">
+            <h1>Programs</h1>
+        </div>
         <div class="actions-bar">
             <div>
                 <h6>Lists of Programs</h6>
@@ -387,13 +354,7 @@ include_once "../back/add_programs.php";
                         <td><?php echo $row['college']; ?></td>
                         <td>
                             <div class="action-buttons">
-                                <?php if ($_GET['role'] == 'Dean' && $_GET['department'] === $row['program_code']) { ?>
-                                    <button class="delete-btn" onclick="confirmDelete('<?php echo $row['program_code']; ?>')">🗑</button>
-                                    <button class="edit-btn" onclick="openEditProgramModal('<?php echo htmlspecialchars($row['program_code'], ENT_QUOTES); ?>', '<?php echo htmlspecialchars($row['program_name'], ENT_QUOTES); ?>', '<?php echo htmlspecialchars($row['college'], ENT_QUOTES); ?>')">✎</button>
-                                <?php } else { ?>
-                                    <button class="delete-btn disabled-btn">🗑</button>
-                                    <button class="edit-btn disabled-btn">✎</button>
-                                <?php } ?>
+                                
                                 <a href="sections.php?department=<?php echo urlencode($row['program_code']); ?>&role=<?php echo urlencode($_GET['role']); ?>">
                                     <button class="programs-btn">Class</button>
                                 </a>

@@ -17,30 +17,6 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 
 
-// modal for adding program
-var modal = document.getElementById("addProgramModal");
-var btn = document.querySelector(".add-new");
-var span = document.querySelector(".close-btn");
-
-btn.onclick = function() {
-    modal.style.display = "block";
-}
-
-span.onclick = function() {
-    modal.style.display = "none";
-}
-
-window.onclick = function(event) {
-    if (event.target == modal) {
-        modal.style.display = "none";
-    }
-}
-
-function confirmDelete(programCode) {
-    if (confirm("Are you sure you want to delete this program?")) {
-        window.location.href = "/facultyloading/back/actions.php?action=delete&program_code=" + programCode;
-    }
-}
 
 // modal for editting program
 function openEditProgramModal(programCode, programName, college) {

@@ -181,7 +181,7 @@ $scheduleData = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 $startTime = strtotime('06:00 AM');
 $endTime = strtotime('09:00 PM');
-$interval = 15 * 60; 
+$interval = 60 * 60; 
 $time_slots = [];
 
 while ($startTime <= $endTime) {

@@ -2,7 +2,6 @@
 include_once("../session/session.php");
 include_once("../connections/connection.php");
 
-// Fetch faculty details
 $sql = "SELECT * FROM `faculty` WHERE `faculty_id` = ?";
 $stmt = $pdo->prepare($sql);
 $stmt->execute([$_GET['id']]);
@@ -14,7 +13,6 @@ if ($result !== false) {
     $row = [];
 }
 
-// Fetch faculty schedules
 try {
     $stmt = $conn->prepare("
         SELECT section.section_name, 

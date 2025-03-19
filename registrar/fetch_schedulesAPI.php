@@ -1,9 +1,7 @@
 <?php
 include_once "../session/session.php";
-// API URL (Change this to your actual API URL)
 $api_url = "http://localhost/registrar/scheduleAPI.php";
 
-// Fetch section_id from GET request (for filtering)
 $section_id = isset($_GET['section_id']) ? intval($_GET['section_id']) : 0;
 
 
@@ -11,7 +9,6 @@ if ($section_id > 0) {
     $api_url .= "?section_id=" . $section_id;
 }
 
-// Fetch data from API
 $response = file_get_contents($api_url);
 $scheduleData = json_decode($response, true);
 
