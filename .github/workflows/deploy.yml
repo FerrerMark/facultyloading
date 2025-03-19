@@ -24,4 +24,4 @@ jobs:
         mirror --reverse --delete --verbose . /path-to-your-site;
         rm -rf /public_html;
         mv /path-to-your-site /public_html;
-        bye"
+        bye" 
