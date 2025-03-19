@@ -1,4 +1,4 @@
-name: Deploy to FTP
+name: Deploy to Server via FTP
 
 on:
   push:
@@ -10,16 +10,14 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout Code
+    - name: Checkout Repository
       uses: actions/checkout@v4
 
-    - name: Deploy with LFTP
-      run: |
-        sudo apt-get install -y lftp
-        lftp -e "
-        set ssl:verify-certificate no;
-        open -u ${{ secrets.FTP_USERNAME }},${{ secrets.FTP_PASSWORD }} ftp.faculty.schoolmanagementsystem2.com;
-        lcd .;
-        mirror --reverse --delete --verbose . /public_html;
-        bye
-        "
+    - name: Deploy using FTP
+      uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+      with:
+        server: ${{ secrets.FTP_SERVER }}
+        username: ${{ secrets.FTP_USERNAME }}
+        password: ${{ secrets.FTP_PASSWORD }}
+        local-dir: ./
+        server-dir: /home/faculty.schoolmanagementsystem2.com/public_html/ 
