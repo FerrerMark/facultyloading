@@ -11,7 +11,6 @@
     <link rel="stylesheet" href="./css/login.css">
 </head>
 <body style="">
-    <h1 style="background-color:black; color: white;">HELLO<span style="background-color: orange; color: black;">WORLD</span></h1>
     <div class="login-container">
         <div class="form-container">
             <div class="logo">
