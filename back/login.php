@@ -31,12 +31,14 @@ if (isset($_POST['submit'])) {
         $_SESSION['role'] = $role;
         $_SESSION['department'] = $department;
 
-        header("Location: /facultyloading/index.php");
+        header("Location: /index.php");
 
        
     } else {
         echo "Invalid username or password";
     }
+}else{
+    echo "Invalid username or password";
 }
 
 ?>

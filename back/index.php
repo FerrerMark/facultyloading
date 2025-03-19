@@ -17,7 +17,7 @@ try {
     $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if ($row) {
-        $_SESSION['role'] = $row['role']; // Sync session role with DB role if necessary
+        $_SESSION['role'] = $row['role'];
         $departmentId = $row['departmentID'];
     } else {
         header("Location: /facultyloading/back/logout.php");
@@ -26,4 +26,5 @@ try {
 } catch (PDOException $e) {
     die("Database error: " . $e->getMessage());
 }
+
 ?>
