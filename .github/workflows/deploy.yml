@@ -20,5 +20,4 @@ jobs:
         username: ${{ secrets.FTP_USERNAME }}
         password: ${{ secrets.FTP_PASSWORD }}
         local-dir: ./
-        server-dir: /home/faculty.schoolmanagementsystem2.com/public_html/
-
+        server-dir: /public_html/
