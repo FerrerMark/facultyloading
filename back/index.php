@@ -3,7 +3,7 @@ include_once("./session/session.php");
 include_once("./connections/connection.php");
 // session_start();
 if (!isset($_SESSION['id'])) {
-    header("Location: /facultyloading/back/logout.php");
+    header("Location: /login.php");
     exit(); 
 }
 
