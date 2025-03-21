@@ -15,7 +15,6 @@ try {
     die("Database connection failed: " . $e->getMessage());
 }
 
-// Configuration
 $semester_input = '1';
 $semester_map = ['1' => 'First', '2' => 'Second', '3' => 'Summer'];
 $semester = $semester_map[$semester_input] ?? 'First';
@@ -25,13 +24,11 @@ const END_HOUR = 21;     // 9:00 PM
 const MAX_TIME_SLOTS = END_HOUR - START_HOUR;
 const SUBJECTS_PER_DAY = 3;
 
-// Day groups
 $day_groups = [
     'MWF' => ['Monday', 'Wednesday', 'Friday'],
     'TTHS' => ['Tuesday', 'Thursday', 'Saturday']
 ];
 
-// Get unique enrollment data
 try {
     $stmt = $registrar_db->prepare("SELECT DISTINCT Department, year_level, enrolled_count FROM enrolled_count WHERE semestrial = ?");
     $stmt->execute([$semester_input]);
@@ -40,14 +37,12 @@ try {
     die("Failed to fetch enrollment data: " . $e->getMessage());
 }
 
-// Get valid programs
 try {
     $programs = $facultyloading_db->query("SELECT program_code FROM programs")->fetchAll(PDO::FETCH_COLUMN);
 } catch (PDOException $e) {
     die("Failed to fetch programs: " . $e->getMessage());
 }
 
-// Prepare statements
 $insert_section_stmt = $facultyloading_db->prepare(
     "INSERT INTO sections (program_code, year_level, section_name, semester) VALUES (?, ?, ?, ?)"
 );
@@ -60,7 +55,6 @@ $room_stmt = $facultyloading_db->prepare(
     VALUES (?, ?, ?, ?, ?, ?)"
 );
 
-// Create sections
 $sections = [];
 $section_counter = 1;
 $created_sections = []; // Track created section names to avoid duplicates
@@ -106,14 +100,12 @@ foreach ($enrollments as $enrollment) {
     }
 }
 
-// Initialize scheduling resources
 $all_days = array_merge(...array_values($day_groups));
 $rooms = $facultyloading_db->query("SELECT room_id, room_no FROM rooms WHERE room_type = 'Lecture'")->fetchAll();
 if (empty($rooms)) {
     die("No lecture rooms available\n");
 }
 
-// Availability tracking
 $section_availability = array_fill_keys(array_column($sections, 'section_id'), 
     array_fill_keys($all_days, array_fill(0, MAX_TIME_SLOTS, true))
 );
@@ -121,7 +113,6 @@ $room_availability = array_fill_keys(array_column($rooms, 'room_id'),
     array_fill_keys($all_days, array_fill(0, MAX_TIME_SLOTS, true))
 );
 
-// Global tracking of scheduled courses
 $global_scheduled_courses = [];
 
 foreach ($sections as $section) {
@@ -221,7 +212,6 @@ foreach ($sections as $section) {
     }
 }
 
-// Helper functions
 function is_slot_free($availability, $start, $duration) {
     for ($i = $start; $i < $start + $duration; $i++) {
         if (!isset($availability[$i]) || !$availability[$i]) {
@@ -268,7 +258,6 @@ function update_availability(&$section_day, &$room_day, $start, $duration) {
 
 echo "Scheduling completed.\n";
 
-// Verify schedules
 echo "\nVerifying schedules at 12:00:00:\n";
 $result = $facultyloading_db->query("SELECT * FROM section_schedules WHERE start_time = '12:00:00'");
 $schedules = $result->fetchAll();
