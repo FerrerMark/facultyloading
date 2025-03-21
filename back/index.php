@@ -3,7 +3,7 @@ include_once("./session/session.php");
 include_once("./connections/connection.php");
 // session_start();
 if (!isset($_SESSION['id'])) {
-    header("Location: /login.php");
+    header("Location: ./back/logout.php");
     exit(); 
 }
 
@@ -17,10 +17,10 @@ try {
     $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if ($row) {
-        $_SESSION['role'] = $row['role'];
+        $_SESSION['role'] = $row['role']; 
         $departmentId = $row['departmentID'];
     } else {
-        header("Location: /facultyloading/back/logout.php");
+        header("Location: ./back/logout.php");
         exit();
     }
 } catch (PDOException $e) {

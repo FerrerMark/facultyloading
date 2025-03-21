@@ -2,8 +2,7 @@
     session_start();
     session_unset();
     session_destroy();
-    // header("location: /facultyloading/login.php");    
-    header("location: http://localhost/pref/logintestapi.php");
-
+    header("location: ../login.php");    
+    // header("location: http://localhost/pref/logintestapi.php");
 
 ?>

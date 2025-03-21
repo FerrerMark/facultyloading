@@ -2,6 +2,8 @@
 include_once("./session/session.php");
 include_once("./connections/connection.php");
 
+
+
 if (isset($_SESSION['id'])) {
     if ($_SESSION['role'] === 'Department Head') {
         header("Location: ../facultyloading/index.php");
@@ -29,12 +31,12 @@ if (isset($_POST['submit'])) {
         $_SESSION['role'] = $role;
         $_SESSION['department'] = $department;
 
-        header("Location: /index.php");
+        header("Location: ./index.php");
+
        
     } else {
         echo "Invalid username or password";
     }
-
 }
 
 ?>
