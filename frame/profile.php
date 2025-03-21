@@ -1,23 +1,16 @@
-<?php
-
-    include_once("../back/profile.php");
-
-?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo $row['FirstName']?></title>
-    <link rel="stylesheet" href="../cssfolder/profile.css">
+    <title>Faculty Profile</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             line-height: 1.6;
             color: #333;
             margin: 0;
-            padding: 20px;
+            padding: 30px;
             background: #fff;
         }
         .container {
@@ -25,65 +18,57 @@
             margin: 0 auto;
             padding: 30px;
             border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
         }
         h1 {
             color: #2c3e50;
             margin-bottom: 20px;
+            margin-top: unset;
         }
-
-        h5{
-            margin: unset;
-        }
-
-        h3 {
-            margin: unset;
-        }
-
         .profile-header {
-            text-align: center;
             display: flex;
             align-items: center;
-            margin-bottom: 30px;
-            flex-direction: column;
+            justify-content: space-evenly;
         }
-
         .profile-image {
-            width: 150px;
-            height: 150px;
+            width: 250px;
+            height: 250px;
+            border: 2px solid #00000099;
             border-radius: 50%;
-            object-fit: cover;
             margin-right: 30px;
+            overflow: hidden; 
         }
-
+        .profile-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; 
+            border-radius: 50%; 
+        }
         .profile-name {
             font-size: 24px;
             font-weight: bold;
+            margin: 0;
         }
-
+        .profile-role {
+            font-size: 18px;
+            font-weight: normal;
+            margin: 5px 0;
+        }
         .profile-department {
             font-size: 18px;
-            color: #7f8c8d;
+            color: #333;
+            margin: 0;
         }
-
         .profile-info {
             margin-bottom: 20px;
         }
-
         .info-label {
             font-weight: bold;
             color: #34495e;
+            margin-top: 10px;
         }
-
         .info-value {
             margin-bottom: 10px;
         }
-
-        img {
-            border: 1px solid black;
-            border-radius: 50%;
-        }
-
         @media (max-width: 600px) {
             .profile-header {
                 flex-direction: column;
@@ -97,29 +82,28 @@
     </style>
 </head>
 <body>
-    <!-- <div class="container"> -->
+    <div class="container">
         <h1>Faculty Profile</h1>
         <div class="profile-header">
-            
-            <img src="https://bootdey.com/img/Content/avatar/avatar7.png" alt="">
+            <div class="profile-image">
+                <img src="https://bootdey.com/img/Content/avatar/avatar7.png" alt="Profile Picture">
+            </div>
             <div>
-                <div class="profile-name"><?php echo $row['firstname']." ".$row['lastname']?></div>
-                <h3><?php echo $row['role']?></h3>
-                <div class="profile-department"><?php echo $row['departmentID']?> Department</div>
+                <h2 class="profile-name">Alice Johnson</h2>
+                <h3 class="profile-role">Department Head</h3>
+                <div class="profile-department">BSIT Department</div>
             </div>
         </div>
         <div class="profile-info">
-
             <div class="info-label">Email:</div>
-            <div class="info-value"><?php echo $row['lastname']?>@gmail.com</  div>
+            <div class="info-value">johnson@gmail.com</div>
             
             <div class="info-label">Phone Number:</div>
-            <div class="info-value"><?php echo $row['phone_no']?></div>
+            <div class="info-value">09765442345</div>
             
             <div class="info-label">Address:</div>
-            <div class="info-value"><?php echo $row['address'] ?></div>
-            
+            <div class="info-value">456 Elm St</div>
         </div>
-    <!-- </div> -->
+    </div>
 </body>
 </html>
