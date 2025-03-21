@@ -1,34 +1,7 @@
 <?php
 include_once "../back/sections.php";
 
-$dep = isset($_GET['department']) ? htmlspecialchars($_GET['department']) : '';
-$role = isset($_GET['role']) ? htmlspecialchars($_GET['role']) : '';
-
-$limit = 10;
-$page = isset($_GET['page']) && is_numeric($_GET['page']) ? (int)$_GET['page'] : 1;
-$offset = ($page - 1) * $limit;
-
-try {
-    $countStmt = $pdo->prepare("SELECT COUNT(*) FROM sections WHERE program_code = :department");
-    $countStmt->bindParam(':department', $dep);
-    $countStmt->execute();
-    $totalRecords = $countStmt->fetchColumn();
-    $totalPages = ceil($totalRecords / $limit);
-
-    $stmt = $pdo->prepare("
-        SELECT * FROM sections
-        WHERE program_code = :department
-        ORDER BY section_id ASC
-        LIMIT :limit OFFSET :offset
-    ");
-    $stmt->bindParam(':department', $dep);
-    $stmt->bindParam(':limit', $limit, PDO::PARAM_INT);
-    $stmt->bindParam(':offset', $offset, PDO::PARAM_INT);
-    $stmt->execute();
-    $sections = $stmt->fetchAll(PDO::FETCH_ASSOC);
-} catch (PDOException $e) {
-    $sections = [];
-}
+error_log(print_r($sections, true));
 ?>
 
 <!DOCTYPE html>
@@ -262,6 +235,7 @@ try {
     </style>
 </head>
 <body>
+    <div class="container">
         <h2><?php echo htmlspecialchars($dep); ?> Sections List</h2>
 
         <div class="toolbar">
@@ -276,7 +250,7 @@ try {
                             $count = array_reduce($sections, function($carry, $section) use ($year) {
                                 return $carry + ($section['year_level'] == $year ? 1 : 0);
                             }, 0);
-                            echo "<span class='filter-item' data-filter='year' data-value='$year'>$year ($count)</span>";
+                            echo "<span class='filter-item' data-filter='year' data-value='$year'>$year</span>";
                         }
                         ?>
                     </div>
@@ -317,37 +291,20 @@ try {
                 <?php endif; ?>
             </tbody>
         </table>
+    </div>
 
-        <div class="pagination">
-            <?php if ($totalPages > 1) : ?>
-                <?php if ($page > 1) : ?>
-                    <a href="?role=<?php echo $role; ?>&department=<?php echo $dep; ?>&page=1">First</a>
-                    <a href="?role=<?php echo $role; ?>&department=<?php echo $dep; ?>&page=<?php echo ($page - 1); ?>">Previous</a>
-                <?php endif; ?>
-                <strong>Page <?php echo $page; ?> of <?php echo $totalPages; ?></strong>
-                <?php if ($page < $totalPages) : ?>
-                    <a href="?role=<?php echo $role; ?>&department=<?php echo $dep; ?>&page=<?php echo ($page + 1); ?>">Next</a>
-                    <a href="?role=<?php echo $role; ?>&department=<?php echo $dep; ?>&page=<?php echo $totalPages; ?>">Last</a>
-                <?php endif; ?>
-            <?php endif; ?>
-        </div>
-                    
     <script>
     document.addEventListener('DOMContentLoaded', function() {
         const searchInput = document.querySelector('.search-box');
         const tableRows = document.querySelectorAll('tbody tr');
         const filterItems = document.querySelectorAll('.filter-item');
-        let activeFilters = {
-            year: null
-        };
+        let activeFilters = { year: null };
 
-        // Search functionality
         searchInput.addEventListener('input', function(e) {
             const searchTerm = e.target.value.toLowerCase();
             filterTable(searchTerm, activeFilters);
         });
 
-        // Filter functionality
         filterItems.forEach(item => {
             item.addEventListener('click', function() {
                 const filterType = this.getAttribute('data-filter');
@@ -370,18 +327,33 @@ try {
 
         function filterTable(searchTerm, filters) {
             tableRows.forEach(row => {
+                const programCode = row.cells[0].textContent.toLowerCase();
                 const sectionName = row.cells[1].textContent.toLowerCase();
                 const yearLevel = row.cells[2].textContent;
+                const semester = row.cells[3].textContent.toLowerCase();
 
-                const matchesSearch = sectionName.includes(searchTerm);
-                const matchesYear = !filters.year || yearLevel === filters.year;
-
-                if (matchesSearch && matchesYear) {
-                    row.style.display = '';
-                } else {
-                    row.style.display = 'none';
+                let matchesYear = true;
+                if (filters.year) {
+                    matchesYear = yearLevel === filters.year;
                 }
+
+                let matchesSearch = true;
+                if (searchTerm) {
+                    matchesSearch = (
+                        programCode.includes(searchTerm) ||
+                        sectionName.includes(searchTerm) ||
+                        semester.includes(searchTerm)
+                    );
+                }
+
+                row.style.display = (matchesYear && matchesSearch) ? '' : 'none';
             });
+
+            const visibleRows = Array.from(tableRows).filter(row => row.style.display !== 'none');
+            const noResultsRow = document.querySelector('tbody tr td[colspan="5"]');
+            if (noResultsRow) {
+                noResultsRow.parentElement.style.display = visibleRows.length === 0 ? '' : 'none';
+            }
         }
     });
     </script>
