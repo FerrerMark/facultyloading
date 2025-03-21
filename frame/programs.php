@@ -20,7 +20,7 @@ include_once "../back/add_programs.php";
         body {
             background-color: #f4f6f9;
             color: #333;
-            padding: 20px;
+            padding: 30px;
         }
 
         .container {
