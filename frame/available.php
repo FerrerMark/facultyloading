@@ -48,7 +48,7 @@ unset($_SESSION['message']);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Instructor Availability</title>
     <style>
-        body { font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px; position: relative;}
+        body { font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 30px; position: relative; margin: unset;}
         .container { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin-bottom: 20px; }
         .courses-list { display: flex; flex-wrap: wrap; gap: 8px; }
         .courses-list label { padding: 6px 12px; background: #f0f0f0; border-radius: 5px; cursor: pointer; }
@@ -69,7 +69,7 @@ unset($_SESSION['message']);
         .notification { background: #f8d7da; color: #721c24; padding: 10px; border: 1px solid #f5c6cb; border-radius: 5px; margin-bottom: 20px;   position: absolute; top: 0; right: 0;}
         td{ color: #555;}
         fieldset{ color: #555;}
-        h1{ color: #2c3e50;}
+        h1{ color: #2c3e50; margin-top: unset;}
     </style>
 </head>
 <body>
