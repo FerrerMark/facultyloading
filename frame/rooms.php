@@ -416,7 +416,7 @@ include_once "../back/rooms.php";
                     <th>Capacity</th>
                     <th>Action</th>
                 </tr>
-            </thead>
+            </thead> 
             <tbody>
                 <?php if (count($rooms) > 0): ?>
                     <?php foreach ($rooms as $room): ?>
