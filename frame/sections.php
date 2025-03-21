@@ -21,7 +21,7 @@ error_log(print_r($sections, true));
         body {
             background-color: #f4f6f9;
             color: #333;
-            padding: 20px;
+            padding: 30px;
         }
 
         .container {
@@ -235,7 +235,6 @@ error_log(print_r($sections, true));
     </style>
 </head>
 <body>
-    <div class="container">
         <h2><?php echo htmlspecialchars($dep); ?> Sections List</h2>
 
         <div class="toolbar">
@@ -291,7 +290,6 @@ error_log(print_r($sections, true));
                 <?php endif; ?>
             </tbody>
         </table>
-    </div>
 
     <script>
     document.addEventListener('DOMContentLoaded', function() {
