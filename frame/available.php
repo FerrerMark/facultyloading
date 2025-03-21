@@ -73,7 +73,6 @@ unset($_SESSION['message']);
     </style>
 </head>
 <body>
-    <div class="container">
         <h1>Set Your Availability</h1>
         <?php if ($message): ?>
             <div class="notification">
@@ -101,7 +100,6 @@ unset($_SESSION['message']);
             </fieldset>
             <button type="submit">Save Availability</button>
         </form>
-    </div>
 
     <h4>My Current Course/s</h4>
     <?php if (!empty($assigned_courses)): ?>
