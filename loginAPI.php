@@ -26,7 +26,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $_SESSION['id'] = $id;
             $_SESSION['role'] = $role;
     
-            header("Location: /facultyloading/index.php");
+            header("Location: ./index.php");
             // echo json_encode(['success' => true]);
 
         } else {
