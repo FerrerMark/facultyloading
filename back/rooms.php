@@ -26,11 +26,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' || $role === 'Department Head') {
                 $stmt->bindParam(':capacity', $capacity, PDO::PARAM_INT);
                 $stmt->execute();
         
-                header("Location: ../frame/rooms.php?department=$dep");
+                header("Location: ../frame/rooms.php?department=$dep&success");
                 exit;
             } catch (PDOException $e) {
                 echo "Error: " . $e->getMessage();
             }
+
         } else if ($action === "delete") {
             $building = $_GET['building'];
             $room_no = $_GET['room'];
@@ -41,7 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' || $role === 'Department Head') {
             $stmt->bindParam(':room_no', $room_no, PDO::PARAM_STR);
             $stmt->execute();
 
-            header("location: ../frame/rooms.php?role=Department Head&department=$dep");    
+            header("location: ../frame/rooms.php?role=Department Head&department=$dep&delete");    
             exit;
         } else if ($action === "edit") {
             if (isset($_GET['building'], $_GET['room']) && isset($_POST['building'], $_POST['room_no'], $_POST['room_type'], $_POST['capacity'])) {
@@ -69,7 +70,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' || $role === 'Department Head') {
                     $stmt->execute();
         
                     if ($stmt->rowCount() > 0) {
-                        header("location: ../frame/rooms.php?department=$dep");
+                        header("location: ../frame/rooms.php?department=$dep&editted");
                     } else {
                         echo "No changes made or record not found.";
                     }

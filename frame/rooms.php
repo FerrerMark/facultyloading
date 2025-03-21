@@ -1,5 +1,6 @@
 <?php
 include_once "../back/rooms.php";
+include_once "../notif/notif.php";
 ?>
 
 <!DOCTYPE html>
@@ -455,6 +456,20 @@ include_once "../back/rooms.php";
                 <button disabled>Next</button>
             </div>
         </div>
+
+        <?php
+
+            if(isset($_GET['success'])){
+                showNotification("Added successfully", "Green");
+            }else if(isset($_GET['delete'])){
+                showNotification("Deleted successfully", "Red");
+            }elseif (isset($_GET['editted'])) {
+                showNotification("Editted successfully", "Yellow");
+            }
+        
+        
+        
+        ?>
 
     <script src="../scripts.js"></script>
     <script>
