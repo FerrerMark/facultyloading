@@ -64,8 +64,8 @@ foreach ($schedules as $schedule) {
         body {
             font-family: Arial, sans-serif;
             background-color: #f4f4f4;
-            margin: 17px;
-            padding: 0px;
+            margin: unset;
+            padding: 30PX;
         }
         .container {
             width: 100%;
@@ -75,10 +75,10 @@ foreach ($schedules as $schedule) {
             border-radius: 8px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
-        h2 {
-            text-align: center;
+        h1 {
+            text-align: left;
             color: #333;
-            padding: 19px 0;
+            margin-top: unset;
         }
         .profile-card {
             background: #ffffff;
@@ -124,8 +124,7 @@ foreach ($schedules as $schedule) {
 </head>
 <body>
 
-<div class="container">
-    <h2>Faculty Profiles</h2>
+    <h1>Faculty Profiles</h1>
     <?php if (count($row) > 0): ?>
         <div class="profile-card">
             <h3><?php echo htmlspecialchars($row['firstname'] . " " . $row['middlename'] . " " . $row['lastname']); ?></h3>
@@ -185,7 +184,6 @@ foreach ($schedules as $schedule) {
             <?php endif; ?>
         </tbody>
     </table>
-</div>
 
 </body>
 </html>

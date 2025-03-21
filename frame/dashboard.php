@@ -23,7 +23,7 @@
                 <div class="card">
                     <h3>Sections</h3>
                     <p class="number"><?php echo $section_count?></p>
-                    <p class="subtext">Currently teaching</p>
+                    <p class="subtext">Current Sections</p>
                 </div>
                 <div class="card">
                     <h3>Your Total Teaching Hrs</h3>
