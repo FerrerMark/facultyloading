@@ -1,0 +1,41 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auto-Sync Faculty Data</title>
+</head>
+<body>
+
+    <p id="syncStatus">Waiting for sync...</p>
+
+    <script>
+        async function syncFacultyData() {
+            document.getElementById("syncStatus").innerText = "⏳ Syncing data...";
+
+            try {
+                let response = await fetch("../HR/HRtoFaculty.php");
+                let data = await response.json();
+
+                let timestamp = new Date().toLocaleTimeString();
+                if (data.status === "success") {
+                    document.getElementById("syncStatus").innerText = `✅ ${data.message} (Last synced: ${timestamp})`;
+                } else {
+                    document.getElementById("syncStatus").innerText = `❌ ${data.message} (Last attempt: ${timestamp})`;
+                }
+            } catch (error) {
+                let timestamp = new Date().toLocaleTimeString();
+                document.getElementById("syncStatus").innerText = `❌ Sync failed! (Last attempt: ${timestamp})`;
+            }
+        }
+
+        // Run the sync function every 5 minutes (300,000 milliseconds)
+        setInterval(syncFacultyData, 300000);
+
+        // Run once immediately when the page loads
+        syncFacultyData();
+    </script>
+
+</body>
+</html>
