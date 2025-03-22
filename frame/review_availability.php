@@ -96,18 +96,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Review Faculty Availability</title>
-    <style>
-        body { font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { padding: 10px; border: 1px solid #ddd; text-align: left; }
-        th { background-color: #0a2d53; color: white; }
-        td { font-size: 14px; color: #555; }
-        tr:nth-child(even) { background-color: #f2f2f2; }
-        button { padding: 5px 10px; margin: 0 1px 5px; cursor: pointer; width: 100%; border-radius: 5px;}
-        .accept { background-color: #28a745; color: white; border: none; }
-        .reject { background-color: #dc3545; color: white; border: none; }
-        h1{ color: #2c3e50;}
-    </style>
+    <link rel="stylesheet" href="../css/review_availability.css">
 </head>
 <body>
     <h1>Review Faculty Availability Submissions</h1>
