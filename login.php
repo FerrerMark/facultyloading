@@ -14,7 +14,7 @@
     <div class="login-container">
         <div class="form-container">
             <div class="logo">
-                <img src="./assets/logo300.pngf" alt="University Logo">
+                <img src="./assets/logo300.png" alt="University Logo">
             </div>
             <h1>Faculty Login</h1>
             <form action="" method="POST">
