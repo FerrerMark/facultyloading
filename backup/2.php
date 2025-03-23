@@ -19,8 +19,8 @@ $semester_input = '1';
 $semester_map = ['1' => 'First', '2' => 'Second', '3' => 'Summer'];
 $semester = $semester_map[$semester_input] ?? 'First';
 const SECTION_SIZE = 50;
-const START_HOUR = 6;    // 6:00 AM
-const END_HOUR = 21;     // 9:00 PM
+const START_HOUR = 6;  
+const END_HOUR = 21;   
 const MAX_TIME_SLOTS = END_HOUR - START_HOUR;
 const SUBJECTS_PER_DAY = 3;
 
@@ -113,7 +113,7 @@ $room_availability = array_fill_keys(array_column($rooms, 'room_id'),
     array_fill_keys($all_days, array_fill(0, MAX_TIME_SLOTS, true))
 );
 
-$global_scheduled_courses = []; // Initialize as an empty array
+$global_scheduled_courses = [];
 
 foreach ($sections as $section) {
     $stmt = $facultyloading_db->prepare(
@@ -129,7 +129,7 @@ foreach ($sections as $section) {
 
     echo "Scheduling for {$section['section_name']} (Day Group: {$section['day_group']}):\n";
     $days = $day_groups[$section['day_group']];
-    $local_scheduled_courses = []; // Reset for each section
+    $local_scheduled_courses = $global_scheduled_courses; // Copy global state
 
     $total_courses = count($courses);
     $courses_per_day = min(SUBJECTS_PER_DAY, ceil($total_courses / count($days)));
@@ -196,7 +196,7 @@ foreach ($sections as $section) {
 
                 $facultyloading_db->commit();
                 $local_scheduled_courses[$course['subject_code']] = true;
-                $global_scheduled_courses[$section['section_name']][$course['subject_code']] = true; // Fixed key
+                $global_scheduled_courses[$course['section_name']][$course['subject_code']] = true;
                 echo "Scheduled {$course['subject_code']} on {$day} {$start_time}-{$end_time} in {$room['room_no']} ({$hours_needed}h)\n";
                 $start_slot += $hours_needed;
             } catch (PDOException $e) {
