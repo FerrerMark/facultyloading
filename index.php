@@ -18,7 +18,7 @@
     <header>
         <div style="display: flex; align-items: center;">
             <span class="logo">
-                <a href="https://faculty.schoolmanagementsystem2.com/"><img src="./assets/logo300.png" alt="Logo" style="width:2rem;"/></a>
+                <a href="http://localhost/facultyloading/index.php"><img src="./assets/logo300.png" alt="Logo" style="width:2rem;"/></a>
             </span>
             <span class="header-title">faculty dashboard</span>
         </div>
@@ -82,15 +82,15 @@
         <div style="width:100%; ">
 
         <?php if($row['role'] == "Instructor"){ ?>
-            <iframe id="frame" src="../frame/dashboard.php" width="100%" height="100%" title="nav">
+            <iframe id="frame" src="./frame/dashboard.php" width="100%" height="100%" title="nav">
             </iframe>
         <?php } ?>
         <?php if($row['role'] == "Department Head"){ ?>
-            <iframe id="frame" src="../frame/dashboard.php" width="100%" height="100%" title="nav">
+            <iframe id="frame" src="./frame/dashboard.php" width="100%" height="100%" title="nav">
             </iframe>
         <?php } ?>  
         <?php if($row['role'] == "Dean"){ ?>
-            <iframe id="frame" src="../frame/dashboard.php" width="100%" height="100%" title="nav">
+            <iframe id="frame" src="./frame/dashboard.php" width="100%" height="100%" title="nav">
             </iframe>
         <?php } ?> 
 
