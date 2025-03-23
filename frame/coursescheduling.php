@@ -7,7 +7,7 @@ try {
         PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
         PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
     ]);
-    $facultyloading_db = new PDO("mysql:host=localhost;dbname=facu_faculty", "facu_faculty", "root", [
+    $facultyloading_db = new PDO("mysql:host=157.173.111.118;dbname=facu_faculty", "facu_faculty", "root", [
         PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
         PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
     ]);
