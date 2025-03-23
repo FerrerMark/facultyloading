@@ -3,11 +3,11 @@ error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
 try {
-    $registrar_db = new PDO("mysql:host=localhost;dbname=registrar", "root", "", [
+    $registrar_db = new PDO("mysql:host=157.173.111.118;dbname=facu_faculty", "facu_faculty", "root", [
         PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
         PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
     ]);
-    $facultyloading_db = new PDO("mysql:host=localhost;dbname=facultyloading", "root", "", [
+    $facultyloading_db = new PDO("mysql:host=157.173.111.118;dbname=facu_registrar", "facu_registrar", "root", [
         PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
         PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
     ]);
