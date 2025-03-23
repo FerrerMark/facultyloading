@@ -18,7 +18,7 @@
     <header>
         <div style="display: flex; align-items: center;">
             <span class="logo">
-                <a href="http://localhost/facultyloading/index.php"><img src="./assets/logo300.png" alt="Logo" style="width:2rem;"/></a>
+                <a href="https://faculty.schoolmanagementsystem2.com/"><img src="./assets/logo300.png" alt="Logo" style="width:2rem;"/></a>
             </span>
             <span class="header-title">faculty dashboard</span>
         </div>
