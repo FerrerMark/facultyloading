@@ -18,7 +18,7 @@
     <header>
         <div style="display: flex; align-items: center;">
             <span class="logo">
-                <a href="http://localhost/facultyloading/index.php"><img src="./assets/logo300.png" alt="Logo" style="width:2rem;"/></a>
+                <a href="https://faculty.schoolmanagementsystem2.com/"><img src="./assets/logo300.png" alt="Logo" style="width:2rem;"/></a>
             </span>
             <span class="header-title">faculty dashboard</span>
         </div>
@@ -75,22 +75,22 @@
 
                 <button id="reportProblemBtn"><a href="#" class="nav-item"><i class="fa-solid fa-flag"></i>&nbsp;report a problem</a></button>
 
-                <button><a href="/facultyloading/back/logout.php" class="nav-item logout-button"><i class="fa-solid fa-arrow-left-long"></i>&nbsp;Logout</a></button>
+                <button><a href="./back/logout.php" class="nav-item logout-button"><i class="fa-solid fa-arrow-left-long"></i>&nbsp;Logout</a></button>
                 
             </div>
         </aside>
         <div style="width:100%; ">
 
         <?php if($row['role'] == "Instructor"){ ?>
-            <iframe id="frame" src="../facultyloading/frame/dashboard.php" width="100%" height="100%" title="nav">
+            <iframe id="frame" src="../frame/dashboard.php" width="100%" height="100%" title="nav">
             </iframe>
         <?php } ?>
         <?php if($row['role'] == "Department Head"){ ?>
-            <iframe id="frame" src="../facultyloading/frame/dashboard.php" width="100%" height="100%" title="nav">
+            <iframe id="frame" src="../frame/dashboard.php" width="100%" height="100%" title="nav">
             </iframe>
         <?php } ?>  
         <?php if($row['role'] == "Dean"){ ?>
-            <iframe id="frame" src="../facultyloading/frame/dashboard.php" width="100%" height="100%" title="nav">
+            <iframe id="frame" src="../frame/dashboard.php" width="100%" height="100%" title="nav">
             </iframe>
         <?php } ?> 
 
