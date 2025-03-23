@@ -15,7 +15,6 @@ try {
     die("Database connection failed: " . $e->getMessage());
 }
 
-// Configuration
 $semester_input = '1';
 $semester_map = ['1' => 'First', '2' => 'Second', '3' => 'Summer'];
 $semester = $semester_map[$semester_input] ?? 'First';
@@ -25,29 +24,25 @@ const END_HOUR = 21;     // 9:00 PM
 const MAX_TIME_SLOTS = END_HOUR - START_HOUR;
 const SUBJECTS_PER_DAY = 3;
 
-// Day groups
 $day_groups = [
     'MWF' => ['Monday', 'Wednesday', 'Friday'],
     'TTHS' => ['Tuesday', 'Thursday', 'Saturday']
 ];
 
-// Get enrollment data
 try {
-    $stmt = $registrar_db->prepare("SELECT Department, year_level, enrolled_count FROM enrolled_count WHERE semestrial = ?");
+    $stmt = $registrar_db->prepare("SELECT DISTINCT Department, year_level, enrolled_count FROM enrolled_count WHERE semestrial = ?");
     $stmt->execute([$semester_input]);
     $enrollments = $stmt->fetchAll();
 } catch (PDOException $e) {
     die("Failed to fetch enrollment data: " . $e->getMessage());
 }
 
-// Get valid programs
 try {
     $programs = $facultyloading_db->query("SELECT program_code FROM programs")->fetchAll(PDO::FETCH_COLUMN);
 } catch (PDOException $e) {
     die("Failed to fetch programs: " . $e->getMessage());
 }
 
-// Prepare statements
 $insert_section_stmt = $facultyloading_db->prepare(
     "INSERT INTO sections (program_code, year_level, section_name, semester) VALUES (?, ?, ?, ?)"
 );
@@ -60,9 +55,9 @@ $room_stmt = $facultyloading_db->prepare(
     VALUES (?, ?, ?, ?, ?, ?)"
 );
 
-// Create sections
 $sections = [];
 $section_counter = 1;
+$created_sections = []; // Track created section names to avoid duplicates
 foreach ($enrollments as $enrollment) {
     $program_code = $enrollment['Department'];
     $year_level = $enrollment['year_level'];
@@ -79,17 +74,24 @@ foreach ($enrollments as $enrollment) {
     for ($i = 1; $i <= $number_of_sections; $i++) {
         $section_number = str_pad($i, 2, '0', STR_PAD_LEFT);
         $section_name = "{$program_code}-{$year_level}{$semester_input}{$section_number}";
+        if (in_array($section_name, $created_sections)) {
+            echo "Section {$section_name} already created, skipping...\n";
+            continue;
+        }
+
         $day_group = ($section_counter % 2 == 0) ? 'TTHS' : 'MWF';
         
         try {
             $insert_section_stmt->execute([$program_code, $year_level, $section_name, $semester]);
+            $section_id = $facultyloading_db->lastInsertId();
             $sections[] = [
-                'section_id' => $facultyloading_db->lastInsertId(),
+                'section_id' => $section_id,
                 'section_name' => $section_name,
                 'program_code' => $program_code,
                 'year_level' => $year_level,
                 'day_group' => $day_group
             ];
+            $created_sections[] = $section_name;
             echo "Created section: {$section_name} (Day Group: {$day_group})\n";
         } catch (PDOException $e) {
             echo "Failed to create section {$section_name}: " . $e->getMessage() . "\n";
@@ -98,14 +100,12 @@ foreach ($enrollments as $enrollment) {
     }
 }
 
-// Initialize scheduling resources
 $all_days = array_merge(...array_values($day_groups));
 $rooms = $facultyloading_db->query("SELECT room_id, room_no FROM rooms WHERE room_type = 'Lecture'")->fetchAll();
 if (empty($rooms)) {
     die("No lecture rooms available\n");
 }
 
-// Availability tracking
 $section_availability = array_fill_keys(array_column($sections, 'section_id'), 
     array_fill_keys($all_days, array_fill(0, MAX_TIME_SLOTS, true))
 );
@@ -113,7 +113,8 @@ $room_availability = array_fill_keys(array_column($rooms, 'room_id'),
     array_fill_keys($all_days, array_fill(0, MAX_TIME_SLOTS, true))
 );
 
-// Schedule courses
+$global_scheduled_courses = [];
+
 foreach ($sections as $section) {
     $stmt = $facultyloading_db->prepare(
         "SELECT subject_code, lecture_hours FROM courses WHERE program_code = ? AND year_level = ? AND semester = ?"
@@ -128,36 +129,45 @@ foreach ($sections as $section) {
 
     echo "Scheduling for {$section['section_name']} (Day Group: {$section['day_group']}):\n";
     $days = $day_groups[$section['day_group']];
-    $scheduled_courses = [];
+    $local_scheduled_courses = $global_scheduled_courses; // Copy global state
 
-    // Distribute courses across days (3 per day)
-    $course_chunks = array_chunk($courses, SUBJECTS_PER_DAY);
-    
+    $total_courses = count($courses);
+    $courses_per_day = min(SUBJECTS_PER_DAY, ceil($total_courses / count($days)));
+    $course_chunks = array_chunk($courses, $courses_per_day);
+
     foreach ($days as $day_index => $day) {
         if (!isset($course_chunks[$day_index])) {
-            break; // No more courses to schedule
+            break;
         }
 
         $day_courses = $course_chunks[$day_index];
-        $start_slot = 0; // Start at 6:00 AM each day
+        $start_slot = 0;
 
         foreach ($day_courses as $course) {
-            if (isset($scheduled_courses[$course['subject_code']])) {
+            if (isset($local_scheduled_courses[$course['subject_code']])) {
+                echo "Course {$course['subject_code']} already scheduled for this section, skipping...\n";
                 continue;
             }
 
-            // Reduce lecture hours by 1 (minimum 1 hour)
             $hours_needed = max(1, $course['lecture_hours'] - 1);
 
             if ($start_slot + $hours_needed > MAX_TIME_SLOTS) {
-                echo "Not enough time slots on {$day} for {$course['subject_code']} in {$section['section_name']}\n";
+                echo "Not enough time slots remaining on {$day} for {$course['subject_code']}\n";
                 break;
             }
 
             $room = find_available_room($room_availability, [$day], $start_slot, $hours_needed);
             if (!$room || !is_slot_free($section_availability[$section['section_id']][$day], $start_slot, $hours_needed)) {
-                echo "No available room or slot for {$course['subject_code']} on {$day} in {$section['section_name']}\n";
-                break;
+                $start_slot = find_next_available_slot($section_availability[$section['section_id']][$day], 
+                    $room_availability, $day, $hours_needed);
+                if ($start_slot === false) {
+                    echo "No available slot or room for {$course['subject_code']} on {$day}\n";
+                    continue;
+                }
+                $room = find_available_room($room_availability, [$day], $start_slot, $hours_needed);
+                if (!$room) {
+                    continue;
+                }
             }
 
             $start_time = sprintf("%02d:00:00", START_HOUR + $start_slot);
@@ -177,7 +187,6 @@ foreach ($sections as $section) {
                     $start_time, $end_time, $room['room_id']
                 ]);
 
-                // Update availability
                 update_availability(
                     $section_availability[$section['section_id']][$day],
                     $room_availability[$room['room_id']][$day],
@@ -186,9 +195,10 @@ foreach ($sections as $section) {
                 );
 
                 $facultyloading_db->commit();
-                $scheduled_courses[$course['subject_code']] = true;
-                echo "Scheduled {$course['subject_code']} on {$day} {$start_time}-{$end_time} in {$room['room_no']} ({hours_needed} hours)\n";
-                $start_slot += $hours_needed; // Move to next available slot
+                $local_scheduled_courses[$course['subject_code']] = true;
+                $global_scheduled_courses[$course['section_name']][$course['subject_code']] = true;
+                echo "Scheduled {$course['subject_code']} on {$day} {$start_time}-{$end_time} in {$room['room_no']} ({$hours_needed}h)\n";
+                $start_slot += $hours_needed;
             } catch (PDOException $e) {
                 $facultyloading_db->rollBack();
                 echo "Error scheduling {$course['subject_code']}: " . $e->getMessage() . "\n";
@@ -196,14 +206,12 @@ foreach ($sections as $section) {
         }
     }
 
-    // Report unscheduled courses
-    $unscheduled = array_filter($courses, fn($c) => !isset($scheduled_courses[$c['subject_code']]));
+    $unscheduled = array_filter($courses, fn($c) => !isset($local_scheduled_courses[$c['subject_code']]));
     if (!empty($unscheduled)) {
         echo "Warning: Could not schedule: " . implode(', ', array_column($unscheduled, 'subject_code')) . "\n";
     }
 }
 
-// Helper functions
 function is_slot_free($availability, $start, $duration) {
     for ($i = $start; $i < $start + $duration; $i++) {
         if (!isset($availability[$i]) || !$availability[$i]) {
@@ -211,6 +219,17 @@ function is_slot_free($availability, $start, $duration) {
         }
     }
     return true;
+}
+
+function find_next_available_slot($section_day, $room_availability, $day, $duration) {
+    global $rooms;
+    for ($slot = 0; $slot <= MAX_TIME_SLOTS - $duration; $slot++) {
+        if (is_slot_free($section_day, $slot, $duration) && 
+            find_available_room($room_availability, [$day], $slot, $duration)) {
+            return $slot;
+        }
+    }
+    return false;
 }
 
 function find_available_room($room_availability, $days, $start, $duration) {
@@ -238,4 +257,15 @@ function update_availability(&$section_day, &$room_day, $start, $duration) {
 }
 
 echo "Scheduling completed.\n";
+
+echo "\nVerifying schedules at 12:00:00:\n";
+$result = $facultyloading_db->query("SELECT * FROM section_schedules WHERE start_time = '12:00:00'");
+$schedules = $result->fetchAll();
+if (empty($schedules)) {
+    echo "No schedules found starting at 12:00:00\n";
+} else {
+    foreach ($schedules as $schedule) {
+        echo "Found: {$schedule['subject_code']} in {$schedule['section_name']} on {$schedule['day_of_week']}\n";
+    }
+}
 ?>

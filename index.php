@@ -64,7 +64,9 @@
 
                     <a href="#" onclick="loadFrame('review_availability','<?php echo $role;?>','<?php echo $departmentId;?>')" class="nav-item"><i class="fa-solid fa-calendar-days"></i>&nbsp;Faculty Course/s Request</a>
 
-                    <a href="#" onclick="loadFrame('available','<?php echo $role;?>','<?php echo $departmentId;?>')" class="nav-item"><i class="fa-solid fa-calendar-days"></i>&nbsp;My Courses</a>
+                    <a href="#" onclick="loadFrame('available','<?php echo $role;?>','<?php echo $departmentId;?>')" class="nav-item"><i class="material-symbols--list-rounded"></i>&nbsp;My Courses</a>
+
+                    <a href="#" onclick="loadFrame('faculty_request_form','<?php echo $role;?>','<?php echo $departmentId;?>')" class="nav-item"><span class="fluent--send-24-filled"></span>&nbsp;Request Faculty</a>
                 <?php } ?>
             </nav>
 
