@@ -69,7 +69,7 @@ include_once "../notif/notif.php";
         </div>
 
         <button class="add-new" onclick="openAddRoomModal()">Add New</button>
-        <button class="add-new" onclick="autoroom()">Auto Room</button>
+<!--         <button class="add-new" onclick="autoroom()">Auto Room</button> -->
 
 
         <div class="toolbar">
